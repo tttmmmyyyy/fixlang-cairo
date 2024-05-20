@@ -5,7 +5,7 @@ import Cairo.Backend.X11;
 
 main : IO ();
 main = (
-    let window = *X11::create_winow(640, 480);
+    let window = *X11::create_window(640, 480);
     let surface = X11::create_surface(window);
     let cairo = Cairo::create(surface);
 
@@ -17,7 +17,7 @@ main = (
 
     eval *window.flush;
     
-    eval *read_line(stdin).try(|msg| println(msg));
+    eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
     eval *window.close_window;
 

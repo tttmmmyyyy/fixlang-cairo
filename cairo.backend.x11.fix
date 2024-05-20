@@ -9,9 +9,11 @@ type Window = box struct { _display : _DisplayHandle, _window_id : _WindowId, wi
 
 create_window : I64 -> I64 -> IO Window;
 create_window = |width, height| IO::from_func $ |_| (
+    let width = width.to_I32;
+    let height = height.to_I32;
     let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
     let window : _WindowId = CALL_C[U64 cairo_fixlang_create_x_window(Ptr, I32, I32), display, width, height];
-    Window { _display : display, _window_id : window, width : width.to_I32, height : height.to_I32 }
+    Window { _display : display, _window_id : window, width : width, height : height }
 );
 
 close_window : Window -> IO ();
