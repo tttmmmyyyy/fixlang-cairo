@@ -19,6 +19,8 @@ main = (
     
     eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
+    let _ = cairo;
+
     eval *window.close_window;
 
     pure()
