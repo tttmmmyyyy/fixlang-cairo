@@ -1,2 +1,6 @@
 .fixlang
 hello.png
+*.o
+*.out
+*.so
+*.a

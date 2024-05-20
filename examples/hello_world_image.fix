@@ -3,7 +3,7 @@ import Cairo;
 
 main : IO ();
 main = (
-    let surface = Surface::create_image(Format::argb, 240, 80);
+    let surface = Surface::create_image_surface(Format::argb, 240, 80);
     
     let cairo = Cairo::create(surface);
     eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);

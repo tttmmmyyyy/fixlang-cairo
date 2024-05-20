@@ -56,12 +56,13 @@ namespace Surface {
     _get_handle : Surface -> _SurfaceHandle;
     _get_handle = |s| s.@_dtor.@value;
 
-    create_image : Format -> I64 -> I64 -> Surface;
-    create_image = |format, width, height| (
+    _create_from_handle : _SurfaceHandle -> Surface;
+    _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_surface_destroy(Ptr), handle]) };
+
+    create_image_surface : Format -> I64 -> I64 -> Surface;
+    create_image_surface = |format, width, height| (
         let handle = CALL_C[Ptr cairo_image_surface_create(I32, I32, I32), format, width.to_I32, height.to_I32];
-        Surface { _dtor : Destructor::make(handle, |handle| (
-            CALL_C[() cairo_surface_destroy(Ptr), handle]
-        )) }
+        Surface::_create_from_handle(handle)
     );
 
     write_to_png : Path -> Surface -> IO ();
