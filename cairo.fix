@@ -1,1 +1,119 @@
 module Cairo;
+
+// The cairo drawing context.
+// To prolong the lifetime of the surface, the surface is captured in the context.
+type Cairo = unbox struct { _dtor : Destructor (_CairoHandle, Surface) };
+
+type _CairoHandle = Ptr;
+
+_get_handle : Cairo -> _CairoHandle;
+_get_handle = |c| c.@_dtor.@value.@0;
+
+create : Surface -> Cairo;
+create = |s| (
+    let handle = CALL_C[Ptr cairo_create(Ptr), s._get_handle];
+    Cairo { _dtor : Destructor::make((handle, s), |(handle, s)| (
+        eval CALL_C[() cairo_destroy(Ptr), handle];
+        let _ = s; // Prolong the lifetime of the surface so that it is longer than that of the context.
+        ()
+    )) }
+);
+
+select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
+select_font_face = |font, slant, weight, cairo| IO::from_func $ |_| (
+    font.borrow_c_str(|font| (
+        CALL_C[() cairo_select_font_face(Ptr, Ptr, I32, I32), cairo._get_handle, font, slant, weight]
+    ))
+);
+
+set_font_size : F64 -> Cairo -> IO ();
+set_font_size = |size, cairo| IO::from_func $ |_| (
+    CALL_C[() cairo_set_font_size(Ptr, F64), cairo._get_handle, size]
+);
+
+set_source_rgb : F64 -> F64 -> F64 -> Cairo -> IO ();
+set_source_rgb = |r, g, b, cairo| IO::from_func $ |_| (
+    CALL_C[() cairo_set_source_rgb(Ptr, F64, F64, F64), cairo._get_handle, r, g, b]
+);
+
+move_to : F64 -> F64 -> Cairo -> IO ();
+move_to = |x, y, cairo| IO::from_func $ |_| (
+    CALL_C[() cairo_move_to(Ptr, F64, F64), cairo._get_handle, x, y]
+);
+
+show_text : String -> Cairo -> IO ();
+show_text = |text, cairo| IO::from_func $ |_| (
+    text.borrow_c_str(|text| (
+        CALL_C[() cairo_show_text(Ptr, Ptr), cairo._get_handle, text]
+    ))
+);
+
+namespace Surface {
+    type Surface = unbox struct { _dtor : Destructor (_SurfaceHandle) };
+
+    type _SurfaceHandle = Ptr;
+
+    _get_handle : Surface -> _SurfaceHandle;
+    _get_handle = |s| s.@_dtor.@value;
+
+    create_image : Format -> I64 -> I64 -> Surface;
+    create_image = |format, width, height| (
+        let handle = CALL_C[Ptr cairo_image_surface_create(I32, I32, I32), format, width.to_I32, height.to_I32];
+        Surface { _dtor : Destructor::make(handle, |handle| (
+            CALL_C[() cairo_surface_destroy(Ptr), handle]
+        )) }
+    );
+
+    write_to_png : Path -> Surface -> IO ();
+    write_to_png = |path, surface| IO::from_func $ |_| (
+        path.to_string.borrow_c_str(|path| (
+            CALL_C[() cairo_surface_write_to_png(Ptr, Ptr), surface._get_handle, path]
+        ))
+    );
+}
+
+namespace Format {
+    type Format = I32;
+
+    argb : Format;
+    argb = 0_I32;
+
+    rgb24 : Format;
+    rgb24 = 1_I32;
+
+    a8 : Format;
+    a8 = 2_I32;
+
+    a1 : Format;
+    a1 = 3_I32;
+
+    rgb16_565 : Format;
+    rgb16_565 = 4_I32;
+
+    rgb30 : I32;
+    rgb30 = 5_I32;
+}
+
+
+namespace FontSlant {
+    type FontSlant = I32;
+
+    normal : FontSlant;
+    normal = 0_I32;
+
+    italic : FontSlant;
+    italic = 1_I32;
+
+    oblique : FontSlant;
+    oblique = 2_I32;
+}
+
+type FontWeight = I32;
+
+namespace FontWeight {
+    normal : FontWeight;
+    normal = 0_I32;
+
+    bold : FontWeight;
+    bold = 1_I32;
+}
