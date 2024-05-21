@@ -18,6 +18,32 @@ create = |surface| (
     ))
 );
 
+save : Cairo -> IO ();
+save = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+        CALL_C[() cairo_save(Ptr), cairo]
+));
+
+restore : Cairo -> IO ();
+restore = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+        CALL_C[() cairo_restore(Ptr), cairo]
+));
+
+get_target : Cairo -> Surface;
+get_target = |cairo| cairo._with_handle(|cairo| (
+    let surface = CALL_C[Ptr cairo_get_target(Ptr), cairo];
+    Surface::_create_from_handle(surface)
+));
+
+push_group : Cairo -> IO ();
+push_group = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+        CALL_C[() cairo_push_group(Ptr), cairo]
+));
+
+push_group_with_content : ContentType -> Cairo -> IO ();
+push_group_with_content = |content, cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+        CALL_C[() cairo_push_group_with_content(Ptr, I32), cairo, content]
+));
+
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
 select_font_face = |font, slant, weight, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
@@ -84,6 +110,19 @@ namespace Surface {
     );
 }
 
+namespace ContentType {
+    type ContentType = I32;
+
+    color : ContentType;
+    color = 0x1000_I32;
+
+    alpha : ContentType;
+    alpha = 0x2000_I32;
+
+    color_alpha : ContentType;
+    color_alpha = 0x3000_I32;
+}
+
 namespace Format {
     type Format = I32;
 
@@ -120,9 +159,9 @@ namespace FontSlant {
     oblique = 2_I32;
 }
 
-type FontWeight = I32;
-
 namespace FontWeight {
+    type FontWeight = I32;
+
     normal : FontWeight;
     normal = 0_I32;
 
