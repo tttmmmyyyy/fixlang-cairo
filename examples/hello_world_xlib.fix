@@ -17,9 +17,6 @@ main = (
 
     eval *window.flush;
 
-    let _ = cairo;
-    let _ = surface;
-    
     eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
     eval *window.close_window;
