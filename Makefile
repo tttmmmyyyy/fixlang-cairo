@@ -5,7 +5,7 @@ clean:
 run_example_image: 
 	fix run -f ./examples/hello_world_image.fix cairo.fix -d cairo	
 
-run_example_x11: build_xlib_lib
+run_example_xlib: build_xlib_lib
 	fix run -f ./examples/hello_world_xlib.fix cairo.fix cairo.backend.xlib.fix -L. -d cairo X11 cairo_backend_xlib
 
 # Compile `cairo.backend.xlib.c` into a shared library `libcairo_backend_xlib.so`.
