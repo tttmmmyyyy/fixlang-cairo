@@ -1,3 +1,4 @@
+// The Xlib backend for Cairo.
 module Cairo.Backend.Xlib;
 
 import Cairo::Surface::*;
