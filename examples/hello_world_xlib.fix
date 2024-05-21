@@ -1,12 +1,12 @@
 module Main;
 
 import Cairo;
-import Cairo.Backend.X11;
+import Cairo.Backend.Xlib;
 
 main : IO ();
 main = (
-    let window = *X11::create_window(640, 480);
-    let surface = X11::create_surface(window);
+    let window = *Xlib::create_window(640, 480);
+    let surface = Xlib::create_surface(window);
     let cairo = Cairo::create(surface);
 
     eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);

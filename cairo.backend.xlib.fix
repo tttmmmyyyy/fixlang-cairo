@@ -1,4 +1,4 @@
-module Cairo.Backend.X11;
+module Cairo.Backend.Xlib;
 
 import Cairo::Surface::*;
 
