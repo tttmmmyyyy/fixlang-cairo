@@ -2,20 +2,18 @@ module Cairo;
 
 // The cairo drawing context.
 // To prolong the lifetime of the surface, the surface is captured in the context.
-type Cairo = unbox struct { _dtor : Destructor (_CairoHandle, Surface) };
+type Cairo = unbox struct { _dtor : Destructor _CairoHandle };
 
 type _CairoHandle = Ptr;
 
 _get_handle : Cairo -> _CairoHandle;
-_get_handle = |c| c.@_dtor.@value.@0;
+_get_handle = |c| c.@_dtor.@value;
 
 create : Surface -> Cairo;
 create = |s| (
     let handle = CALL_C[Ptr cairo_create(Ptr), s._get_handle];
-    Cairo { _dtor : Destructor::make((handle, s), |(handle, s)| (
-        eval CALL_C[() cairo_destroy(Ptr), handle];
-        let _ = s; // Prolong the lifetime of the surface so that it is longer than that of the context.
-        ()
+    Cairo { _dtor : Destructor::make(handle, |handle| (
+        CALL_C[() cairo_destroy(Ptr), handle]
     )) }
 );
 

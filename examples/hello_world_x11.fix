@@ -16,10 +16,11 @@ main = (
     eval *cairo.show_text("Hello world!");
 
     eval *window.flush;
-    
-    eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
     let _ = cairo;
+    let _ = surface;
+    
+    eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
     eval *window.close_window;
 
