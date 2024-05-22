@@ -18,7 +18,11 @@ create = |surface| (
     ))
 );
 
-// TODO: add get_status function.
+status : Cairo -> IO Status;
+status = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let status = CALL_C[I32 cairo_status(Ptr), cairo];
+    status
+));
 
 save : Cairo -> IO ();
 save = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
@@ -65,6 +69,466 @@ get_group_target = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     Surface::_create_from_handle(surface)
 ));
 
+set_source_rgb : (F64, F64, F64) -> Cairo -> IO ();
+set_source_rgb = |(r, g, b), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_source_rgb(Ptr, F64, F64, F64), cairo, r, g, b]
+    ))
+);
+
+set_source_rgba : (F64, F64, F64,F64) -> Cairo -> IO ();
+set_source_rgba = |(r, g, b, a), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_source_rgba(Ptr, F64, F64, F64, F64), cairo, r, g, b, a]
+    ))
+);
+
+set_source : Pattern -> Cairo -> IO ();
+set_source = |pattern, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_set_source(Ptr, Ptr), cairo, pattern]
+        ))
+    ))
+);
+
+set_source_surface : Surface -> (F64, F64) -> Cairo -> IO ();
+set_source_surface = |surface, (x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        surface._with_handle(|surface| (
+            CALL_C[() cairo_set_source_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
+        ))
+    ))
+);
+
+get_source : Cairo -> IO Pattern;
+get_source = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let pattern = CALL_C[Ptr cairo_get_source(Ptr), cairo];
+    eval CALL_C[Ptr cairo_pattern_reference(Ptr), pattern];
+    Pattern::_create_from_handle(pattern)
+));
+
+set_antialias : Antialias -> Cairo -> IO ();
+set_antialias = |antialias, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_antialias(Ptr, I32), cairo, antialias]
+    ))
+);
+
+get_antialias : Cairo -> IO Antialias;
+get_antialias = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let antialias = CALL_C[I32 cairo_get_antialias(Ptr), cairo];
+    antialias
+));
+
+set_dash : Array F64 -> F64 -> Cairo -> IO ();
+set_dash = |dashes, offset, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| ( 
+        let num_dashes = dashes.get_size.to_I32;
+        dashes.borrow_ptr(|dashes| (
+            CALL_C[() cairo_set_dash(Ptr, Ptr, F64, I32), cairo, dashes, num_dashes, offset]
+        ))
+    ))
+);
+
+get_dash_count : Cairo -> IO I64;
+get_dash_count = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let count = CALL_C[I32 cairo_get_dash_count(Ptr), cairo];
+    count.to_I64
+));
+
+get_dash : Cairo -> IO (Array F64, F64);
+get_dash = |cairo| IO::from_func $ |_| (
+    let dash_count = cairo.get_dash_count;
+    let dashes : Array F64 = Array::fill(dash_count, 0.0);
+    let offset : Array F64 = Array::fill(1, 0.0);
+    eval cairo._with_handle(|cairo| CALL_C[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes._get_ptr, offset._get_ptr]);
+    (dashes, offset.@(0))
+);
+
+set_fill_rule : FillRule -> Cairo -> IO ();
+set_fill_rule = |fill_rule, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_fill_rule(Ptr, I32), cairo, fill_rule]
+    ))
+);
+
+get_fill_rule : Cairo -> IO FillRule;
+get_fill_rule = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let fill_rule = CALL_C[I32 cairo_get_fill_rule(Ptr), cairo];
+    fill_rule
+));
+
+set_line_cap : LineCap -> Cairo -> IO ();
+set_line_cap = |line_cap, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_line_cap(Ptr, I32), cairo, line_cap]
+    ))
+);
+
+get_line_cap : Cairo -> IO LineCap;
+get_line_cap = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let line_cap = CALL_C[I32 cairo_get_line_cap(Ptr), cairo];
+    line_cap
+));
+
+set_line_join : LineJoin -> Cairo -> IO ();
+set_line_join = |line_join, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_line_join(Ptr, I32), cairo, line_join]
+    ))
+);
+
+get_line_join : Cairo -> IO LineJoin;
+get_line_join = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let line_join = CALL_C[I32 cairo_get_line_join(Ptr), cairo];
+    line_join
+));
+
+set_line_width : F64 -> Cairo -> IO ();
+set_line_width = |width, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_line_width(Ptr, F64), cairo, width]
+    ))
+);
+
+get_line_width : Cairo -> IO F64;
+get_line_width = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let width = CALL_C[F64 cairo_get_line_width(Ptr), cairo];
+    width
+));
+
+set_miter_limit : F64 -> Cairo -> IO ();
+set_miter_limit = |limit, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_miter_limit(Ptr, F64), cairo, limit]
+    ))
+);
+
+get_miter_limit : Cairo -> IO F64;
+get_miter_limit = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let limit = CALL_C[F64 cairo_get_miter_limit(Ptr), cairo];
+    limit
+));
+
+set_operator : Operator -> Cairo -> IO ();
+set_operator = |op, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_operator(Ptr, I32), cairo, op]
+    ))
+);
+
+get_operator : Cairo -> IO Operator;
+get_operator = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let op = CALL_C[I32 cairo_get_operator(Ptr), cairo];
+    op
+));
+
+set_tolerance : F64 -> Cairo -> IO ();
+set_tolerance = |tolerance, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_tolerance(Ptr, F64), cairo, tolerance]
+    ))
+);
+
+get_tolerance : Cairo -> IO F64;
+get_tolerance = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let tolerance = CALL_C[F64 cairo_get_tolerance(Ptr), cairo];
+    tolerance
+));
+
+clip : Cairo -> IO ();
+clip = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_clip(Ptr), cairo]
+));
+
+clip_preserve : Cairo -> IO ();
+clip_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_clip_preserve(Ptr), cairo]
+));
+
+clip_extents : Cairo -> IO (F64, F64, F64, F64);
+clip_extents = |cairo| IO::from_func $ |_| (
+    let x1 : Array F64 = Array::fill(1, 0.0);
+    let y1 : Array F64 = Array::fill(1, 0.0);
+    let x2 : Array F64 = Array::fill(1, 0.0);
+    let y2 : Array F64 = Array::fill(1, 0.0);
+    eval CALL_C[() cairo_clip_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
+    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+);
+
+in_clip : (F64, F64) -> Cairo -> IO Bool;
+in_clip = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        let result = CALL_C[I32 cairo_in_clip(Ptr, F64, F64), cairo, x, y];
+        result != 1
+    ))
+);
+
+reset_clip : Cairo -> IO ();
+reset_clip = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_reset_clip(Ptr), cairo]
+));
+
+copy_clip_rectangle_list : Cairo -> IO RectangleList;
+copy_clip_rectangle_list = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let list = CALL_C[Ptr cairo_copy_clip_rectangle_list(Ptr), cairo];
+    RectangleList::_create_from_handle(list)
+));
+
+fill : Cairo -> IO ();
+fill = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_fill(Ptr), cairo]
+));
+
+fill_preserve : Cairo -> IO ();
+fill_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_fill_preserve(Ptr), cairo]
+));
+
+fill_extents : Cairo -> IO (F64, F64, F64, F64);
+fill_extents = |cairo| IO::from_func $ |_| (
+    let x1 : Array F64 = Array::fill(1, 0.0);
+    let y1 : Array F64 = Array::fill(1, 0.0);
+    let x2 : Array F64 = Array::fill(1, 0.0);
+    let y2 : Array F64 = Array::fill(1, 0.0);
+    eval CALL_C[() cairo_fill_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
+    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+);
+
+in_fill : (F64, F64) -> Cairo -> IO Bool;
+in_fill = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        let result = CALL_C[I32 cairo_in_fill(Ptr, F64, F64), cairo, x, y];
+        result != 1
+    ))
+);
+
+mask : Pattern -> Cairo -> IO ();
+mask = |pattern, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mask(Ptr, Ptr), cairo, pattern]
+        ))
+    ))
+);
+
+mask_surface : Surface -> (F64, F64) -> Cairo -> IO ();
+mask_surface = |surface, (x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        surface._with_handle(|surface| (
+            CALL_C[() cairo_mask_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
+        ))
+    ))
+);
+
+paint : Cairo -> IO ();
+paint = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_paint(Ptr), cairo]
+));
+
+paint_with_alpha : F64 -> Cairo -> IO ();
+paint_with_alpha = |alpha, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_paint_with_alpha(Ptr, F64), cairo, alpha]
+    ))
+);
+
+stroke : Cairo -> IO ();
+stroke = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_stroke(Ptr), cairo]
+));
+
+stroke_preserve : Cairo -> IO ();
+stroke_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_stroke_preserve(Ptr), cairo]
+));
+
+stroke_extents : Cairo -> IO (F64, F64, F64, F64);
+stroke_extents = |cairo| IO::from_func $ |_| (
+    let x1 : Array F64 = Array::fill(1, 0.0);
+    let y1 : Array F64 = Array::fill(1, 0.0);
+    let x2 : Array F64 = Array::fill(1, 0.0);
+    let y2 : Array F64 = Array::fill(1, 0.0);
+    eval CALL_C[() cairo_stroke_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
+    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+);
+
+in_stroke : (F64, F64) -> Cairo -> IO Bool;
+in_stroke = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        let result = CALL_C[I32 cairo_in_stroke(Ptr, F64, F64), cairo, x, y];
+        result != 1
+    ))
+);
+
+copy_page : Cairo -> IO ();
+copy_page = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_copy_page(Ptr), cairo]
+));
+
+show_page : Cairo -> IO ();
+show_page = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_show_page(Ptr), cairo]
+));
+
+set_hairline : Bool -> Cairo -> IO ();
+set_hairline = |hairline, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_set_antialias(Ptr, I32), cairo, if hairline { 1_I32 } else { 0_I32 }]
+    ))
+);
+
+get_hairline : Cairo -> IO Bool;
+get_hairline = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let hairline = CALL_C[I32 cairo_get_hairline(Ptr), cairo];
+    hairline == 1_I32
+));
+
+copy_path : Cairo -> IO Cairo::Path;
+copy_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let path = CALL_C[Ptr cairo_copy_path(Ptr), cairo];
+    Cairo::Path::_create_from_handle(path)
+));
+
+copy_path_flat : Cairo -> IO Cairo::Path;
+copy_path_flat = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let path = CALL_C[Ptr cairo_copy_path_flat(Ptr), cairo];
+    Cairo::Path::_create_from_handle(path)
+));
+
+append_path : Cairo::Path -> Cairo -> IO ();
+append_path = |path, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        path._with_handle(|path| (
+            CALL_C[() cairo_append_path(Ptr, Ptr), cairo, path]
+        ))
+    ))
+);
+
+has_current_point : Cairo -> IO Bool;
+has_current_point = |cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        let result = CALL_C[I32 cairo_has_current_point(Ptr), cairo];
+        result != 0
+    ))
+);
+
+get_current_point : Cairo -> IO (F64, F64);
+get_current_point = |cairo| IO::from_func $ |_| (
+    let x : Array F64 = Array::fill(1, 0.0);
+    let y : Array F64 = Array::fill(1, 0.0);
+    eval cairo._with_handle(|cairo| CALL_C[() cairo_get_current_point(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]);
+    (x.@(0), y.@(0))
+);
+
+new_path : Cairo -> IO ();
+new_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_new_path(Ptr), cairo]
+));
+
+new_sub_path : Cairo -> IO ();
+new_sub_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_new_sub_path(Ptr), cairo]
+));
+
+close_path : Cairo -> IO ();
+close_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_close_path(Ptr), cairo]
+));
+
+arc : (F64, F64) -> F64 -> F64 -> F64 -> Cairo -> IO ();
+arc = |(x, y), radius, angle1, angle2, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_arc(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
+    ))
+);
+
+arc_negative : (F64, F64) -> F64 -> F64 -> F64 -> Cairo -> IO ();
+arc_negative = |(x, y), radius, angle1, angle2, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_arc_negative(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
+    ))
+);
+
+curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Cairo -> IO ();
+curve_to = |x1, y1, x2, y2, x3, y3, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, x1, y1, x2, y2, x3, y3]
+    ))
+);
+
+line_to : (F64, F64) -> Cairo -> IO ();
+line_to = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_line_to(Ptr, F64, F64), cairo, x, y]
+    ))
+);
+
+move_to : (F64, F64) -> Cairo -> IO ();
+move_to = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_move_to(Ptr, F64, F64), cairo, x, y]
+    ))
+);
+
+rectangle : (F64, F64) -> (F64, F64) -> Cairo -> IO ();
+rectangle = |(x, y), (width, height), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_rectangle(Ptr, F64, F64, F64, F64), cairo, x, y, width, height]
+    ))
+);
+
+glyph_path : Array Glyph -> Cairo -> IO ();
+glyph_path = |glyphs, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        let num_glyphs = glyphs.get_size.to_I32;
+        glyphs.borrow_ptr(|glyphs| (
+            CALL_C[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
+        ))
+    ))
+);
+
+text_path : String -> Cairo -> IO ();
+text_path = |text, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        text.borrow_c_str(|text| (
+            CALL_C[() cairo_text_path(Ptr, Ptr), cairo, text]
+        ))
+    ))
+);
+
+rel_curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Cairo -> IO ();
+rel_curve_to = |(dx1, dy1), (dx2, dy2), (dx3, dy3), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_rel_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, dx1, dy1, dx2, dy2, dx3, dy3]
+    ))
+);
+
+rel_line_to : (F64, F64) -> Cairo -> IO ();
+rel_line_to = |(dx, dy), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_rel_line_to(Ptr, F64, F64), cairo, dx, dy]
+    ))
+);
+
+rel_move_to : (F64, F64) -> Cairo -> IO ();
+rel_move_to = |(dx, dy), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_rel_move_to(Ptr, F64, F64), cairo, dx, dy]
+    ))
+);
+
+path_extents : Cairo -> IO (F64, F64, F64, F64);
+path_extents = |cairo| IO::from_func $ |_| (
+    let x1 : Array F64 = Array::fill(1, 0.0);
+    let y1 : Array F64 = Array::fill(1, 0.0);
+    let x2 : Array F64 = Array::fill(1, 0.0);
+    let y2 : Array F64 = Array::fill(1, 0.0);
+    eval CALL_C[() cairo_path_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
+    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+);
+
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
 select_font_face = |font, slant, weight, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
@@ -79,20 +543,6 @@ set_font_size = |size, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
         CALL_C[() cairo_set_font_size(Ptr, F64), cairo, size]
     ))
-);
-
-set_source_rgb : F64 -> F64 -> F64 -> Cairo -> IO ();
-set_source_rgb = |r, g, b, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        CALL_C[() cairo_set_source_rgb(Ptr, F64, F64, F64), cairo, r, g, b]
-    ))
-);
-
-move_to : F64 -> F64 -> Cairo -> IO ();
-move_to = |x, y, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        CALL_C[() cairo_move_to(Ptr, F64, F64), cairo, x, y]
-    ))    
 );
 
 show_text : String -> Cairo -> IO ();
@@ -141,6 +591,412 @@ namespace Pattern {
 
     _create_from_handle : _PatternHandle -> Pattern;
     _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_pattern_destroy(Ptr), handle]) };
+
+    add_color_stop_rgb : F64 -> (F64, F64, F64) -> Pattern -> IO ();
+    add_color_stop_rgb = |offset, (r, g, b), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_pattern_add_color_stop_rgb(Ptr, F64, F64, F64, F64), pattern, offset, r, g, b]
+        ))
+    );
+
+    add_color_stop_rgba : F64 -> (F64, F64, F64, F64) -> Pattern -> IO ();
+    add_color_stop_rgba = |offset, (r, g, b, a), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_pattern_add_color_stop_rgba(Ptr, F64, F64, F64, F64, F64), pattern, offset, r, g, b, a]
+        ))
+    );
+
+    get_color_stop_count : Pattern -> IO I64;
+    get_color_stop_count = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+        let count = CALL_C[I32 cairo_pattern_get_color_stop_count(Ptr), pattern];
+        count.to_I64
+    ));
+
+    get_color_stop_rgba : I64 -> Pattern -> IOFail Status (F64, F64, F64, F64);
+    get_color_stop_rgba = |index, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let r : Array F64 = Array::fill(1, 0.0);
+        let g : Array F64 = Array::fill(1, 0.0);
+        let b : Array F64 = Array::fill(1, 0.0);
+        let a : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), pattern, index.to_I32, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        if status == Status::success {
+            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    create_rgb : (F64, F64, F64) -> Pattern;
+    create_rgb = |(r, g, b)| (
+        let handle = CALL_C[Ptr cairo_pattern_create_rgb(F64, F64, F64), r, g, b];
+        Pattern::_create_from_handle(handle)
+    );
+
+    create_rgba : (F64, F64, F64, F64) -> Pattern;
+    create_rgba = |(r, g, b, a)| (
+        let handle = CALL_C[Ptr cairo_pattern_create_rgba(F64, F64, F64, F64), r, g, b, a];
+        Pattern::_create_from_handle(handle)
+    );
+
+    get_rgba : Pattern -> IOFail Status (F64, F64, F64, F64);
+    get_rgba = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let r : Array F64 = Array::fill(1, 0.0);
+        let g : Array F64 = Array::fill(1, 0.0);
+        let b : Array F64 = Array::fill(1, 0.0);
+        let a : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        if status == Status::success {
+            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    create_for_surface : Surface -> IO Pattern;
+    create_form_surface = |surface| IO::from_func $ |_| (
+        surface._with_handle(|surface| (
+            let handle = CALL_C[Ptr cairo_pattern_create_for_surface(Ptr), surface];
+            Pattern::_create_from_handle(handle)
+        ))
+    );
+
+    get_surface : Pattern -> IOFail Status Surface;
+    get_surface = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let surface : Array Ptr = Array::fill(1, nullptr);
+        let status = CALL_C[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface._get_ptr];
+        if status == Status::success {
+            let surface = surface.@(0);
+            let surface = CALL_C[Ptr cairo_surface_reference(Ptr), surface];
+            Result::ok $ Surface::_create_from_handle(surface)
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    create_linear : (F64, F64) -> (F64, F64) -> Pattern;
+    create_linear = |(x0, y0), (x1, y1)| (
+        let handle = CALL_C[Ptr cairo_pattern_create_linear(F64, F64, F64, F64), x0, y0, x1, y1];
+        Pattern::_create_from_handle(handle)
+    );
+
+    get_linear_points : Pattern -> IOFail Status ((F64, F64), (F64, F64));
+    get_linear_points = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let x0 : Array F64 = Array::fill(1, 0.0);
+        let y0 : Array F64 = Array::fill(1, 0.0);
+        let x1 : Array F64 = Array::fill(1, 0.0);
+        let y1 : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
+        if status == Status::success {
+            Result::ok $ ((x0.@(0), y0.@(0)), (x1.@(0), y1.@(0)))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    create_radial : (F64, F64, F64) -> (F64, F64, F64) -> F64 -> Pattern;
+    create_radial = |(x0, y0, r0), (x1, y1, r1)| r1 (
+        let handle = CALL_C[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
+        Pattern::_create_from_handle(handle)
+    );
+
+    get_radial_circles : Pattern -> IOFail Status ((F64, F64, F64), (F64, F64, F64), F64);
+    get_radial_circles = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let x0 : Array F64 = Array::fill(1, 0.0);
+        let y0 : Array F64 = Array::fill(1, 0.0);
+        let r0 : Array F64 = Array::fill(1, 0.0);
+        let x1 : Array F64 = Array::fill(1, 0.0);
+        let y1 : Array F64 = Array::fill(1, 0.0);
+        let r1 : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, r0._get_ptr, x1._get_ptr, y1._get_ptr, r1._get_ptr];
+        if status == Status::success {
+            Result::ok $ ((x0.@(0), y0.@(0), r0.@(0)), (x1.@(0), y1.@(0), r1.@(0)))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    create_mesh : Pattern;
+    create_mesh = (
+        let handle = CALL_C[Ptr cairo_pattern_create_mesh()];
+        Pattern::_create_from_handle(handle)
+    );
+
+    mesh_begin_patch : Pattern -> IO ();
+    mesh_begin_patch = |pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_begin_patch(Ptr), pattern]
+        ))
+    );
+
+    mesh_end_patch : Pattern -> IO ();
+    mesh_end_patch = |pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_end_patch(Ptr), pattern]
+        ))
+    );
+
+    mesh_move_to : (F64, F64) -> Pattern -> IO ();
+    mesh_move_to = |(x, y), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_move_to(Ptr, F64, F64), pattern, x, y]
+        ))
+    );
+
+    mesh_line_to : (F64, F64) -> Pattern -> IO ();
+    mesh_line_to = |(x, y), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_line_to(Ptr, F64, F64), pattern, x, y]
+        ))
+    );
+
+    mesh_curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Pattern -> IO ();
+    mesh_curve_to = |(x1, y1), (x2, y2), (x3, y3), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_curve_to(Ptr, F64, F64, F64, F64, F64, F64, F64, F64), pattern, x1, y1, x2, y2, x3, y3]
+        ))
+    );
+
+    mesh_set_control_point : (F64, F64) -> Pattern -> IO ();
+    mesh_set_control_point = |(x, y), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_set_control_point(Ptr, F64, F64), pattern, x, y]
+        ))
+    );
+
+    mesh_set_corner_color_rgb : I64 -> (F64, F64, F64) -> Pattern -> IO ();
+    mesh_set_corner_color_rgb = |corner, (r, g, b), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_set_corner_color_rgb(Ptr, U32, F64, F64, F64), pattern, corner.to_U32, r, g, b]
+        ))
+    );
+
+    mesh_set_corner_color_rgba : I64 -> (F64, F64, F64, F64) -> Pattern -> IO ();
+    mesh_set_corner_color_rgba = |corner, (r, g, b, a), pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_mesh_pattern_set_corner_color_rgba(Ptr, U32, F64, F64, F64, F64), pattern, corner.to_U32, r, g, b, a]
+        ))
+    );
+
+    mesh_get_patch_count : Pattern -> IOFail Status I64;
+    mesh_get_patch_count = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let count : Array U32 = Array::fill(1, 0_U32);
+        let status = CALL_C[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count._get_ptr];
+        if status == Status::success {
+            Result::ok $ count.@(0).to_I64
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    mesh_get_path : I64 -> Pattern -> IO Cairo::Path;
+    mesh_get_path = |patch_num, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+        let path = CALL_C[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
+        Cairo::Path::_create_from_handle(path)
+    ));
+
+    mesh_get_control_point : I64 -> Pattern -> IOFail Status (F64, F64);
+    mesh_get_control_point = |corner, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let x : Array F64 = Array::fill(1, 0.0);
+        let y : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, x._get_ptr, y._get_ptr];
+        if status == Status::success {
+            Result::ok $ (x.@(0), y.@(0))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    mesh_get_corner_color_rgba : I64 -> Pattern -> IOFail Status (F64, F64, F64, F64);
+    mesh_get_corner_color_rgba = |corner, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+        let r : Array F64 = Array::fill(1, 0.0);
+        let g : Array F64 = Array::fill(1, 0.0);
+        let b : Array F64 = Array::fill(1, 0.0);
+        let a : Array F64 = Array::fill(1, 0.0);
+        let status = CALL_C[I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr), pattern, corner.to_U32, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        if status == Status::success {
+            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+        } else {
+            Result::err $ status
+        }
+    ));
+
+    status : Pattern -> IO Status;
+    status = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+        let status = CALL_C[I32 cairo_pattern_status(Ptr), pattern];
+        status
+    ));
+
+    set_extend : Extend -> Pattern -> IO ();
+    set_extend = |extend, pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_pattern_set_extend(Ptr, I32), pattern, extend]
+        ))
+    );
+
+    get_extend : Pattern -> IO Extend;
+    get_extend = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+        let extend = CALL_C[I32 cairo_pattern_get_extend(Ptr), pattern];
+        extend
+    ));
+
+    set_filter : Filter -> Pattern -> IO ();
+    set_filter = |filter, pattern| IO::from_func $ |_| (
+        pattern._with_handle(|pattern| (
+            CALL_C[() cairo_pattern_set_filter(Ptr, I32), pattern, filter]
+        ))
+    );
+
+    get_filter : Pattern -> IO Filter;
+    get_filter = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+        let filter = CALL_C[I32 cairo_pattern_get_filter(Ptr), pattern];
+        filter
+    ));
+}
+
+namespace RectangleList {
+    type RectangleList = unbox struct { _dtor : Destructor _RectangleListHandle };
+
+    type _RectangleListHandle = Ptr;
+
+    _with_handle : (_RectangleListHandle -> a) -> RectangleList -> a;
+    _with_handle = |act, list| list.@_dtor.borrow(act);
+
+    _create_from_handle : _RectangleListHandle -> RectangleList;
+    _create_from_handle = |handle| RectangleList { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_rectangle_list_destroy(Ptr), handle]) };
+
+    // TODO: add a function RectangleList -> Iterator Rectangle, where Rectangle is a struct with x, y, width, height fields.
+    // TODO: add a function RectangleList -> I64 that returns the number of rectangles in the list.
+}
+
+namespace Path {
+    type Path = unbox struct { _dtor : Destructor _PathHandle };
+
+    type _PathHandle = Ptr;
+
+    _with_handle : (_PathHandle -> a) -> Path -> a;
+    _with_handle = |act, path| path.@_dtor.borrow(act);
+
+    _create_from_handle : _PathHandle -> Path;
+    _create_from_handle = |handle| Path { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_path_destroy(Ptr), handle]) };
+
+    // TODO: add a function Path -> Iterator PathData, where PathData is Fix's equivalent of cairo_path_data_t.
+    // TODO: add a function Path -> I64 that returns the number of elements in the path.
+}
+
+namespace Glyph {
+    type Glyph = unbox struct { index : U64, x : F64, y : F64 };
+}
+
+namespace Status {
+    type Status = I32;
+
+    success : Status;
+    success = 0_I32;
+
+    no_memory : Status;
+    no_memory = 1_I32;
+
+    invalid_restore : Status;
+    invalid_restore = 2_I32;
+
+    invalid_pop_group : Status;
+    invalid_pop_group = 3_I32;
+
+    no_current_point : Status;
+    no_current_point = 4_I32;
+
+    invalid_matrix : Status;
+    invalid_matrix = 5_I32;
+
+    invalid_status : Status;
+    invalid_status = 6_I32;
+
+    null_pointer : Status;
+    null_pointer = 7_I32;
+
+    invalid_string : Status;
+    invalid_string = 8_I32;
+
+    invalid_path_data : Status;
+    invalid_path_data = 9_I32;
+
+    read_error : Status;
+    read_error = 10_I32;
+
+    write_error : Status;
+    write_error = 11_I32;
+
+    surface_finished : Status;
+    surface_finished = 12_I32;
+
+    surface_type_mismatch : Status;
+    surface_type_mismatch = 13_I32;
+
+    pattern_type_mismatch : Status;
+    pattern_type_mismatch = 14_I32;
+
+    invalid_content : Status;
+    invalid_content = 15_I32;
+
+    invalid_format : Status;
+    invalid_format = 16_I32;
+
+    invalid_visual : Status;
+    invalid_visual = 17_I32;
+
+    file_not_found : Status;
+    file_not_found = 18_I32;
+
+    invalid_dash : Status;
+    invalid_dash = 19_I32;
+
+    invalid_dsc_comment : Status;
+    invalid_dsc_comment = 20_I32;
+
+    invalid_index : Status;
+    invalid_index = 21_I32;
+
+    clip_not_representable : Status;
+    clip_not_representable = 22_I32;
+
+    temp_file_error : Status;
+    temp_file_error = 23_I32;
+
+    invalid_stride : Status;
+    invalid_stride = 24_I32;
+
+    font_type_mismatch : Status;
+    font_type_mismatch = 25_I32;
+
+    user_font_immutable : Status;
+    user_font_immutable = 26_I32;
+
+    user_font_error : Status;
+    user_font_error = 27_I32;
+
+    negative_count : Status;
+    negative_count = 28_I32;
+
+    invalid_clusters : Status;
+    invalid_clusters = 29_I32;
+
+    invalid_slant : Status;
+    invalid_slant = 30_I32;
+
+    invalid_weight : Status;
+    invalid_weight = 31_I32;
+
+    invalid_size : Status;
+    invalid_size = 32_I32;
+
+    user_font_not_implemented : Status;
+    user_font_not_implemented = 33_I32;
+
+    device_type_mismatch : Status;
+    device_type_mismatch = 34_I32;
+
+    device_error : Status;
+    device_error = 35_I32;
 }
 
 namespace Content {
@@ -200,4 +1056,156 @@ namespace FontWeight {
 
     bold : FontWeight;
     bold = 1_I32;
+}
+
+namespace Antialias {
+    type Antialias = I32;
+
+    default : Antialias;
+    default = 0_I32;
+
+    none : Antialias;
+    none = 1_I32;
+
+    gray : Antialias;
+    gray = 2_I32;
+
+    subpixel : Antialias;
+    subpixel = 3_I32;
+
+    fast : Antialias;
+    fast = 4_I32;
+
+    good : Antialias;
+    good = 5_I32;
+
+    best : Antialias;
+    best = 6_I32;
+}
+
+namespace FillRule {
+    type FillRule = I32;
+
+    winding : FillRule;
+    winding = 0_I32;
+
+    even_odd : FillRule;
+    even_odd = 1_I32;
+}
+
+namespace LineCap {
+    type LineCap = I32;
+
+    butt : LineCap;
+    butt = 0_I32;
+
+    round : LineCap;
+    round = 1_I32;
+
+    square : LineCap;
+    square = 2_I32;
+}
+
+namespace LineJoin {
+    type LineJoin = I32;
+
+    miter : LineJoin;
+    miter = 0_I32;
+
+    round : LineJoin;
+    round = 1_I32;
+
+    bevel : LineJoin;
+    bevel = 2_I32;
+}
+
+namespace Operator {
+    type Operator = I32;
+
+    clear : Operator;
+    clear = 0_I32;
+
+    source : Operator;
+    source = 1_I32;
+
+    over : Operator;
+    over = 2_I32;
+
+    in_ : Operator;
+    in_ = 3_I32;
+
+    out : Operator;
+    out = 4_I32;
+
+    atop : Operator;
+    atop = 5_I32;
+
+    dest : Operator;
+    dest = 6_I32;
+
+    dest_over : Operator;
+    dest_over = 7_I32;
+
+    dest_in : Operator;
+    dest_in = 8_I32;
+
+    dest_out : Operator;
+    dest_out = 9_I32;
+
+    dest_atop : Operator;
+    dest_atop = 10_I32;
+
+    xor : Operator;
+    xor = 11_I32;
+
+    add : Operator;
+    add = 12_I32;
+
+    saturate : Operator;
+    saturate = 13_I32;
+
+    multiply : Operator;
+    multiply = 14_I32;
+
+    screen : Operator;
+    screen = 15_I32;
+
+    overlay : Operator;
+    overlay = 16_I32;
+
+    darken : Operator;
+    darken = 17_I32;
+
+    lighten : Operator;
+    lighten = 18_I32;
+
+    color_dodge : Operator;
+    color_dodge = 19_I32;
+
+    color_burn : Operator;
+    color_burn = 20_I32;
+
+    hard_light : Operator;
+    hard_light = 21_I32;
+
+    soft_light : Operator;
+    soft_light = 22_I32;
+
+    difference : Operator;
+    difference = 23_I32;
+
+    exclusion : Operator;
+    exclusion = 24_I32;
+
+    hsl_hue : Operator;
+    hsl_hue = 25_I32;
+
+    hsl_saturation : Operator;
+    hsl_saturation = 26_I32;
+
+    hsl_color : Operator;
+    hsl_color = 27_I32;
+
+    hsl_luminosity : Operator;
+    hsl_luminosity = 28_I32;
 }
