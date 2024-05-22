@@ -18,6 +18,8 @@ create = |surface| (
     ))
 );
 
+// TODO: add get_status function.
+
 save : Cairo -> IO ();
 save = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
         CALL_C[() cairo_save(Ptr), cairo]
@@ -31,6 +33,7 @@ restore = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
 get_target : Cairo -> Surface;
 get_target = |cairo| cairo._with_handle(|cairo| (
     let surface = CALL_C[Ptr cairo_get_target(Ptr), cairo];
+    eval CALL_C[Ptr cairo_surface_reference(Ptr), surface];
     Surface::_create_from_handle(surface)
 ));
 
@@ -39,9 +42,27 @@ push_group = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
         CALL_C[() cairo_push_group(Ptr), cairo]
 ));
 
-push_group_with_content : ContentType -> Cairo -> IO ();
+push_group_with_content : Content -> Cairo -> IO ();
 push_group_with_content = |content, cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
         CALL_C[() cairo_push_group_with_content(Ptr, I32), cairo, content]
+));
+
+pop_group : Cairo -> IO Pattern;
+pop_group = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let pattern = CALL_C[Ptr cairo_pop_group(Ptr), cairo];
+    Pattern::_create_from_handle(pattern)
+));
+
+pop_group_to_source : Cairo -> IO ();
+pop_group_to_source = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+        CALL_C[() cairo_pop_group_to_source(Ptr), cairo]
+));
+
+get_group_target : Cairo -> IO Surface;
+get_group_target = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    let surface = CALL_C[Ptr cairo_get_group_target(Ptr), cairo];
+    eval CALL_C[Ptr cairo_surface_reference(Ptr), surface];
+    Surface::_create_from_handle(surface)
 ));
 
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
@@ -110,16 +131,28 @@ namespace Surface {
     );
 }
 
-namespace ContentType {
-    type ContentType = I32;
+namespace Pattern {
+    type Pattern = unbox struct { _dtor : Destructor _PatternHandle };
 
-    color : ContentType;
+    type _PatternHandle = Ptr;
+
+    _with_handle : (_PatternHandle -> a) -> Pattern -> a;
+    _with_handle = |act, pattern| pattern.@_dtor.borrow(act);
+
+    _create_from_handle : _PatternHandle -> Pattern;
+    _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_pattern_destroy(Ptr), handle]) };
+}
+
+namespace Content {
+    type Content = I32;
+
+    color : Content;
     color = 0x1000_I32;
 
-    alpha : ContentType;
+    alpha : Content;
     alpha = 0x2000_I32;
 
-    color_alpha : ContentType;
+    color_alpha : Content;
     color_alpha = 0x3000_I32;
 }
 
