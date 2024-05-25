@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "cairo-xlib.h": "c",
+        "cairo.h": "c"
+    }
+}
