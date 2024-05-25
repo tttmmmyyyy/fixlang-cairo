@@ -1,6 +1,7 @@
 module Cairo;
 
-// The cairo drawing context.
+import Std hiding { Path };
+
 type Cairo = unbox struct { _dtor : Destructor _CairoHandle };
 
 type _CairoHandle = Ptr;
@@ -385,19 +386,19 @@ get_hairline = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     hairline == 1_I32
 ));
 
-copy_path : Cairo -> IO Cairo::Path;
+copy_path : Cairo -> IO Path;
 copy_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     let path = CALL_C[Ptr cairo_copy_path(Ptr), cairo];
-    Cairo::Path::_create_from_handle(path)
+    Path::_create_from_handle(path)
 ));
 
-copy_path_flat : Cairo -> IO Cairo::Path;
+copy_path_flat : Cairo -> IO Path;
 copy_path_flat = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     let path = CALL_C[Ptr cairo_copy_path_flat(Ptr), cairo];
-    Cairo::Path::_create_from_handle(path)
+    Path::_create_from_handle(path)
 ));
 
-append_path : Cairo::Path -> Cairo -> IO ();
+append_path : Path -> Cairo -> IO ();
 append_path = |path, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
         path._with_handle(|path| (
@@ -883,7 +884,7 @@ namespace Pattern {
     ));
 
     create_for_surface : Surface -> IO Pattern;
-    create_form_surface = |surface| IO::from_func $ |_| (
+    create_for_surface = |surface| IO::from_func $ |_| (
         surface._with_handle(|surface| (
             let handle = CALL_C[Ptr cairo_pattern_create_for_surface(Ptr), surface];
             Pattern::_create_from_handle(handle)
@@ -929,7 +930,7 @@ namespace Pattern {
         Pattern::_create_from_handle(handle)
     );
 
-    get_radial_circles : Pattern -> IOFail Status ((F64, F64, F64), (F64, F64, F64), F64);
+    get_radial_circles : Pattern -> IOFail Status ((F64, F64, F64), (F64, F64, F64));
     get_radial_circles = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
         let x0 : Array F64 = Array::fill(1, 0.0);
         let y0 : Array F64 = Array::fill(1, 0.0);
@@ -1018,10 +1019,10 @@ namespace Pattern {
         }
     ));
 
-    mesh_get_path : I64 -> Pattern -> IO Cairo::Path;
+    mesh_get_path : I64 -> Pattern -> IO Path;
     mesh_get_path = |patch_num, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let path = CALL_C[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
-        Cairo::Path::_create_from_handle(path)
+        Path::_create_from_handle(path)
     ));
 
     mesh_get_control_point : I64 -> Pattern -> IOFail Status (F64, F64);
@@ -2236,4 +2237,42 @@ namespace TextClusterFlags {
 
     backward : TextClusterFlags;
     backward = 1_U32;
+}
+
+namespace Extend {
+    type Extend = I32;
+
+    none : Extend;
+    none = 0_I32;
+
+    repeat : Extend;
+    repeat = 1_I32;
+
+    reflect : Extend;
+    reflect = 2_I32;
+
+    pad : Extend;
+    pad = 3_I32;
+}
+
+namespace Filter {
+    type Filter = I32;
+
+    fast : Filter;
+    fast = 0_I32;
+
+    good : Filter;
+    good = 1_I32;
+
+    best : Filter;
+    best = 2_I32;
+
+    nearest : Filter;
+    nearest = 3_I32;
+
+    bilinear : Filter;
+    bilinear = 4_I32;
+
+    gaussian : Filter;
+    gaussian = 5_I32;
 }
