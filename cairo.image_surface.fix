@@ -1,6 +1,6 @@
 module Cairo.ImageSurface;
 
-import Cairo::Surface;
+import Cairo::{Surface, Surface::*, Format};
 
 create : Format -> (I32, I32) -> Surface;
 create = |format, (width, height)| (

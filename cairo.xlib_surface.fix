@@ -1,6 +1,6 @@
-module Cairo.Surface.Xlib;
+module Cairo.XlibSurface;
 
-import Cairo::Surface;
+import Cairo::{Surface, Surface::_create_from_handle};
 
 type _DisplayHandle = Ptr;
 type _WindowId = U64;

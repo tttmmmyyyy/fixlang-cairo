@@ -1,7 +1,5 @@
 module Cairo;
 
-import Std hiding { Path };
-
 type Cairo = unbox struct { _dtor : Destructor _CairoHandle };
 
 type _CairoHandle = Ptr;
@@ -386,19 +384,19 @@ get_hairline = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     hairline == 1_I32
 ));
 
-copy_path : Cairo -> IO Path;
+copy_path : Cairo -> IO Cairo::Path;
 copy_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     let path = CALL_C[Ptr cairo_copy_path(Ptr), cairo];
     Path::_create_from_handle(path)
 ));
 
-copy_path_flat : Cairo -> IO Path;
+copy_path_flat : Cairo -> IO Cairo::Path;
 copy_path_flat = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     let path = CALL_C[Ptr cairo_copy_path_flat(Ptr), cairo];
     Path::_create_from_handle(path)
 ));
 
-append_path : Path -> Cairo -> IO ();
+append_path : Cairo::Path -> Cairo -> IO ();
 append_path = |path, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
         path._with_handle(|path| (
@@ -791,8 +789,9 @@ glyph_extents = |glyphs, cairo| IO::from_func $ |_| (
     extents
 );
 
+type Surface = unbox struct { _dtor : Destructor (_SurfaceHandle) };
+
 namespace Surface {
-    type Surface = unbox struct { _dtor : Destructor (_SurfaceHandle) };
 
     type _SurfaceHandle = Ptr;
 
@@ -802,7 +801,7 @@ namespace Surface {
     _create_from_handle : _SurfaceHandle -> Surface;
     _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_surface_destroy(Ptr), handle]) };
 
-    write_to_png : Path -> Surface -> IO ();
+    write_to_png : Std::Path -> Surface -> IO ();
     write_to_png = |path, surface| IO::from_func $ |_| (
         surface._with_handle(|surface| (
             path.to_string.borrow_c_str(|path| (
@@ -812,8 +811,9 @@ namespace Surface {
     );
 }
 
+type Pattern = unbox struct { _dtor : Destructor _PatternHandle };
+
 namespace Pattern {
-    type Pattern = unbox struct { _dtor : Destructor _PatternHandle };
 
     type _PatternHandle = Ptr;
 
@@ -843,8 +843,8 @@ namespace Pattern {
         count.to_I64
     ));
 
-    get_color_stop_rgba : I32 -> Pattern -> IOFail Status (F64, F64, F64, F64);
-    get_color_stop_rgba = |index, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    get_color_stop_rgba : I32 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
+    get_color_stop_rgba = |index, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
@@ -869,8 +869,8 @@ namespace Pattern {
         Pattern::_create_from_handle(handle)
     );
 
-    get_rgba : Pattern -> IOFail Status (F64, F64, F64, F64);
-    get_rgba = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    get_rgba : Pattern -> IO (Result Status (F64, F64, F64, F64));
+    get_rgba = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
@@ -891,8 +891,8 @@ namespace Pattern {
         ))
     );
 
-    get_surface : Pattern -> IOFail Status Surface;
-    get_surface = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    get_surface : Pattern -> IO (Result Status Surface);
+    get_surface = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let surface : Array Ptr = Array::fill(1, nullptr);
         let status = CALL_C[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface._get_ptr];
         if status == Status::success {
@@ -910,8 +910,8 @@ namespace Pattern {
         Pattern::_create_from_handle(handle)
     );
 
-    get_linear_points : Pattern -> IOFail Status ((F64, F64), (F64, F64));
-    get_linear_points = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    get_linear_points : Pattern -> IO (Result Status ((F64, F64), (F64, F64)));
+    get_linear_points = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let x0 : Array F64 = Array::fill(1, 0.0);
         let y0 : Array F64 = Array::fill(1, 0.0);
         let x1 : Array F64 = Array::fill(1, 0.0);
@@ -930,8 +930,8 @@ namespace Pattern {
         Pattern::_create_from_handle(handle)
     );
 
-    get_radial_circles : Pattern -> IOFail Status ((F64, F64, F64), (F64, F64, F64));
-    get_radial_circles = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    get_radial_circles : Pattern -> IO (Result Status ((F64, F64, F64), (F64, F64, F64)));
+    get_radial_circles = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let x0 : Array F64 = Array::fill(1, 0.0);
         let y0 : Array F64 = Array::fill(1, 0.0);
         let r0 : Array F64 = Array::fill(1, 0.0);
@@ -1008,8 +1008,8 @@ namespace Pattern {
         ))
     );
 
-    mesh_get_patch_count : Pattern -> IOFail Status I64;
-    mesh_get_patch_count = |pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_patch_count : Pattern -> IO (Result Status I64);
+    mesh_get_patch_count = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let count : Array U32 = Array::fill(1, 0_U32);
         let status = CALL_C[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count._get_ptr];
         if status == Status::success {
@@ -1019,14 +1019,14 @@ namespace Pattern {
         }
     ));
 
-    mesh_get_path : I64 -> Pattern -> IO Path;
+    mesh_get_path : I64 -> Pattern -> IO Cairo::Path;
     mesh_get_path = |patch_num, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let path = CALL_C[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
         Path::_create_from_handle(path)
     ));
 
-    mesh_get_control_point : I64 -> Pattern -> IOFail Status (F64, F64);
-    mesh_get_control_point = |corner, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_control_point : I64 -> Pattern -> IO (Result Status (F64, F64));
+    mesh_get_control_point = |corner, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let x : Array F64 = Array::fill(1, 0.0);
         let y : Array F64 = Array::fill(1, 0.0);
         let status = CALL_C[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, x._get_ptr, y._get_ptr];
@@ -1037,8 +1037,8 @@ namespace Pattern {
         }
     ));
 
-    mesh_get_corner_color_rgba : I64 -> Pattern -> IOFail Status (F64, F64, F64, F64);
-    mesh_get_corner_color_rgba = |corner, pattern| IOFail::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_corner_color_rgba : I64 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
+    mesh_get_corner_color_rgba = |corner, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
@@ -1108,8 +1108,9 @@ namespace Pattern {
     ));
 }
 
+type RectangleList = unbox struct { _dtor : Destructor _RectangleListHandle };
+
 namespace RectangleList {
-    type RectangleList = unbox struct { _dtor : Destructor _RectangleListHandle };
 
     type _RectangleListHandle = Ptr;
 
@@ -1123,27 +1124,27 @@ namespace RectangleList {
     // TODO: add a function RectangleList -> I64 that returns the number of rectangles in the list.
 }
 
+type Path = unbox struct { _dtor : Destructor _PathHandle };
+
 namespace Path {
-    type Path = unbox struct { _dtor : Destructor _PathHandle };
 
     type _PathHandle = Ptr;
 
-    _with_handle : (_PathHandle -> a) -> Path -> a;
+    _with_handle : (_PathHandle -> a) -> Cairo::Path -> a;
     _with_handle = |act, path| path.@_dtor.borrow(act);
 
-    _create_from_handle : _PathHandle -> Path;
-    _create_from_handle = |handle| Path { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_path_destroy(Ptr), handle]) };
+    _create_from_handle : _PathHandle -> Cairo::Path;
+    _create_from_handle = |handle| Cairo::Path { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_path_destroy(Ptr), handle]) };
 
     // TODO: add a function Path -> Iterator PathData, where PathData is Fix's equivalent of cairo_path_data_t.
     // TODO: add a function Path -> I64 that returns the number of elements in the path.
 }
 
-namespace Glyph {
-    type Glyph = unbox struct { index : U64, x : F64, y : F64 };
-}
+type Glyph = unbox struct { index : U64, x : F64, y : F64 };
+
+type Matrix = unbox struct { xx : F64, yx : F64, xy : F64, yy : F64, x0 : F64, y0 : F64 };
 
 namespace Matrix {
-    type Matrix = unbox struct { xx : F64, yx : F64, xy : F64, yy : F64, x0 : F64, y0 : F64 };
 
     _with_ptr : (Ptr -> a) -> Matrix -> (a, Matrix);
     _with_ptr = |act, matrix| (
@@ -1229,8 +1230,9 @@ namespace Matrix {
     );
 }
 
+type Region = unbox struct { _dtor : Destructor _RegionHandle };
+
 namespace Region {
-    type Region = unbox struct { _dtor : Destructor _RegionHandle };
 
     type _RegionHandle = Ptr;
 
@@ -1466,8 +1468,9 @@ namespace Region {
     );
 }
 
+type RectangleInt = unbox struct { x : I32, y : I32, width : I32, height : I32 };
+
 namespace RectangleInt {
-    type RectangleInt = unbox struct { x : I32, y : I32, width : I32, height : I32 };
 
     _with_ptr : (Ptr -> a) -> RectangleInt -> (a, RectangleInt);
     _with_ptr = |act, rect| (
@@ -1477,8 +1480,9 @@ namespace RectangleInt {
     );
 }
 
+type FontOptions = unbox struct { _dtor : Destructor _FontOptionsHandle };
+
 namespace FontOptions {
-    type FontOptions = unbox struct { _dtor : Destructor _FontOptionsHandle };
 
     type _FontOptionsHandle = Ptr;
 
@@ -1617,8 +1621,9 @@ namespace FontOptions {
     );
 }
 
+type FontFace = unbox struct { _dtor : Destructor _FontFaceHandle };
+
 namespace FontFace {
-    type FontFace = unbox struct { _dtor : Destructor _FontFaceHandle };
 
     type _FontFaceHandle = Ptr;
 
@@ -1642,6 +1647,7 @@ namespace FontFace {
 }
 
 namespace ToyFontFace {
+
     create : String -> FontSlant -> FontWeight -> FontFace;
     create = |family, slant, weight| (
         family.borrow_c_str(|family| (
@@ -1669,8 +1675,9 @@ namespace ToyFontFace {
     ));
 }
 
+type ScaledFont = unbox struct { _dtor : Destructor _ScaledFontHandle };
+
 namespace ScaledFont {
-    type ScaledFont = unbox struct { _dtor : Destructor _ScaledFontHandle };
 
     type _ScaledFontHandle = Ptr;
 
@@ -1771,8 +1778,9 @@ namespace ScaledFont {
     ));
 }
 
+type FontExtents = unbox struct { ascent : F64, descent : F64, height : F64, max_x_advance : F64, max_y_advance : F64 };
+
 namespace FontExtents {
-    type FontExtents = unbox struct { ascent : F64, descent : F64, height : F64, max_x_advance : F64, max_y_advance : F64 };
 
     _with_ptr : (Ptr -> a) -> FontExtents -> (a, FontExtents);
     _with_ptr = |act, extents| (
@@ -1782,8 +1790,9 @@ namespace FontExtents {
     );
 }
 
+type TextExtents = unbox struct { x_bearing : F64, y_bearing : F64, width : F64, height : F64, x_advance : F64, y_advance : F64 };
+
 namespace TextExtents {
-    type TextExtents = unbox struct { x_bearing : F64, y_bearing : F64, width : F64, height : F64, x_advance : F64, y_advance : F64 };
 
     _with_ptr : (Ptr -> a) -> TextExtents -> (a, TextExtents);
     _with_ptr = |act, extents| (
@@ -1793,8 +1802,9 @@ namespace TextExtents {
     );
 }
 
+type TextCluster = unbox struct { num_bytes : I32, num_glyphs : I32 };
+
 namespace TextCluster {
-    type TextCluster = unbox struct { num_bytes : I32, num_glyphs : I32 };
 
     _with_ptr : (Ptr -> a) -> TextCluster -> (a, TextCluster);
     _with_ptr = |act, cluster| (
@@ -1804,8 +1814,9 @@ namespace TextCluster {
     );
 }
 
+type Status = I32;
+
 namespace Status {
-    type Status = I32;
 
     success : Status;
     success = 0_I32;
@@ -1916,8 +1927,9 @@ namespace Status {
     device_error = 35_I32;
 }
 
+type Content = I32;
+
 namespace Content {
-    type Content = I32;
 
     color : Content;
     color = 0x1000_I32;
@@ -1929,8 +1941,9 @@ namespace Content {
     color_alpha = 0x3000_I32;
 }
 
+type Format = I32;
+
 namespace Format {
-    type Format = I32;
 
     argb : Format;
     argb = 0_I32;
@@ -1951,9 +1964,9 @@ namespace Format {
     rgb30 = 5_I32;
 }
 
+type FontSlant = I32;
 
 namespace FontSlant {
-    type FontSlant = I32;
 
     normal : FontSlant;
     normal = 0_I32;
@@ -1965,8 +1978,9 @@ namespace FontSlant {
     oblique = 2_I32;
 }
 
+type FontWeight = I32;
+
 namespace FontWeight {
-    type FontWeight = I32;
 
     normal : FontWeight;
     normal = 0_I32;
@@ -1975,8 +1989,9 @@ namespace FontWeight {
     bold = 1_I32;
 }
 
+type Antialias = I32;
+
 namespace Antialias {
-    type Antialias = I32;
 
     default : Antialias;
     default = 0_I32;
@@ -2000,8 +2015,9 @@ namespace Antialias {
     best = 6_I32;
 }
 
+type FillRule = I32;
+
 namespace FillRule {
-    type FillRule = I32;
 
     winding : FillRule;
     winding = 0_I32;
@@ -2010,8 +2026,9 @@ namespace FillRule {
     even_odd = 1_I32;
 }
 
+type LineCap = I32;
+
 namespace LineCap {
-    type LineCap = I32;
 
     butt : LineCap;
     butt = 0_I32;
@@ -2023,8 +2040,9 @@ namespace LineCap {
     square = 2_I32;
 }
 
+type LineJoin = I32;
+
 namespace LineJoin {
-    type LineJoin = I32;
 
     miter : LineJoin;
     miter = 0_I32;
@@ -2036,8 +2054,9 @@ namespace LineJoin {
     bevel = 2_I32;
 }
 
+type Operator = I32;
+
 namespace Operator {
-    type Operator = I32;
 
     clear : Operator;
     clear = 0_I32;
@@ -2127,8 +2146,9 @@ namespace Operator {
     hsl_luminosity = 28_I32;
 }
 
+type PatternType = I32;
+
 namespace Pattern {
-    type PatternType = I32;
 
     solid : PatternType;
     solid = 0_I32;
@@ -2149,8 +2169,9 @@ namespace Pattern {
     raster_source = 5_I32;
 }
 
+type Overlap = I32;
+
 namespace Overlap {
-    type Overlap = I32;
 
     in_ : Overlap;
     in_ = 0_I32;
@@ -2162,8 +2183,9 @@ namespace Overlap {
     part = 2_I32;
 }
 
+type SubpixelOrder = I32;
+
 namespace SubpixelOrder {
-    type SubpixelOrder = I32;
 
     default : SubpixelOrder;
     default = 0_I32;
@@ -2181,8 +2203,9 @@ namespace SubpixelOrder {
     vbgr = 4_I32;
 }
 
+type HintStyle = I32;
+
 namespace HintStyle {
-    type HintStyle = I32;
 
     default : HintStyle;
     default = 0_I32;
@@ -2200,8 +2223,9 @@ namespace HintStyle {
     full = 4_I32;
 }
 
+type HintMetrics = I32;
+
 namespace HintMetrics {
-    type HintMetrics = I32;
 
     default : HintMetrics;
     default = 0_I32;
@@ -2213,8 +2237,9 @@ namespace HintMetrics {
     on = 2_I32;
 }
 
+type FontType = I32;
+
 namespace FontType {
-    type FontType = I32;
 
     toy : FontType;
     toy = 0_I32;
@@ -2232,15 +2257,17 @@ namespace FontType {
     user = 4_I32;
 }
 
+type TextClusterFlags = U32;
+
 namespace TextClusterFlags {
-    type TextClusterFlags = U32;
 
     backward : TextClusterFlags;
     backward = 1_U32;
 }
 
+type Extend = I32;
+
 namespace Extend {
-    type Extend = I32;
 
     none : Extend;
     none = 0_I32;
@@ -2255,8 +2282,9 @@ namespace Extend {
     pad = 3_I32;
 }
 
+type Filter = I32;
+
 namespace Filter {
-    type Filter = I32;
 
     fast : Filter;
     fast = 0_I32;

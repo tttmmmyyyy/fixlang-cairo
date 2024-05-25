@@ -2,11 +2,11 @@ clean:
 	fix clean
 	rm -f libcairo_backend_x11.so
 
-run_example_image: 
-	fix run -f ./examples/hello_world_image.fix cairo.fix -d cairo_fixlang
+run_example_image:
+	fix run -f ./examples/hello_world_image.fix cairo.fix cairo.image_surface.fix -d cairo
 
-run_example_xlib: libcairo_fixlang_xlib_surface.so
-	fix run -f ./examples/hello_world_xlib.fix cairo.fix cairo.xlib_surface.fix -L. -d cairo_fixlang X11 cairo_fixlang_xlib_surface 
+run_example_xlib:
+	fix run -f ./examples/hello_world_xlib.fix cairo.fix cairo.xlib_surface.fix -L. -d cairo_fixlang_xlib_surface cairo X11 
 
-libcairo_fixlang_xlib_surface.so:
+libcairo_fixlang_xlib_surface.so: cairo.xlib_surface.c
 	gcc -I /usr/include/cairo -shared -fPIC -o libcairo_fixlang_xlib_surface.so cairo.xlib_surface.c
