@@ -2,7 +2,7 @@
 #include <cairo/cairo-xlib.h>
 #include <cairo.h>
 
-Window cairo_fixlang_create_x_window(Display *display, int32_t width, int32_t height)
+Window cairo_fixlang_xlib_surface_create_x_window(Display *display, int32_t width, int32_t height)
 {
     XEvent event;
     Window win = XCreateSimpleWindow(display, RootWindow(display, DefaultScreen(display)),
@@ -20,7 +20,7 @@ Window cairo_fixlang_create_x_window(Display *display, int32_t width, int32_t he
     return win;
 }
 
-cairo_surface_t *cairo_fixlang_create_x_surface(Display *display, Window win, int32_t width, int32_t height)
+cairo_surface_t *cairo_fixlang_xlib_surface_create_x_surface(Display *display, Window win, int32_t width, int32_t height)
 {
     return cairo_xlib_surface_create(display, win, DefaultVisual(display, 0), width, height);
 }

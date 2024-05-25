@@ -801,12 +801,6 @@ namespace Surface {
     _create_from_handle : _SurfaceHandle -> Surface;
     _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_surface_destroy(Ptr), handle]) };
 
-    create_image_surface : Format -> (I32, I32) -> Surface;
-    create_image_surface = |format, (width, height)| (
-        let handle = CALL_C[Ptr cairo_image_surface_create(I32, I32, I32), format, width, height];
-        Surface::_create_from_handle(handle)
-    );
-
     write_to_png : Path -> Surface -> IO ();
     write_to_png = |path, surface| IO::from_func $ |_| (
         surface._with_handle(|surface| (

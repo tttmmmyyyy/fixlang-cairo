@@ -1,0 +1,9 @@
+module Cairo.ImageSurface;
+
+import Cairo::Surface;
+
+create : Format -> (I32, I32) -> Surface;
+create = |format, (width, height)| (
+    let handle = CALL_C[Ptr cairo_image_surface_create(I32, I32, I32), format, width, height];
+    Surface::_create_from_handle(handle)
+);
