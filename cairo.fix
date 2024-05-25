@@ -18,8 +18,8 @@ create = |surface| (
     ))
 );
 
-status : Cairo -> IO Status;
-status = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+@status : Cairo -> IO Status;
+@status = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
     let status = CALL_C[I32 cairo_status(Ptr), cairo];
     status
 ));
@@ -529,6 +529,102 @@ path_extents = |cairo| IO::from_func $ |_| (
     (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
 );
 
+translate : (F64, F64) -> Cairo -> IO ();
+translate = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_translate(Ptr, F64, F64), cairo, x, y]
+    ))
+);
+
+scale : (F64, F64) -> Cairo -> IO ();
+scale = |(x, y), cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_scale(Ptr, F64, F64), cairo, x, y]
+    ))
+);
+
+rotate : F64 -> Cairo -> IO ();
+rotate = |angle, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_rotate(Ptr, F64), cairo, angle]
+    ))
+);
+
+transform : Matrix -> Cairo -> IO ();
+transform = |matrix, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        _CairoMatrix::_create(matrix)._with_handle(|matrix| (
+            CALL_C[() cairo_transform(Ptr, Ptr), cairo, matrix]
+        ))
+    ))
+);
+
+set_matrix : Matrix -> Cairo -> IO ();
+set_matrix = |matrix, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        _CairoMatrix::_create(matrix)._with_handle(|matrix| (
+            CALL_C[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
+        ))
+    ))
+);
+
+get_matrix : Cairo -> IO Matrix;
+get_matrix = |cairo| IO::from_func $ |_| (
+    let matrix = _CairoMatrix::_create(Matrix::init_identity);
+    eval cairo._with_handle(|cairo| (
+        matrix._with_handle(|matrix| (
+            CALL_C[() cairo_get_matrix(Ptr, Ptr), cairo, matrix._get_ptr]
+        ))
+    ));
+    matrix._get_matrix
+);
+
+identity_matrix : Cairo -> IO ();
+identity_matrix = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
+    CALL_C[() cairo_identity_matrix(Ptr), cairo]
+));
+
+user_to_device : (F64, F64) -> Cairo -> IO (F64, F64);
+user_to_device = |(x, y), cairo| IO::from_func $ |_| (
+    let x : Array F64 = Array::fill(1, x);
+    let y : Array F64 = Array::fill(1, y);
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
+    ));
+    (x.@(0), y.@(0))
+);
+
+
+user_to_device_distance : (F64, F64) -> Cairo -> IO (F64, F64);
+user_to_device_distance = |(dx, dy), cairo| IO::from_func $ |_| (
+    let dx : Array F64 = Array::fill(1, dx);
+    let dy : Array F64 = Array::fill(1, dy);
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
+    ));
+    (dx.@(0), dy.@(0))
+);
+
+device_to_user : (F64, F64) -> Cairo -> IO (F64, F64);
+device_to_user = |(x, y), cairo| IO::from_func $ |_| (
+    let x : Array F64 = Array::fill(1, x);
+    let y : Array F64 = Array::fill(1, y);
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
+    ));
+    (x.@(0), y.@(0))
+);
+
+device_to_user_distance : (F64, F64) -> Cairo -> IO (F64, F64);
+device_to_user_distance = |(dx, dy), cairo| IO::from_func $ |_| (
+    let dx : Array F64 = Array::fill(1, dx);
+    let dy : Array F64 = Array::fill(1, dy);
+    cairo._with_handle(|cairo| (
+        CALL_C[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
+    ));
+    (dx.@(0), dy.@(0))
+);
+
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
 select_font_face = |font, slant, weight, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
@@ -544,6 +640,66 @@ set_font_size = |size, cairo| IO::from_func $ |_| (
         CALL_C[() cairo_set_font_size(Ptr, F64), cairo, size]
     ))
 );
+
+set_font_matrix : Matrix -> Cairo -> IO ();
+set_font_matrix = |matrix, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        _CairoMatrix::_create(matrix)._with_handle(|matrix| (
+            CALL_C[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
+        ))
+    ))
+);
+
+get_font_matrix : Cairo -> IO Matrix;
+get_font_matrix = |cairo| IO::from_func $ |_| (
+    let matrix = _CairoMatrix::_create(Matrix::init_identity);
+    eval cairo._with_handle(|cairo| (
+        matrix._with_handle(|matrix| (
+            CALL_C[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix._get_ptr]
+        ))
+    ));
+    matrix._get_matrix
+);
+
+set_font_options : FontOptions -> Cairo -> IO ();
+set_font_options = |options, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        options._with_handle(|options| (
+            CALL_C[() cairo_set_font_options(Ptr, Ptr), cairo, options]
+        ))
+    ))
+);
+
+get_font_options : Cairo -> IO FontOptions;
+get_font_options = |cairo| IO::from_func $ |_| (
+    let options = FontOptions::create();
+    eval cairo._with_handle(|cairo| (
+        options._with_handle(|options| (
+            CALL_C[() cairo_get_font_options(Ptr, Ptr), cairo, options]
+        ))
+    ));
+    options
+);
+
+set_font_face : FontFace -> Cairo -> IO ();
+set_font_face = |face, cairo| IO::from_func $ |_| (
+    cairo._with_handle(|cairo| (
+        face._with_handle(|face| (
+            CALL_C[() cairo_set_font_face(Ptr, Ptr), cairo, face]
+        ))
+    ))
+);
+
+get_font_face : Cairo -> IO FontFace;
+get_font_face = |cairo| IO::from_func $ |_| (
+    let face = cairo._with_handle(|cairo| (
+        CALL_C[Ptr cairo_get_font_face(Ptr, Ptr), cairo, face]
+    ));
+    let face = CALL_C[Ptr cairo_font_face_reference(Ptr), face];
+    FontFace::_create_from_handle(face)
+);
+
+set_scaled_font : ScaledFont -> Cairo -> IO ();
 
 show_text : String -> Cairo -> IO ();
 show_text = |text, cairo| IO::from_func $ |_| (
@@ -820,8 +976,8 @@ namespace Pattern {
         }
     ));
 
-    status : Pattern -> IO Status;
-    status = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    @status : Pattern -> IO Status;
+    @status = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
         let status = CALL_C[I32 cairo_pattern_status(Ptr), pattern];
         status
     ));
@@ -1029,24 +1185,20 @@ namespace Region {
     _create_from_handle : _RegionHandle -> Region;
     _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_region_destroy(Ptr), handle]) };
 
-    _clone : Region -> Region;
-    _clone = |region| region._with_handle(|region| (
-        let handle = CALL_C[Ptr cairo_region_copy(Ptr), region];
-        Region::_create_from_handle(handle)
-    ));
-
     _force_unique : Region -> Region;
     _force_unique = |region| (
-        let (is_unique, region) = regions.unsafe_is_unique;
-        if is_unique {
-            region
-        } else {
-            region._clone
-        }
+        region.mod__dtor(|dtor| (
+            let (is_unique, dtor) = dtor.unsafe_is_unique;
+            if is_unique { dtor };    
+            dtor.borrow(|dtor| (
+                let handle = CALL_C[Ptr cairo_region_copy(Ptr), dtor];
+                Destructor::make(handle, |handle| CALL_C[() cairo_region_destroy(Ptr), handle])
+            ))
+        ))
     );
 
-    create : Region;
-    create = (
+    create : () -> Region;
+    create = |_| (
         let handle = CALL_C[Ptr cairo_region_create()];
         Region::_create_from_handle(handle)
     );
@@ -1069,8 +1221,8 @@ namespace Region {
         Region::_create_from_handle(handle)
     );
 
-    status : Region -> Status;
-    status = |region| region._with_handle(|region| (
+    @status : Region -> Status;
+    @status = |region| region._with_handle(|region| (
         let status = CALL_C[I32 cairo_region_status(Ptr), region];
         status
     ));
@@ -1290,6 +1442,231 @@ namespace RectangleInt {
         _get_handle : _CairoRectangleInt -> _CairoRectangleIntHandle;
         _get_handle = |rect| rect.@_dtor.@_value;
     }
+}
+
+namespace FontOptions {
+    type FontOptions = unbox struct { _dtor : Destructor _FontOptionsHandle };
+
+    type _FontOptionsHandle = Ptr;
+
+    _with_handle : (_FontOptionsHandle -> a) -> FontOptions -> a;
+    _with_handle = |act, options| options.@_dtor.borrow(act);
+
+    _create_from_handle : _FontOptionsHandle -> FontOptions;
+    _create_from_handle = |handle| FontOptions { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_font_options_destroy(Ptr), handle]) };
+
+    _force_unique : FontOptions -> FontOptions;
+    _force_unique = |options| (
+        options.mod__dtor(|dtor| (
+            let (is_unique, dtor) = dtor.unsafe_is_unique;
+            if is_unique { dtor };    
+            dtor.borrow(|dtor| (
+                let handle = CALL_C[Ptr cairo_font_options_copy(Ptr), dtor];
+                Destructor::make(handle, |handle| CALL_C[() cairo_font_options_destroy(Ptr), handle])
+            ))
+        ))
+    );
+
+    create : () -> FontOptions;
+    create = |_| (
+        let handle = CALL_C[Ptr cairo_font_options_create()];
+        FontOptions::_create_from_handle(handle)
+    );
+
+    @status : FontOptions -> Status;
+    @status = |options| options._with_handle(|options| (
+        let status = CALL_C[I32 cairo_font_options_status(Ptr), options];
+        status
+    ));
+
+    merge : FontOptions -> FontOptions -> FontOptions;
+    merge = |other, options| (
+        let options = options._force_unique;
+        eval options._with_handle(|options| (
+            other._with_handle(|other| (
+                CALL_C[() cairo_font_options_merge(Ptr, Ptr), options, other]
+            ))
+        ));
+        options
+    );
+
+    hash : FontOptions -> U64;
+    hash = |options| options._with_handle(|options| (
+        let hash = CALL_C[U64 cairo_font_options_hash(Ptr), options];
+        hash
+    ));
+
+    equal : FontOptions -> FontOptions -> Bool;
+    equal = |options1, options2| (
+        options1._with_handle(|options1| (
+            options2._with_handle(|options2| (
+                let equal = CALL_C[I32 cairo_font_options_equal(Ptr, Ptr), options1, options2];
+                equal != 0
+            ))
+        ))
+    );
+
+    set_antialias : Antialias -> FontOptions -> FontOptions;
+    set_antialias = |antialias, options| (
+        let options = options._force_unique;
+        eval options._with_handle(|options| (
+            CALL_C[() cairo_font_options_set_antialias(Ptr, I32), options, antialias]
+        ));
+        options
+    );
+
+    get_antialias : FontOptions -> Antialias;
+    get_antialias = |options| options._with_handle(|options| (
+        let antialias = CALL_C[I32 cairo_font_options_get_antialias(Ptr), options];
+        antialias
+    ));
+
+    set_subpixel_order : SubpixelOrder -> FontOptions -> FontOptions;
+    set_subpixel_order = |order, options| (
+        let options = options._force_unique;
+        eval options._with_handle(|options| (
+            CALL_C[() cairo_font_options_set_subpixel_order(Ptr, I32), options, order]
+        ));
+        options
+    );
+
+    get_subpixel_order : FontOptions -> SubpixelOrder;
+    get_subpixel_order = |options| options._with_handle(|options| (
+        let order = CALL_C[I32 cairo_font_options_get_subpixel_order(Ptr), options];
+        order
+    ));
+
+    set_hint_style : HintStyle -> FontOptions -> FontOptions;
+    set_hint_style = |style, options| (
+        let options = options._force_unique;
+        eval options._with_handle(|options| (
+            CALL_C[() cairo_font_options_set_hint_style(Ptr, I32), options, style]
+        ));
+        options
+    );
+
+    get_hint_style : FontOptions -> HintStyle;
+    get_hint_style = |options| options._with_handle(|options| (
+        let style = CALL_C[I32 cairo_font_options_get_hint_style(Ptr), options];
+        style
+    ));
+
+    set_hint_metrics : HintMetrics -> FontOptions -> FontOptions;
+    set_hint_metrics = |metrics, options| (
+        let options = options._force_unique;
+        eval options._with_handle(|options| (
+            CALL_C[() cairo_font_options_set_hint_metrics(Ptr, I32), options, metrics]
+        ));
+        options
+    );
+
+    get_hint_metrics : FontOptions -> HintMetrics;
+    get_hint_metrics = |options| options._with_handle(|options| (
+        let metrics = CALL_C[I32 cairo_font_options_get_hint_metrics(Ptr), options];
+        metrics
+    ));
+
+    get_variations : FontOptions -> String;
+    get_variations = |options| options._with_handle(|options| (
+        let variations = CALL_C[Ptr cairo_font_options_get_variations(Ptr), options];
+        String::_unsafe_from_c_str(variations)
+    ));
+
+    set_variations : String -> FontOptions -> FontOptions;
+    set_variations = |variations, options| (
+        let options = options._force_unique;
+        variations.borrow_c_str(|variations| (
+            eval options._with_handle(|options| (
+                CALL_C[() cairo_font_options_set_variations(Ptr, Ptr), options, variations]
+            ));
+        ));
+        options
+    );
+}
+
+namespace FontFace {
+    type FontFace = unbox struct { _dtor : Destructor _FontFaceHandle };
+
+    type _FontFaceHandle = Ptr;
+
+    _with_handle : (_FontFaceHandle -> a) -> FontFace -> a;
+    _with_handle = |act, face| face.@_dtor.borrow(act);
+
+    _create_from_handle : _FontFaceHandle -> FontFace;
+    _create_from_handle = |handle| FontFace { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_font_face_destroy(Ptr), handle]) };
+
+    @status : FontFace -> Status;
+    @status = |face| face._with_handle(|face| (
+        let status = CALL_C[I32 cairo_font_face_status(Ptr), face];
+        status
+    ));
+
+    get_type : FontFace -> FontType;
+    get_type = |face| face._with_handle(|face| (
+        let face_type = CALL_C[I32 cairo_font_face_get_type(Ptr), face];
+        face_type
+    ));
+}
+
+namespace ScaledFont {
+    type ScaledFont = unbox struct { _dtor : Destructor _ScaledFontHandle };
+
+    type _ScaledFontHandle = Ptr;
+
+    _with_handle : (_ScaledFontHandle -> a) -> ScaledFont -> a;
+    _with_handle = |act, font| font.@_dtor.borrow(act);
+
+    _create_from_handle : _ScaledFontHandle -> ScaledFont;
+    _create_from_handle = |handle| ScaledFont { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_scaled_font_destroy(Ptr), handle]) };
+
+    @status : ScaledFont -> Status;
+    @status = |font| font._with_handle(|font| (
+        let status = CALL_C[I32 cairo_scaled_font_status(Ptr), font];
+        status
+    ));
+}
+
+namespace FontExtents {
+    type FontExtents = unbox struct { ascent : F64, descent : F64, height : F64, max_x_advance : F64, max_y_advance : F64 };
+
+    namespace _CairoFontExtents {
+        type _CairoFontExtentsHandle = Ptr;
+
+        type _CairoFontExtents = unbox struct { _dtor : Destructor _CairoFontExtentsHandle };
+
+        _create : FontExtents -> _CairoFontExtents;
+        _create = |extents| (
+            let handle = CALL_C[Ptr cairo_fixlang_allocate_font_extents(F64, F64, F64, F64, F64), extents.@ascent, extents.@descent, extents.@height, extents.@max_x_advance, extents.@max_y_advance];
+            _create_from_handle(handle)
+        );
+    }
+
+    // namespace _CairoMatrix {
+    //     type _CairoMatrixHandle = Ptr;
+
+    //     type _CairoMatrix = unbox struct { _dtor : Destructor _CairoMatrixHandle };
+
+    //     _create : Matrix -> _CairoMatrix;
+    //     _create = |matrix| (
+    //         let handle = CALL_C[Ptr cairo_fixlang_allocate_matrix(F64, F64, F64, F64, F64, F64), matrix.@xx, matrix.@yx, matrix.@xy, matrix.@yy, matrix.@x0, matrix.@y0];
+    //         _create_from_handle(handle)
+    //     );
+
+    //     _get_matrix : _CairoMatrix -> Matrix;
+    //     _get_matrix = |cairo_matrix| (
+    //         let elems : Array F64 = Array::fill(6, 0.0);
+    //         eval cairo_matrix.borrow(|cairo_matrix| (
+    //             CALL_C[() cairo_matrix_get_elements(Ptr, Ptr), cairo_matrix, elems._get_ptr]
+    //         ));
+    //         Matrix { xx : elems.@(0), yx : elems.@(1), xy : elems.@(2), yy : elems.@(3), x0 : elems.@(4), y0 : elems.@(5) }
+    //     );
+
+    //     _with_handle : (_CairoMatrixHandle -> a) -> _CairoMatrix -> a;
+    //     _with_handle = |act, matrix| matrix.@_dtor.borrow(act);
+
+    //     _create_from_handle : _CairoMatrixHandle -> _CairoMatrix;
+    //     _create_from_handle = |handle| _CairoMatrix { _dtor : Destructor::make(handle, |handle| CALL_C[() cairo_fixlang_free_matrix(Ptr), handle]) };
+    // }
 }
 
 namespace Status {
@@ -1648,4 +2025,74 @@ namespace Overlap {
 
     part : Overlap;
     part = 2_I32;
+}
+
+namespace SubpixelOrder {
+    type SubpixelOrder = I32;
+
+    default : SubpixelOrder;
+    default = 0_I32;
+
+    rgb : SubpixelOrder;
+    rgb = 1_I32;
+
+    bgr : SubpixelOrder;
+    bgr = 2_I32;
+
+    vrgb : SubpixelOrder;
+    vrgb = 3_I32;
+
+    vbgr : SubpixelOrder;
+    vbgr = 4_I32;
+}
+
+namespace HintStyle {
+    type HintStyle = I32;
+
+    default : HintStyle;
+    default = 0_I32;
+
+    none : HintStyle;
+    none = 1_I32;
+
+    slight : HintStyle;
+    slight = 2_I32;
+
+    medium : HintStyle;
+    medium = 3_I32;
+
+    full : HintStyle;
+    full = 4_I32;
+}
+
+namespace HintMetrics {
+    type HintMetrics = I32;
+
+    default : HintMetrics;
+    default = 0_I32;
+
+    off : HintMetrics;
+    off = 1_I32;
+
+    on : HintMetrics;
+    on = 2_I32;
+}
+
+namespace FontType {
+    type FontType = I32;
+
+    toy : FontType;
+    toy = 0_I32;
+
+    ft : FontType;
+    ft = 1_I32;
+
+    win32 : FontType;
+    win32 = 2_I32;
+
+    quartz : FontType;
+    quartz = 3_I32;
+
+    user : FontType;
+    user = 4_I32;
 }
