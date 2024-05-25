@@ -588,7 +588,7 @@ user_to_device : (F64, F64) -> Cairo -> IO (F64, F64);
 user_to_device = |(x, y), cairo| IO::from_func $ |_| (
     let x : Array F64 = Array::fill(1, x);
     let y : Array F64 = Array::fill(1, y);
-    cairo._with_handle(|cairo| (
+    eval cairo._with_handle(|cairo| (
         CALL_C[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
     ));
     (x.@(0), y.@(0))
@@ -599,7 +599,7 @@ user_to_device_distance : (F64, F64) -> Cairo -> IO (F64, F64);
 user_to_device_distance = |(dx, dy), cairo| IO::from_func $ |_| (
     let dx : Array F64 = Array::fill(1, dx);
     let dy : Array F64 = Array::fill(1, dy);
-    cairo._with_handle(|cairo| (
+    eval cairo._with_handle(|cairo| (
         CALL_C[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
     ));
     (dx.@(0), dy.@(0))
@@ -609,7 +609,7 @@ device_to_user : (F64, F64) -> Cairo -> IO (F64, F64);
 device_to_user = |(x, y), cairo| IO::from_func $ |_| (
     let x : Array F64 = Array::fill(1, x);
     let y : Array F64 = Array::fill(1, y);
-    cairo._with_handle(|cairo| (
+    eval cairo._with_handle(|cairo| (
         CALL_C[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
     ));
     (x.@(0), y.@(0))
@@ -619,7 +619,7 @@ device_to_user_distance : (F64, F64) -> Cairo -> IO (F64, F64);
 device_to_user_distance = |(dx, dy), cairo| IO::from_func $ |_| (
     let dx : Array F64 = Array::fill(1, dx);
     let dy : Array F64 = Array::fill(1, dy);
-    cairo._with_handle(|cairo| (
+    eval cairo._with_handle(|cairo| (
         CALL_C[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
     ));
     (dx.@(0), dy.@(0))
@@ -915,7 +915,7 @@ namespace Pattern {
         let y0 : Array F64 = Array::fill(1, 0.0);
         let x1 : Array F64 = Array::fill(1, 0.0);
         let y1 : Array F64 = Array::fill(1, 0.0);
-        let status = CALL_C[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
+        let status = CALL_C[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
         if status == Status::success {
             Result::ok $ ((x0.@(0), y0.@(0)), (x1.@(0), y1.@(0)))
         } else {
@@ -982,7 +982,7 @@ namespace Pattern {
     mesh_curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Pattern -> IO ();
     mesh_curve_to = |(x1, y1), (x2, y2), (x3, y3), pattern| IO::from_func $ |_| (
         pattern._with_handle(|pattern| (
-            CALL_C[() cairo_mesh_pattern_curve_to(Ptr, F64, F64, F64, F64, F64, F64, F64, F64), pattern, x1, y1, x2, y2, x3, y3]
+            CALL_C[() cairo_mesh_pattern_curve_to(Ptr, F64, F64, F64, F64, F64, F64), pattern, x1, y1, x2, y2, x3, y3]
         ))
     );
 
@@ -1181,7 +1181,7 @@ namespace Matrix {
         let yx = matrix.@xx * -s + matrix.@yx * c;
         let xy = matrix.@xy * c + matrix.@yy * s;
         let yy = matrix.@xy * -s + matrix.@yy * c;
-        Matrix { xx, yx, xy, yy, x0 : matrix.@x0, y0 : matrix.@y0 }
+        Matrix { xx : xx, yx : yx, xy : xy, yy : yy, x0 : matrix.@x0, y0 : matrix.@y0 }
     );
 
     invert : Matrix -> Option Matrix;
@@ -1197,7 +1197,7 @@ namespace Matrix {
             let yy = matrix.@xx * inv_det;
             let x0 = (matrix.@xy * matrix.@y0 - matrix.@yy * matrix.@x0) * inv_det;
             let y0 = (matrix.@yx * matrix.@x0 - matrix.@xx * matrix.@y0) * inv_det;
-            Option::some $ Matrix { xx, yx, xy, yy, x0, y0 }
+            Option::some $ Matrix { xx : xx, yx : yx, xy : xy, yy : yy, x0 : x0, y0 : y0 }
         }
     );
 
@@ -1210,7 +1210,7 @@ namespace Matrix {
         let yy = a.@xy * b.@yx + a.@yy * b.@yy;
         let x0 = a.@x0 * b.@xx + a.@y0 * b.@xy + b.@x0;
         let y0 = a.@x0 * b.@yx + a.@y0 * b.@yy + b.@y0;
-        Matrix { xx, yx, xy, yy, x0, y0 }
+        Matrix { xx : xx, yx : yx, xy : xy, yy : yy, x0 : x0, y0 : y0 }
     );
 
     transform_distance : (F64, F64) -> Matrix -> (F64, F64);
@@ -1285,7 +1285,7 @@ namespace Region {
     get_extents = |region| region._with_handle(|region| (
         let cairo_rect = _CairoRectangleInt::_create(RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 });
         eval cairo_rect._with_handle(|cairo_rect| (
-            CALL_C[() cairo_region_get_extents(Ptr, Ptr), region, rect._get_ptr];
+            CALL_C[() cairo_region_get_extents(Ptr, Ptr), region, rect._get_ptr]
         ));
         cairo_rect._get_rectangle_int
     ));
@@ -1300,7 +1300,7 @@ namespace Region {
     get_rectangle = |index, region| region._with_handle(|region| (
         let cairo_rect = _CairoRectangleInt::_create(RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 });
         eval cairo_rect._with_handle(|cairo_rect| (
-            CALL_C[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect._get_ptr];
+            CALL_C[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect._get_ptr]
         ));
         cairo_rect._get_rectangle_int
     ));
@@ -1339,7 +1339,7 @@ namespace Region {
     translate = |(dx, dy), region| (
         let region = region._force_unique;
         eval region._with_handle(|region| (
-            CALL_C[() cairo_region_translate(Ptr, I32, I32), region, dx, dy];
+            CALL_C[() cairo_region_translate(Ptr, I32, I32), region, dx, dy]
         ));
         region
     );
@@ -1347,11 +1347,11 @@ namespace Region {
     intersect : Region -> Region -> Result Status Region;
     intersect = |region1, region2| (
         let region1 = region1._force_unique;
-        let status = region1._with_handle(|region1| (
-            region2._with_handle(|region2| (
-                CALL_C[I32 cairo_region_intersect(Ptr, Ptr, Ptr), region1, region2]
-            ))
-        ));
+        let status = region1._with_handle(|region1| 
+            region2._with_handle(|region2| 
+                CALL_C[I32 cairo_region_intersect(Ptr, Ptr), region1, region2]
+            )
+        );
         if status == Status::success {
             Result::ok $ region1
         } else {
@@ -1362,11 +1362,11 @@ namespace Region {
     intersect_rectangle : RectangleInt -> Region -> Result Status Region;
     intersect_rectangle = |rect, region| (
         let region = region._force_unique;
-        let status = _CairoRectangleInt::_create(rect)._with_handle(|rect| (
-            region._with_handle(|region| (
-                CALL_C[I32 cairo_region_intersect_rectangle(Ptr, Ptr, Ptr), region, rect]
-            ))
-        ));
+        let status = _CairoRectangleInt::_create(rect)._with_handle(|rect| 
+            region._with_handle(|region| 
+                CALL_C[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
+            )
+        );
         if status == Status::success {
             Result::ok $ region
         } else {
@@ -1607,11 +1607,11 @@ namespace FontOptions {
     set_variations : String -> FontOptions -> FontOptions;
     set_variations = |variations, options| (
         let options = options._force_unique;
-        variations.borrow_c_str(|variations| (
-            eval options._with_handle(|options| (
+        eval variations.borrow_c_str(|variations| 
+            options._with_handle(|options| 
                 CALL_C[() cairo_font_options_set_variations(Ptr, Ptr), options, variations]
-            ));
-        ));
+            )
+        );
         options
     );
 }
@@ -1697,11 +1697,11 @@ namespace ScaledFont {
     text_extents : String -> ScaledFont -> TextExtents;
     text_extents = |text, font| font._with_handle(|font| (
         let cairo_extents = _CairoTextExtents::_create(TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 });
-        text.borrow_c_str(|text| (
-            eval cairo_extents._with_handle(|cairo_extents| (
+        eval text.borrow_c_str(|text| 
+            cairo_extents._with_handle(|cairo_extents| 
                 CALL_C[() cairo_scaled_font_text_extents(Ptr, Ptr, Ptr), font, text, cairo_extents]
-            ));
-        ));
+            )
+        );
         cairo_extents._get_text_extents
     ));
 
@@ -1741,25 +1741,25 @@ namespace ScaledFont {
 
     get_font_matrix : ScaledFont -> Matrix;
     get_font_matrix = |font| font._with_handle(|font| (
-        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| (
-            eval CALL_C[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
-        ))
+        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
+            CALL_C[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
+        );
         matrix
     ));
 
     get_ctm : ScaledFont -> Matrix;
     get_ctm = |font| font._with_handle(|font| (
-        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| (
-            eval CALL_C[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
-        ))
+        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
+            CALL_C[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
+        );
         matrix
     ));
 
     get_scale_matrix : ScaledFont -> Matrix;
     get_scale_matrix = |font| font._with_handle(|font| (
-        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| (
-            eval CALL_C[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
-        ))
+        let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
+            CALL_C[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
+        );
         matrix
     ));
 
