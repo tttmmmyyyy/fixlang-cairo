@@ -43,11 +43,12 @@ main = (
             break_m()
         };
         let state = state.proceed(now);
+        let count = state.@count;
 
         eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
-        eval *cairo.set_font_size(32.0 * 0.1 * state.@count.to_F64);
+        eval *cairo.set_font_size(32.0);
         eval *cairo.set_source_rgb((0.0, 0.0, 1.0));
-        eval *cairo.move_to((10.0, 50.0));
+        eval *cairo.move_to((10.0 + (count % 300).to_F64, 50.0));
         eval *cairo.show_text("Hello world!");
 
         eval *window.flush;
