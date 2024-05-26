@@ -9,7 +9,6 @@ type _BackBufferId = U64;
 type Window = box struct { 
     _display : _DisplayHandle,
     _window_id : _WindowId,
-    _back_buffer_id : _BackBufferId,
     width : I32,
     height : I32
 };
@@ -20,8 +19,7 @@ create_window = |width, height| IO::from_func $ |_| (
     let height = height.to_I32;
     let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
     let window : _WindowId = CALL_C[U64 cairo_fixlang_xlib_surface_create_x_window(Ptr, I32, I32), display, width, height];
-    let back_buffer = CALL_C[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), display, window, XbeSwapAction::undefined];
-    Window { _display : display, _window_id : window, _back_buffer_id : back_buffer, width : width, height : height }
+    Window { _display : display, _window_id : window, width : width, height : height }
 );
 
 close_window : Window -> IO ();
@@ -38,7 +36,8 @@ create_front_surface = |window| (
 
 create_back_surface : Window -> Surface;
 create_back_surface = |window| (
-    let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_back_buffer_id, window.@width, window.@height];
+    let back_buffer = CALL_C[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), window.@_display, window.@_window_id, XbeSwapAction::undefined];
+    let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, back_buffer, window.@width, window.@height];
     Surface::_create_from_handle(handle)
 );
 
