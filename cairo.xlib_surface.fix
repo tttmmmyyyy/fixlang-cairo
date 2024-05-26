@@ -4,8 +4,15 @@ import Cairo::{Surface, Surface::_create_from_handle};
 
 type _DisplayHandle = Ptr;
 type _WindowId = U64;
+type _BackBufferId = U64;
 
-type Window = box struct { _display : _DisplayHandle, _window_id : _WindowId, width : I32, height : I32 };
+type Window = box struct { 
+    _display : _DisplayHandle,
+    _window_id : _WindowId,
+    _back_buffer_id : _BackBufferId,
+    width : I32,
+    height : I32
+};
 
 create_window : I64 -> I64 -> IO Window;
 create_window = |width, height| IO::from_func $ |_| (
@@ -13,7 +20,8 @@ create_window = |width, height| IO::from_func $ |_| (
     let height = height.to_I32;
     let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
     let window : _WindowId = CALL_C[U64 cairo_fixlang_xlib_surface_create_x_window(Ptr, I32, I32), display, width, height];
-    Window { _display : display, _window_id : window, width : width, height : height }
+    let back_buffer = CALL_C[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), display, window, XbeSwapAction::undefined];
+    Window { _display : display, _window_id : window, _back_buffer_id : back_buffer, width : width, height : height }
 );
 
 close_window : Window -> IO ();
@@ -22,11 +30,41 @@ close_window = |window| IO::from_func $ |_| (
     CALL_C[() XCloseDisplay(Ptr), window.@_display]
 );
 
-create_surface : Window -> Surface;
-create_surface = |window| (
+create_front_surface : Window -> Surface;
+create_front_surface = |window| (
     let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_window_id, window.@width, window.@height];
     Surface::_create_from_handle(handle)
 );
 
+create_back_surface : Window -> Surface;
+create_back_surface = |window| (
+    let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_back_buffer_id, window.@width, window.@height];
+    Surface::_create_from_handle(handle)
+);
+
+swap_buffers : XbeSwapAction -> Window -> IO ();
+swap_buffers = |swap_action, window| IO::from_func $ |_| (
+    let swap_action = [(window.@_window_id, swap_action)];
+    swap_action.borrow_ptr(|swap_action| 
+        CALL_C[() XdbeSwapBuffers(Ptr, Ptr, I32), window.@_display, swap_action, 1_I32]
+    )
+);
+
 flush : Window -> IO ();
 flush = |window| IO::from_func $ |_| CALL_C[() XFlush(Ptr), window.@_display];
+
+type XbeSwapAction = U8;
+
+namespace XbeSwapAction {
+    undefined : XbeSwapAction;
+    undefined = 0_U8;
+
+    background : XbeSwapAction;
+    background = 1_U8;
+
+    untouched : XbeSwapAction;
+    untouched = 2_U8;
+
+    copied : XbeSwapAction;
+    copied = 3_U8;
+}

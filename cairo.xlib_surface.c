@@ -1,5 +1,6 @@
 #include <X11/Xlib.h>
 #include <cairo/cairo-xlib.h>
+#include <X11/extensions/Xdbe.h>
 #include <cairo.h>
 
 Window cairo_fixlang_xlib_surface_create_x_window(Display *display, int32_t width, int32_t height)

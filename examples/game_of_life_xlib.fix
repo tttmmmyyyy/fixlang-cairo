@@ -1,0 +1,61 @@
+module Main;
+
+import Cairo;
+import Cairo.XlibSurface;
+import Time;
+
+type GameState = box struct {
+    start_time : F64,
+    prev_time: F64,
+    now_time : F64,
+    count : I64,
+};
+
+namespace GameState {
+    proceed : F64 -> GameState -> GameState;
+    proceed = |now_time, state| (
+        if now_time - state.@prev_time < 0.016 { state };
+        let state = state.set_now_time(now_time);
+        let state = state.mod_count(|count| count + 1);
+        let state = state.set_prev_time(now_time);
+        state
+    );
+}
+
+main : IO ();
+main = (
+    let window = *XlibSurface::create_window(640, 480);
+    
+    let surface = XlibSurface::create_back_surface(window);
+    let cairo = Cairo::create(surface);
+
+    let start_time = (*Time::get_now_monotonic).to_F64;
+    let state = GameState { 
+        start_time : start_time,
+        prev_time : start_time,
+        now_time : start_time,
+        count : 0,
+    };
+
+    eval *loop_m(state, |state|
+        let now = (*Time::get_now_monotonic).to_F64;
+        if now - state.@start_time > 10.0 {
+            break_m()
+        };
+        let state = state.proceed(now);
+
+        eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
+        eval *cairo.set_font_size(32.0 * 0.1 * state.@count.to_F64);
+        eval *cairo.set_source_rgb((0.0, 0.0, 1.0));
+        eval *cairo.move_to((10.0, 50.0));
+        eval *cairo.show_text("Hello world!");
+
+        eval *window.flush;
+        eval *window.swap_buffers(XbeSwapAction::background);
+        continue_m(state)
+    );
+
+    eval *window.close_window;
+
+    pure()
+);
