@@ -61,25 +61,29 @@ namespace GameState {
     update_current : GameState -> GameState;
     update_current = |state| (
         let prev = state.@prev_state;
-        let get_prev = |x, y| (
-            let x = (x + cells_count.@0) % cells_count.@0;
-            let y = (y + cells_count.@1) % cells_count.@1;
-            prev.@(x).@(y)
-        );
         state.mod_current_state(|current| (
-            Iterator::range(0, cells_count.@1).product(Iterator::range(0, cells_count.@0)).fold(current, |current, (y, x)|
-                let count = Iterator::range(-1, 2).product(Iterator::range(-1, 2)).fold(0, |acc, (dy, dx)|
-                    if dx == 0 && dy == 0 { acc };
+            let cells = cells_count.@0 * cells_count.@1;
+            loop((0, current), |(pos, current)|
+                if pos == cells { break $ current };
+                let y = pos % cells_count.@1;
+                let x = pos / cells_count.@1;
+                let count = loop((0, 0), |(d, acc)|
+                    if d == 9 { break $ acc };
+                    let dx = d % 3 - 1;
+                    let dy = d / 3 - 1;
+                    if dx == 0 && dy == 0 { continue $ (d + 1, acc) };
                     let x = (x + dx + cells_count.@0) % cells_count.@0;
                     let y = (y + dy + cells_count.@1) % cells_count.@1;
-                    acc + if prev.@(x).@(y) { 1 } else { 0 }
+                    let acc = acc + if prev.@(x).@(y) { 1 } else { 0 };
+                    continue $ (d + 1, acc)
                 );
                 let alive = if prev.@(x).@(y) {
                     count == 2 || count == 3
                 } else {
                     count == 3
                 };
-                current.mod(x, set(y, alive))
+                let current = current.mod(x, set(y, alive));
+                continue $ (pos + 1, current)
             )
         ))
     );
