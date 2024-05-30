@@ -126,7 +126,7 @@ main = (
         let now_time = (*Time::get_now_monotonic).to_F64;
         if now_time - prev_time < 1.0 / fps { continue_m $ (state, prev_time) };
 
-        let (state, elapsed) = consumed_time_while_lazy(|_| state.proceed_cells);
+        let state = state.proceed_cells;
         eval *println(elapsed.to_string);
 
         eval *state.render(cairo);
