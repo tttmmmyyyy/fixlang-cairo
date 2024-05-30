@@ -52,9 +52,9 @@ namespace GameState {
 
     swap : GameState -> GameState;
     swap = |state| (
-        let prev_state = state.@current_state;
-        let current_state = state.@prev_state;
-        state.set_prev_state(prev_state).set_current_state(current_state)
+        let current_state = state.@current_state;
+        let prev_state = state.@prev_state;
+        state.set_prev_state(current_state).set_current_state(prev_state)
     );
 
     update_current : GameState -> GameState;
@@ -90,19 +90,24 @@ namespace GameState {
 
     render : Cairo -> GameState -> IO ();
     render = |cairo, state| (
-        Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).loop_iter_m((), |_, (x, y)|
+        eval *cairo.set_source_rgb((1.0, 1.0, 1.0));
+
+        eval *Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).loop_iter_m((), |_, (x, y)|
             let is_alive = state.@current_state.@(x).@(y);
-            let color = if is_alive { (1.0, 1.0, 1.0) } else { (0.0, 0.0, 0.0) };
 
-            let pos = ((x * cell_size.@0).to_F64, (y * cell_size.@1).to_F64);
-            let cell_size = (cell_size.@0.to_F64, cell_size.@1.to_F64);
-
-            eval *cairo.set_source_rgb(color);
-            eval *cairo.rectangle(pos, cell_size);
-            eval *cairo.fill;
+            eval *if is_alive {   
+                let pos = ((x * cell_size.@0).to_F64, (y * cell_size.@1).to_F64);
+                let cell_size = (cell_size.@0.to_F64, cell_size.@1.to_F64);
+                cairo.rectangle(pos, cell_size)
+            } else {
+                pure()
+            };
 
             continue_m $ ()
-        )
+        );
+
+        eval *cairo.fill;
+        pure()
     );
 }
 
