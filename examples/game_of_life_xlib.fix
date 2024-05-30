@@ -3,57 +3,131 @@ module Main;
 import Cairo;
 import Cairo.XlibSurface;
 import Time;
+import Random;
+
+cells_count : (I64, I64);
+cells_count = (200, 200);
+
+cell_size : (I64, I64);
+cell_size = (3, 3);
+
+window_size : (I64, I64);
+window_size = (cells_count.@0 * cell_size.@0, cells_count.@1 * cell_size.@1);
+
+fps : F64;
+fps = 10.0;
 
 type GameState = box struct {
-    start_time : F64,
-    prev_time: F64,
-    now_time : F64,
-    count : I64,
+    prev_state : Array (Array Bool),
+    current_state : Array (Array Bool),
 };
 
 namespace GameState {
-    proceed : F64 -> GameState -> GameState;
-    proceed = |now_time, state| (
-        if now_time - state.@prev_time < 0.016 { state };
-        let state = state.set_now_time(now_time);
-        let state = state.mod_count(|count| count + 1);
-        let state = state.set_prev_time(now_time);
+    initialize : GameState;
+    initialize = (
+        let prev_state = Array::fill(cells_count.@0, Array::fill(cells_count.@1, false));
+        let current_state = Array::fill(cells_count.@0, Array::fill(cells_count.@1, false));
+        GameState {
+            prev_state : prev_state,
+            current_state : current_state,
+        }
+    );
+
+    randomize : Random -> GameState -> (GameState, Random);
+    randomize = |rand, state| (
+        Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).fold((state, rand), |(state, rand), (x, y)|
+            let (alive, rand) = rand.generate_U64;
+            let alive = alive % 2_U64 == 0_U64;
+            let state = state.mod_current_state(|current| current.mod(x, set(y, alive)));
+            (state, rand)
+        )
+    );
+
+    proceed_cells : GameState -> GameState;
+    proceed_cells = |state| (
+        let state = state.swap;
+        let state = state.update_current;
         state
+    );
+
+    swap : GameState -> GameState;
+    swap = |state| (
+        let prev_state = state.@current_state;
+        let current_state = state.@prev_state;
+        state.set_prev_state(prev_state).set_current_state(current_state)
+    );
+
+    update_current : GameState -> GameState;
+    update_current = |state| (
+        let prev = state.@prev_state;
+        let get_prev = |x, y| (
+            let x = (x + cells_count.@0) % cells_count.@0;
+            let y = (y + cells_count.@1) % cells_count.@1;
+            prev.@(x).@(y)
+        );
+        let count_neighbors = |x, y| (        
+            Iterator::range(-1, 2).product(Iterator::range(-1, 2)).fold(0, |acc, (dx, dy)|
+                let add = if dx == 0 && dy == 0 { 
+                    0
+                } else {
+                    if get_prev(x + dx, y + dy) { 1 } else { 0 }
+                };
+                acc + add
+            )
+        );
+        state.mod_current_state(|current| (
+            Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).fold(current, |current, (x, y)|
+                let count = count_neighbors(x, y);
+                let alive = if current.@(x).@(y) { // If current cell is alive,
+                    count == 2 || count == 3
+                } else { // If current cell is dead,
+                    count == 3
+                };
+                current.mod(x, set(y, alive))
+            )
+        ))
+    );
+
+    render : Cairo -> GameState -> IO ();
+    render = |cairo, state| (
+        Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).loop_iter_m((), |_, (x, y)|
+            let is_alive = state.@current_state.@(x).@(y);
+            let color = if is_alive { (1.0, 1.0, 1.0) } else { (0.0, 0.0, 0.0) };
+
+            let pos = ((x * cell_size.@0).to_F64, (y * cell_size.@1).to_F64);
+            let cell_size = (cell_size.@0.to_F64, cell_size.@1.to_F64);
+
+            eval *cairo.set_source_rgb(color);
+            eval *cairo.rectangle(pos, cell_size);
+            eval *cairo.fill;
+
+            continue_m $ ()
+        )
     );
 }
 
 main : IO ();
 main = (
-    let window = *XlibSurface::create_window(640, 480);
+    let window = *XlibSurface::create_window(window_size.@0, window_size.@1);
     
     let surface = XlibSurface::create_back_surface(window);
     let cairo = Cairo::create(surface);
 
-    let start_time = (*Time::get_now_monotonic).to_F64;
-    let state = GameState { 
-        start_time : start_time,
-        prev_time : start_time,
-        now_time : start_time,
-        count : 0,
-    };
+    let time = (*Time::get_now_monotonic).to_F64;
+    let rand = Random::init_by_seed(time.to_U64);
+    let (state, _rand) = GameState::initialize.randomize(rand);
 
-    eval *loop_m(state, |state|
-        let now = (*Time::get_now_monotonic).to_F64;
-        if now - state.@start_time > 10.0 {
-            break_m()
-        };
-        let state = state.proceed(now);
-        let count = state.@count;
+    eval *loop_m((state, time), |(state, prev_time)|
+        let now_time = (*Time::get_now_monotonic).to_F64;
+        if now_time - prev_time < 1.0 / fps { continue_m $ (state, prev_time) };
 
-        eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
-        eval *cairo.set_font_size(32.0);
-        eval *cairo.set_source_rgb((0.0, 0.0, 1.0));
-        eval *cairo.move_to((10.0 + (count % 300).to_F64, 50.0));
-        eval *cairo.show_text("Hello world!");
+        let state = state.proceed_cells;
 
+        eval *state.render(cairo);
         eval *window.flush;
         eval *window.swap_buffers(XbeSwapAction::background);
-        continue_m(state)
+
+        continue_m $ (state, now_time)
     );
 
     eval *window.close_window;
