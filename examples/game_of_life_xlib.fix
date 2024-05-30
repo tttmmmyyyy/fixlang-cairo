@@ -6,7 +6,7 @@ import Time;
 import Random;
 
 cells_count : (I64, I64);
-cells_count = (200, 200);
+cells_count = (100, 100);
 
 cell_size : (I64, I64);
 cell_size = (3, 3);
@@ -76,7 +76,7 @@ namespace GameState {
             )
         );
         state.mod_current_state(|current| (
-            Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).fold(current, |current, (x, y)|
+            Iterator::range(0, cells_count.@1).product(Iterator::range(0, cells_count.@0)).fold(current, |current, (y, x)|
                 let count = count_neighbors(x, y);
                 let alive = if prev.@(x).@(y) {
                     count == 2 || count == 3
@@ -92,7 +92,7 @@ namespace GameState {
     render = |cairo, state| (
         eval *cairo.set_source_rgb((1.0, 1.0, 1.0));
 
-        eval *Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).loop_iter_m((), |_, (x, y)|
+        eval *Iterator::range(0, cells_count.@1).product(Iterator::range(0, cells_count.@0)).loop_iter_m((), |_, (y, x)|
             let is_alive = state.@current_state.@(x).@(y);
 
             eval *if is_alive {   
@@ -126,7 +126,8 @@ main = (
         let now_time = (*Time::get_now_monotonic).to_F64;
         if now_time - prev_time < 1.0 / fps { continue_m $ (state, prev_time) };
 
-        let state = state.proceed_cells;
+        let (state, elapsed) = consumed_time_while_lazy(|_| state.proceed_cells);
+        eval *println(elapsed.to_string);
 
         eval *state.render(cairo);
         eval *window.flush;
