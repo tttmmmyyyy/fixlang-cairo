@@ -78,9 +78,9 @@ namespace GameState {
         state.mod_current_state(|current| (
             Iterator::range(0, cells_count.@0).product(Iterator::range(0, cells_count.@1)).fold(current, |current, (x, y)|
                 let count = count_neighbors(x, y);
-                let alive = if current.@(x).@(y) { // If current cell is alive,
+                let alive = if prev.@(x).@(y) {
                     count == 2 || count == 3
-                } else { // If current cell is dead,
+                } else {
                     count == 3
                 };
                 current.mod(x, set(y, alive))
