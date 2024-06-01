@@ -113,7 +113,7 @@ namespace GameState {
 
 main : IO ();
 main = (
-    let window = *XlibSurface::create_window(window_size.@0, window_size.@1);
+    let window = *XlibSurface::create_window(window_size);
     
     let surface = XlibSurface::create_back_surface(window);
     let cairo = Cairo::create(surface);

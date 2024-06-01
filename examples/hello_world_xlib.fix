@@ -5,7 +5,7 @@ import Cairo.XlibSurface;
 
 main : IO ();
 main = (
-    let window = *XlibSurface::create_window(640, 480);
+    let window = *XlibSurface::create_window((640, 480));
     
     let surface = XlibSurface::create_front_surface(window);
     let cairo = Cairo::create(surface);

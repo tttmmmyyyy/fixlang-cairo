@@ -13,8 +13,8 @@ type Window = box struct {
     height : I32
 };
 
-create_window : I64 -> I64 -> IO Window;
-create_window = |width, height| IO::from_func $ |_| (
+create_window : (I64, I64) -> IO Window;
+create_window = |(width, height)| IO::from_func $ |_| (
     let width = width.to_I32;
     let height = height.to_I32;
     let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
