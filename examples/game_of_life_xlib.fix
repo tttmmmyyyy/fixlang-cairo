@@ -21,6 +21,7 @@ fps = 60.0;
 type GameState = box struct {
     prev_state : Array (Array Bool),
     current_state : Array (Array Bool),
+    dragging : Bool,
 };
 
 namespace GameState {
@@ -31,6 +32,7 @@ namespace GameState {
         GameState {
             prev_state : prev_state,
             current_state : current_state,
+            dragging : false,
         }
     );
 
@@ -114,7 +116,7 @@ namespace GameState {
 main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window(window_size);
-    let event_mask = EventMask::exposure;
+    let event_mask = EventMask::exposure.bit_or(EventMask::button_press).bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion);
     eval *window.select_input(event_mask);
     // Wait for the window to be exposed.
     eval *loop_m((), |_| (
@@ -131,12 +133,36 @@ main = (
     let (state, _rand) = GameState::initialize.randomize(rand);
 
     eval *loop_m((state, time), |(state, prev_time)|
+        // First, process X events updating the state.
+        let state = *loop_m(state, |state| (
+            if *window.events_queued(QueuedMode::already) == 0 { break_m $ state };
+            let event = *window.next_event;
+            let state = if event.is_button_press {
+                state.set_dragging(true)
+            } else if event.is_button_release {
+                state.set_dragging(false)
+            } else if event.is_motion_notify {
+                if !state.@dragging { state }; // If not dragging, ignore.
+                // Update the cell.
+                let x = event.as_motion_notify.@x.to_I64 / cell_size.@0;
+                let y = event.as_motion_notify.@y.to_I64 / cell_size.@1;
+                let state = state.mod_current_state(|current| current.mod(x, set(y, true)));
+                state
+            } else {
+                state
+            };
+            continue_m $ state
+        ));
+
+        // If the time since the last frame is less than the desired frame time, skip updateing the cells.
         let now_time = (*Time::get_now_monotonic).to_F64;
         if now_time - prev_time < 1.0 / fps { continue_m $ (state, prev_time) };
 
+        // Update the cells.
         let (state, time) = consumed_time_while_lazy(|_| state.proceed_cells);
-        eval *println(time.to_string);
+        eval *println("Time to update cells: " + time.to_string);
 
+        // Render the cells.
         eval *state.render(cairo);
         eval *window.flush;
         eval *window.swap_buffers(XbeSwapAction::background);

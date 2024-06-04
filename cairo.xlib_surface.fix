@@ -70,6 +70,24 @@ next_event = |window| IO::from_func $ |_| (
                 CALL_C[() cairo_fixlang_xlib_as_destroy_notify_event(Ptr, Ptr), event_ptr, destroy_notify_event_ptr]
             );
             Event::destroy_notify(destroy_notify_event.@(0))
+        } else if event_type == Event::_button_press_id {
+            let button_press_event = [ButtonEvent::_null];
+            eval button_press_event.borrow_ptr(|button_press_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_press_event_ptr]
+            );
+            Event::button_press(button_press_event.@(0))
+        } else if event_type == Event::_button_release_id {
+            let button_release_event = [ButtonEvent::_null];
+            eval button_release_event.borrow_ptr(|button_release_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_release_event_ptr]
+            );
+            Event::button_release(button_release_event.@(0))
+        } else if event_type == Event::_motion_notify_id {
+            let motion_notify_event = [MotionEvent::_null];
+            eval motion_notify_event.borrow_ptr(|motion_notify_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_motion_notify_event(Ptr, Ptr), event_ptr, motion_notify_event_ptr]
+            );
+            Event::motion_notify(motion_notify_event.@(0))
         } else {
             Event::unimplemented()
         }
@@ -80,6 +98,24 @@ select_input : EventMask -> Window -> IO ();
 select_input = |event_mask, window| IO::from_func $ |_| (
     CALL_C[() XSelectInput(Ptr, U64, U64), window.@_display, window.@_window_id, event_mask]
 );
+
+events_queued : QueuedMode -> Window -> IO I64;
+events_queued = |mode, window| IO::from_func $ |_| (
+    CALL_C[I32 XEventsQueued(Ptr, I32), window.@_display, mode].to_I64
+);
+
+type QueuedMode = I32;
+
+namespace QueuedMode {
+    already : QueuedMode;
+    already = 0_I32;
+
+    reading : QueuedMode;
+    reading = 1_I32;
+
+    after_flush : QueuedMode;
+    after_flush = 2_I32;
+}
 
 type XbeSwapAction = U8;
 
@@ -98,12 +134,70 @@ namespace XbeSwapAction {
 }
 
 type Event = box union {
+    button_press : ButtonEvent,
+    button_release : ButtonEvent,
+    motion_notify : MotionEvent,
     expose : ExposeEvent,
     destroy_notify : DestroyNotifyEvent,
     unimplemented : (),
 };
 
 namespace Event {
+    _button_press_id : I32;
+    _button_press_id = 4_I32;
+
+    _button_release_id : I32;
+    _button_release_id = 5_I32;
+
+    type ButtonEvent = unbox struct {
+        type_ : I32,
+        serial : U64,
+        send_event : I32,
+        _display : Ptr,
+        _window : U64,
+        _root : U64,
+        _subwindow : U64,
+        time : U64,
+        x : I32,
+        y : I32,
+        x_root : I32,
+        y_root : I32,
+        state : U64,
+        button : U32,
+        same_screen : I32
+    };
+
+    namespace ButtonEvent {
+        _null : ButtonEvent;
+        _null = ButtonEvent { type_ : 0_I32, serial : 0_U64, send_event : 0_I32, _display : nullptr, _window : 0_U64, _root : 0_U64, _subwindow : 0_U64, time : 0_U64, x : 0_I32, y : 0_I32, x_root : 0_I32, y_root : 0_I32, state : 0_U64, button : 0_U32, same_screen : 0_I32 };
+    }
+
+    _motion_notify_id : I32;
+    _motion_notify_id = 6_I32;
+
+    type MotionEvent = unbox struct {
+        type_ : I32,
+        serial : U64,
+        send_event : I32,
+        _display : Ptr,
+        _window : U64,
+        _root : U64,
+        _subwindow : U64,
+        time : U64,
+        x : I32,
+        y : I32,
+        x_root : I32,
+        y_root : I32,
+        state : U64,
+        is_hint : U8,
+        same_screen : I32
+    };
+
+    namespace MotionEvent {
+        _null : MotionEvent;
+        _null = MotionEvent { type_ : 0_I32, serial : 0_U64, send_event : 0_I32, _display : nullptr, _window : 0_U64, _root : 0_U64, _subwindow : 0_U64, time : 0_U64, x : 0_I32, y : 0_I32, x_root : 0_I32, y_root : 0_I32, state : 0_U64, is_hint : 0_U8, same_screen : 0_I32 };
+    }
+
     _expose_id : I32;
     _expose_id = 12_I32;
 
@@ -146,6 +240,15 @@ namespace Event {
 type EventMask = U64;
 
 namespace EventMask {
+    button_press : EventMask;
+    button_press = 1_U64.shift_left(2_U64);
+
+    button_release : EventMask;
+    button_release = 1_U64.shift_left(3_U64);
+
+    pointer_motion : EventMask;
+    pointer_motion = 1_U64.shift_left(6_U64);
+
     exposure : EventMask;
     exposure = 1_U64.shift_left(15_U64);
 

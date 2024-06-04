@@ -51,3 +51,13 @@ void cairo_fixlang_xlib_as_destroy_notify_event(XEvent *event, XDestroyWindowEve
 {
     *destroy_notify_event = event->xdestroywindow;
 }
+
+void cairo_fixlang_xlib_as_button_event(XEvent *event, XButtonEvent *button_event)
+{
+    *button_event = event->xbutton;
+}
+
+void cairo_fixlang_xlib_as_motion_notify_event(XEvent *event, XMotionEvent *motion_notify_event)
+{
+    *motion_notify_event = event->xmotion;
+}
