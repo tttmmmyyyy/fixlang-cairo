@@ -5,7 +5,15 @@ import Cairo.XlibSurface;
 
 main : IO ();
 main = (
-    let window = *XlibSurface::create_window((640, 480));
+    let window = *XlibSurface::create_simple_window((640, 480));
+    let event_mask = EventMask::exposure;
+    eval *window.select_input(event_mask);
+    // Wait for the window to be exposed.
+    eval *loop_m((), |_| (
+        let event = *window.next_event;
+        if event.is_expose { break_m $ () };
+        continue_m $ ()
+    ));
     
     let surface = XlibSurface::create_front_surface(window);
     let cairo = Cairo::create(surface);
@@ -18,9 +26,10 @@ main = (
 
     eval *window.flush;
 
+    // Wait for any key is pressed.
     eval *read_line(stdin).map(|_|()).try(|msg| println(msg));
 
-    eval *window.close_window;
+    eval *window.destroy_window;
 
     pure()
 );

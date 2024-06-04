@@ -113,7 +113,15 @@ namespace GameState {
 
 main : IO ();
 main = (
-    let window = *XlibSurface::create_window(window_size);
+    let window = *XlibSurface::create_simple_window(window_size);
+    let event_mask = EventMask::exposure;
+    eval *window.select_input(event_mask);
+    // Wait for the window to be exposed.
+    eval *loop_m((), |_| (
+        let event = *window.next_event;
+        if event.is_expose { break_m $ () };
+        continue_m $ ()
+    ));
     
     let surface = XlibSurface::create_back_surface(window);
     let cairo = Cairo::create(surface);
@@ -136,7 +144,7 @@ main = (
         continue_m $ (state, now_time)
     );
 
-    eval *window.close_window;
+    eval *window.destroy_window;
 
     pure()
 );

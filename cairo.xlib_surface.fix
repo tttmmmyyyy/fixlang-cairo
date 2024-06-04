@@ -1,6 +1,7 @@
 module Cairo.XlibSurface;
 
 import Cairo::{Surface, Surface::_create_from_handle};
+import Debug;
 
 type _DisplayHandle = Ptr;
 type _WindowId = U64;
@@ -13,8 +14,8 @@ type Window = box struct {
     height : I32
 };
 
-create_window : (I64, I64) -> IO Window;
-create_window = |(width, height)| IO::from_func $ |_| (
+create_simple_window : (I64, I64) -> IO Window;
+create_simple_window = |(width, height)| IO::from_func $ |_| (
     let width = width.to_I32;
     let height = height.to_I32;
     let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
@@ -22,8 +23,8 @@ create_window = |(width, height)| IO::from_func $ |_| (
     Window { _display : display, _window_id : window, width : width, height : height }
 );
 
-close_window : Window -> IO ();
-close_window = |window| IO::from_func $ |_| (
+destroy_window : Window -> IO ();
+destroy_window = |window| IO::from_func $ |_| (
     eval CALL_C[() XDestroyWindow(Ptr, U64), window.@_display, window.@_window_id];
     CALL_C[() XCloseDisplay(Ptr), window.@_display]
 );
@@ -52,6 +53,30 @@ swap_buffers = |swap_action, window| IO::from_func $ |_| (
 flush : Window -> IO ();
 flush = |window| IO::from_func $ |_| CALL_C[() XFlush(Ptr), window.@_display];
 
+next_event : Window -> IO Event;
+next_event = |window| IO::from_func $ |_| (
+    let event_ptr = CALL_C[Ptr cairo_fixlang_xlib_next_event(Ptr), window.@_display];
+    let event = Destructor::make(event_ptr, |event_ptr| CALL_C[() cairo_fixlang_xlib_free_event(Ptr), event_ptr]);
+    event.borrow(|event_ptr| 
+        eval debug_println("ok");
+        let event_type = CALL_C[I32 cairo_fixlang_xlib_event_type(Ptr), event_ptr];
+        if event_type == Event::_expose_id {
+            let expose_event = [ExposeEvent::_null]; // TODO: we should add `Array::unsafe_uninitialized`, or `borrow_ptr` for any boxed type.
+            eval expose_event.borrow_ptr(|expose_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_expose_event(Ptr, Ptr), event_ptr, expose_event_ptr]
+            );
+            Event::expose(expose_event.@(0))
+        } else {
+            Event::unimplemented()
+        }
+    )
+);
+
+select_input : EventMask -> Window -> IO ();
+select_input = |event_mask, window| IO::from_func $ |_| (
+    CALL_C[() XSelectInput(Ptr, U64, U64), window.@_display, window.@_window_id, event_mask]
+);
+
 type XbeSwapAction = U8;
 
 namespace XbeSwapAction {
@@ -66,4 +91,40 @@ namespace XbeSwapAction {
 
     copied : XbeSwapAction;
     copied = 3_U8;
+}
+
+type Event = box union {
+    expose : ExposeEvent,
+    unimplemented : (),
+};
+
+namespace Event {
+    _expose_id : I32;
+    _expose_id = 12_I32;
+
+    type ExposeEvent = unbox struct {
+        type_ : I32,
+        serial : U64,
+        send_event : I32,
+        _display : Ptr,
+        window : U64,
+        x : I32,
+        y : I32,
+        width : I32,
+        height : I32,
+        count : I32
+    };
+
+    namespace ExposeEvent {
+        _null : ExposeEvent;
+        _null = ExposeEvent { type_ : 0_I32, serial : 0_U64, send_event : 0_I32, _display : nullptr, window : 0_U64, x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32, count : 0_I32 };
+    }
+
+}
+
+type EventMask = U64;
+
+namespace EventMask {
+    exposure : EventMask;
+    exposure = 1_U64.shift_left(15_U64);
 }
