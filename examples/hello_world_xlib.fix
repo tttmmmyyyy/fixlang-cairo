@@ -8,6 +8,7 @@ main = (
     let window = *XlibSurface::create_simple_window((640, 480));
     let event_mask = EventMask::exposure;
     eval *window.select_input(event_mask);
+
     // Wait for the window to be exposed.
     eval *loop_m((), |_| (
         let event = *window.next_event;

@@ -46,3 +46,8 @@ void cairo_fixlang_xlib_as_expose_event(XEvent *event, XExposeEvent *expose_even
 {
     *expose_event = event->xexpose;
 }
+
+void cairo_fixlang_xlib_as_destroy_notify_event(XEvent *event, XDestroyWindowEvent *destroy_notify_event)
+{
+    *destroy_notify_event = event->xdestroywindow;
+}
