@@ -131,8 +131,9 @@ namespace GameState {
 main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window(window_size);
-    let event_mask = EventMask::exposure.bit_or(EventMask::button_press).bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion);
+    let event_mask = EventMask::exposure.bit_or(EventMask::button_press).bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion).bit_or(EventMask::key_press);
     eval *window.select_input(event_mask);
+
     // Wait for the window to be exposed.
     eval *loop_m((), |_| (
         let event = *window.next_event;
@@ -149,9 +150,13 @@ main = (
 
     eval *loop_m((state, rand, time), |(state, rand, prev_time)|
         // First, process X events updating the state.
-        let state = *loop_m(state, |state| (
-            if *window.events_queued(QueuedMode::already) == 0 { break_m $ state };
+        let opt_state = *loop_m(state, |state| (
+            if *window.events_queued(QueuedMode::already) == 0 { break_m $ Option::some(state) };
             let event = *window.next_event;
+
+            let exit = event.is_key_press && event.as_key_press.@keycode == 24_U32;
+            if exit { break_m $ Option::none() };
+
             let state = if event.is_button_press {
                 let event = event.as_button_press;
                 state.set_drag_pos(Option::some $ (event.@x.to_I64 / cell_size.@0, event.@y.to_I64 / cell_size.@1))
@@ -166,6 +171,9 @@ main = (
             };
             continue_m $ state
         ));
+
+        if opt_state.is_none { break_m $ () };
+        let state = opt_state.as_some;
 
         // If the time since the last frame is less than the desired frame time, skip updateing the cells.
         let now_time = (*Time::get_now_monotonic).to_F64;

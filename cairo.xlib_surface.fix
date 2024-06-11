@@ -70,6 +70,18 @@ next_event = |window| IO::from_func $ |_| (
                 CALL_C[() cairo_fixlang_xlib_as_destroy_notify_event(Ptr, Ptr), event_ptr, destroy_notify_event_ptr]
             );
             Event::destroy_notify(destroy_notify_event.@(0))
+        } else if event_type == Event::_key_press_id {
+            let key_press_event = [KeyEvent::_null];
+            eval key_press_event.borrow_ptr(|key_press_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_press_event_ptr]
+            );
+            Event::key_press(key_press_event.@(0))
+        } else if event_type == Event::_key_release_id {
+            let key_release_event = [KeyEvent::_null];
+            eval key_release_event.borrow_ptr(|key_release_event_ptr|
+                CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_release_event_ptr]
+            );
+            Event::key_release(key_release_event.@(0))
         } else if event_type == Event::_button_press_id {
             let button_press_event = [ButtonEvent::_null];
             eval button_press_event.borrow_ptr(|button_press_event_ptr|
@@ -134,6 +146,8 @@ namespace XbeSwapAction {
 }
 
 type Event = box union {
+    key_press : KeyEvent,
+    key_release : KeyEvent,
     button_press : ButtonEvent,
     button_release : ButtonEvent,
     motion_notify : MotionEvent,
@@ -143,6 +157,35 @@ type Event = box union {
 };
 
 namespace Event {
+    _key_press_id : I32;
+    _key_press_id = 2_I32;
+
+    _key_release_id : I32;
+    _key_release_id = 3_I32;
+
+    type KeyEvent = unbox struct {
+        type_ : I32,
+        serial : U64,
+        send_event : I32,
+        _display : Ptr,
+        _window : U64,
+        _root : U64,
+        _subwindow : U64,
+        time : U64,
+        x : I32,
+        y : I32,
+        x_root : I32,
+        y_root : I32,
+        state : U32,
+        keycode : U32,
+        same_screen : I32
+    };
+
+    namespace KeyEvent {
+        _null : KeyEvent;
+        _null = KeyEvent { type_ : 0_I32, serial : 0_U64, send_event : 0_I32, _display : nullptr, _window : 0_U64, _root : 0_U64, _subwindow : 0_U64, time : 0_U64, x : 0_I32, y : 0_I32, x_root : 0_I32, y_root : 0_I32, state : 0_U32, keycode : 0_U32, same_screen : 0_I32 };
+    }
+
     _button_press_id : I32;
     _button_press_id = 4_I32;
 
@@ -240,6 +283,12 @@ namespace Event {
 type EventMask = U64;
 
 namespace EventMask {
+    key_press : EventMask;
+    key_press = 1_U64.shift_left(0_U64);
+
+    key_release : EventMask;
+    key_release = 1_U64.shift_left(1_U64);
+
     button_press : EventMask;
     button_press = 1_U64.shift_left(2_U64);
 
