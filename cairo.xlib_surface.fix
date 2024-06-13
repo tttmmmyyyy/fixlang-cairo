@@ -116,6 +116,21 @@ events_queued = |mode, window| IO::from_func $ |_| (
     CALL_C[I32 XEventsQueued(Ptr, I32), window.@_display, mode].to_I64
 );
 
+type KeyCode = U32;
+type KeySym = U64;
+
+keycode_to_keysym : KeyCode -> Window -> IO KeySym;
+keycode_to_keysym = |keycode, window| IO::from_func $ |_| (
+    CALL_C[U64 XKeycodeToKeysym(Ptr, U32, I32), window.@_display, keycode, 0_I32]
+);
+
+string_to_keysym : String -> KeySym;
+string_to_keysym = |string| (
+    string.borrow_c_str(|cstr|
+        CALL_C[U64 XStringToKeysym(Ptr), cstr]
+    )
+);
+
 type QueuedMode = I32;
 
 namespace QueuedMode {

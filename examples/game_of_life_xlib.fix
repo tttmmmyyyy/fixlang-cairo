@@ -154,7 +154,12 @@ main = (
             if *window.events_queued(QueuedMode::already) == 0 { break_m $ Option::some(state) };
             let event = *window.next_event;
 
-            let exit = event.is_key_press && event.as_key_press.@keycode == 24_U32;
+            let exit = *if !event.is_key_press { pure $ false } else {
+                let keycode = event.as_key_press.@keycode;
+                let keysym = *window.keycode_to_keysym(keycode);
+                let keysym_q = string_to_keysym("q");
+                pure $ keysym == keysym_q
+            };
             if exit { break_m $ Option::none() };
 
             let state = if event.is_button_press {
