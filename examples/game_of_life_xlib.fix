@@ -154,12 +154,13 @@ main = (
             if *window.events_queued(QueuedMode::already) == 0 { break_m $ Option::some(state) };
             let event = *window.next_event;
 
-            let exit = *if !event.is_key_press { pure $ false } else {
+            let exit = *(
+                if !event.is_key_press { pure $ false };
                 let keycode = event.as_key_press.@keycode;
                 let keysym = *window.keycode_to_keysym(keycode);
                 let keysym_q = string_to_keysym("q");
                 pure $ keysym == keysym_q
-            };
+            );
             if exit { break_m $ Option::none() };
 
             let state = if event.is_button_press {
@@ -187,8 +188,7 @@ main = (
         // If the user is dragging, put a seed around the drag position.
         let (state, rand) = if state.@drag_pos.is_some {
             let (x, y) = state.@drag_pos.as_some;
-            let (state, rand) = state.put_seed_around(rand, (x,y));
-            (state, rand)
+            state.put_seed_around(rand, (x,y))
         } else {
             (state, rand)
         };
