@@ -59,47 +59,47 @@ next_event = |window| IO::from_func $ |_| (
     event.borrow(|event_ptr| 
         let event_type = CALL_C[I32 cairo_fixlang_xlib_event_type(Ptr), event_ptr];
         if event_type == Event::_expose_id {
-            let expose_event = [ExposeEvent::_null]; // TODO: we should add `Array::unsafe_uninitialized`, or `borrow_ptr` for any boxed type.
-            eval expose_event.borrow_ptr(|expose_event_ptr|
+            let expose_event = ExposeEvent::_null;
+            eval expose_event.unsafe_borrow_boxed_data_ptr(|expose_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_expose_event(Ptr, Ptr), event_ptr, expose_event_ptr]
             );
-            Event::expose(expose_event.@(0))
+            Event::expose(expose_event)
         } else if event_type == Event::_destroy_notify_id {
-            let destroy_notify_event = [DestroyNotifyEvent::_null];
-            eval destroy_notify_event.borrow_ptr(|destroy_notify_event_ptr|
+            let destroy_notify_event = DestroyNotifyEvent::_null;
+            eval destroy_notify_event.unsafe_borrow_boxed_data_ptr(|destroy_notify_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_destroy_notify_event(Ptr, Ptr), event_ptr, destroy_notify_event_ptr]
             );
-            Event::destroy_notify(destroy_notify_event.@(0))
+            Event::destroy_notify(destroy_notify_event)
         } else if event_type == Event::_key_press_id {
-            let key_press_event = [KeyEvent::_null];
-            eval key_press_event.borrow_ptr(|key_press_event_ptr|
+            let key_press_event = KeyEvent::_null;
+            eval key_press_event.unsafe_borrow_boxed_data_ptr(|key_press_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_press_event_ptr]
             );
-            Event::key_press(key_press_event.@(0))
+            Event::key_press(key_press_event)
         } else if event_type == Event::_key_release_id {
-            let key_release_event = [KeyEvent::_null];
-            eval key_release_event.borrow_ptr(|key_release_event_ptr|
+            let key_release_event = KeyEvent::_null;
+            eval key_release_event.unsafe_borrow_boxed_data_ptr(|key_release_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_release_event_ptr]
             );
-            Event::key_release(key_release_event.@(0))
+            Event::key_release(key_release_event)
         } else if event_type == Event::_button_press_id {
-            let button_press_event = [ButtonEvent::_null];
-            eval button_press_event.borrow_ptr(|button_press_event_ptr|
+            let button_press_event = ButtonEvent::_null;
+            eval button_press_event.unsafe_borrow_boxed_data_ptr(|button_press_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_press_event_ptr]
             );
-            Event::button_press(button_press_event.@(0))
+            Event::button_press(button_press_event)
         } else if event_type == Event::_button_release_id {
-            let button_release_event = [ButtonEvent::_null];
-            eval button_release_event.borrow_ptr(|button_release_event_ptr|
+            let button_release_event = ButtonEvent::_null;
+            eval button_release_event.unsafe_borrow_boxed_data_ptr(|button_release_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_release_event_ptr]
             );
-            Event::button_release(button_release_event.@(0))
+            Event::button_release(button_release_event)
         } else if event_type == Event::_motion_notify_id {
-            let motion_notify_event = [MotionEvent::_null];
-            eval motion_notify_event.borrow_ptr(|motion_notify_event_ptr|
+            let motion_notify_event = MotionEvent::_null;
+            eval motion_notify_event.unsafe_borrow_boxed_data_ptr(|motion_notify_event_ptr|
                 CALL_C[() cairo_fixlang_xlib_as_motion_notify_event(Ptr, Ptr), event_ptr, motion_notify_event_ptr]
             );
-            Event::motion_notify(motion_notify_event.@(0))
+            Event::motion_notify(motion_notify_event)
         } else {
             Event::unimplemented()
         }
@@ -160,7 +160,7 @@ namespace XbeSwapAction {
     copied = 3_U8;
 }
 
-type Event = box union {
+type Event = union {
     key_press : KeyEvent,
     key_release : KeyEvent,
     button_press : ButtonEvent,
@@ -178,7 +178,7 @@ namespace Event {
     _key_release_id : I32;
     _key_release_id = 3_I32;
 
-    type KeyEvent = unbox struct {
+    type KeyEvent = box struct {
         type_ : I32,
         serial : U64,
         send_event : I32,
@@ -207,7 +207,7 @@ namespace Event {
     _button_release_id : I32;
     _button_release_id = 5_I32;
 
-    type ButtonEvent = unbox struct {
+    type ButtonEvent = box struct {
         type_ : I32,
         serial : U64,
         send_event : I32,
@@ -233,7 +233,7 @@ namespace Event {
     _motion_notify_id : I32;
     _motion_notify_id = 6_I32;
 
-    type MotionEvent = unbox struct {
+    type MotionEvent = box struct {
         type_ : I32,
         serial : U64,
         send_event : I32,
@@ -259,7 +259,7 @@ namespace Event {
     _expose_id : I32;
     _expose_id = 12_I32;
 
-    type ExposeEvent = unbox struct {
+    type ExposeEvent = box struct {
         type_ : I32,
         serial : U64,
         send_event : I32,
@@ -280,7 +280,7 @@ namespace Event {
     _destroy_notify_id : I32;
     _destroy_notify_id = 17_I32;
 
-    type DestroyNotifyEvent = unbox struct {
+    type DestroyNotifyEvent = box struct {
         type_ : I32,
         serial : U64,
         send_event : I32,
