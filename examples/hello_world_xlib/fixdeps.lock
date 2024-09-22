@@ -1,6 +1,0 @@
-proj_file_hash = "67de487a318c27c6a857052437dc973c"
-
-[[dependencies]]
-name = "cairo-fix"
-version = "0.1.0"
-path = "/home/maruyama/cairo-fixlang/examples/hello_world_xlib/../../"
