@@ -4,3 +4,4 @@ hello.png
 *.out
 *.so
 *.a
+fixdeps.lock
