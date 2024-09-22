@@ -1,5 +1,5 @@
 [general]
-name = "hello-world-image"
+name = "hello-world-xlib"
 version = "0.1.0"
 
 [build]
