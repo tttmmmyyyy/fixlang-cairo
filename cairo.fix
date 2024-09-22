@@ -1,4 +1,5 @@
 module Cairo;
+import Math::{sin, cos};
 
 type Cairo = unbox struct { _dtor : Destructor CairoHandle };
 
@@ -519,7 +520,7 @@ rel_move_to = |(dx, dy), cairo| IO::from_func $ |_| (
 );
 
 path_extents : Cairo -> IO (F64, F64, F64, F64);
-path_extents = |cairo| IO::from_func $ |_| (
+path_extents = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo|
     let x1 : Array F64 = Array::fill(1, 0.0);
     let y1 : Array F64 = Array::fill(1, 0.0);
     let x2 : Array F64 = Array::fill(1, 0.0);
@@ -552,30 +553,32 @@ rotate = |angle, cairo| IO::from_func $ |_| (
 transform : Matrix -> Cairo -> IO ();
 transform = |matrix, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
-        CairoMatrix::_create(matrix)._with_handle(|matrix| (
+        let _ = matrix._with_ptr(|matrix| (
             FFI_CALL[() cairo_transform(Ptr, Ptr), cairo, matrix]
-        ))
+        ));
+        ()
     ))
 );
 
 set_matrix : Matrix -> Cairo -> IO ();
 set_matrix = |matrix, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
-        CairoMatrix::_create(matrix)._with_handle(|matrix| (
+        let _ = matrix._with_ptr(|matrix| (
             FFI_CALL[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
-        ))
+        ));
+        ()
     ))
 );
 
 get_matrix : Cairo -> IO Matrix;
 get_matrix = |cairo| IO::from_func $ |_| (
-    let matrix = CairoMatrix::_create(Matrix::init_identity);
-    eval cairo._with_handle(|cairo| (
-        matrix._with_handle(|matrix| (
-            FFI_CALL[() cairo_get_matrix(Ptr, Ptr), cairo, matrix._get_ptr]
+    let matrix = Matrix::init_identity;
+    let (_, matrix) = cairo._with_handle(|cairo| (
+        matrix._with_ptr(|matrix| (
+            FFI_CALL[() cairo_get_matrix(Ptr, Ptr), cairo, matrix]
         ))
     ));
-    matrix._get_matrix
+    matrix
 );
 
 identity_matrix : Cairo -> IO ();
@@ -643,21 +646,22 @@ set_font_size = |size, cairo| IO::from_func $ |_| (
 set_font_matrix : Matrix -> Cairo -> IO ();
 set_font_matrix = |matrix, cairo| IO::from_func $ |_| (
     cairo._with_handle(|cairo| (
-        CairoMatrix::_create(matrix)._with_handle(|matrix| (
+        let _ = matrix._with_ptr(|matrix| (
             FFI_CALL[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
-        ))
+        ));
+        ()
     ))
 );
 
 get_font_matrix : Cairo -> IO Matrix;
 get_font_matrix = |cairo| IO::from_func $ |_| (
-    let matrix = CairoMatrix::_create(Matrix::init_identity);
-    eval cairo._with_handle(|cairo| (
-        matrix._with_handle(|matrix| (
-            FFI_CALL[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix._get_ptr]
+    let matrix = Matrix::init_identity;
+    let (_, matrix) = cairo._with_handle(|cairo| (
+        matrix._with_ptr(|matrix| (
+            FFI_CALL[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
         ))
     ));
-    matrix._get_matrix
+    matrix
 );
 
 set_font_options : FontOptions -> Cairo -> IO ();
@@ -692,7 +696,7 @@ set_font_face = |face, cairo| IO::from_func $ |_| (
 get_font_face : Cairo -> IO FontFace;
 get_font_face = |cairo| IO::from_func $ |_| (
     let face = cairo._with_handle(|cairo| (
-        FFI_CALL[Ptr cairo_get_font_face(Ptr, Ptr), cairo, face]
+        FFI_CALL[Ptr cairo_get_font_face(Ptr), cairo]
     ));
     let face = FFI_CALL[Ptr cairo_font_face_reference(Ptr), face];
     FontFace::_create_from_handle(face)
@@ -744,7 +748,7 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| IO::from_func $ |_| (
             let num_clusters = clusters.get_size.to_I32;
             glyphs.borrow_ptr(|glyphs| (
                 clusters.borrow_ptr(|clusters| (
-                    FFI_CALL[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, I32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
+                    FFI_CALL[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
                 ))
             ))
         ))
@@ -753,9 +757,9 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| IO::from_func $ |_| (
 
 font_extents : Cairo -> IO FontExtents;
 font_extents = |cairo| IO::from_func $ |_| (
-    let extents = FontExtents::create();
-    eval cairo._with_handle(|cairo| (
-        extents._with_handle(|extents| (
+    let extents = FontExtents::create;
+    let (_, extents) = cairo._with_handle(|cairo| (
+        extents._with_ptr(|extents| (
             FFI_CALL[() cairo_font_extents(Ptr, Ptr), cairo, extents]
         ))
     ));
@@ -764,10 +768,10 @@ font_extents = |cairo| IO::from_func $ |_| (
 
 text_extents : String -> Cairo -> IO TextExtents;
 text_extents = |text, cairo| IO::from_func $ |_| (
-    let extents = TextExtents::create();
-    eval cairo._with_handle(|cairo| (
+    let extents = TextExtents::create;
+    let (_, extents) = cairo._with_handle(|cairo| (
         text.borrow_c_str(|text| (
-            extents._with_handle(|extents| (
+            extents._with_ptr(|extents| (
                 FFI_CALL[() cairo_text_extents(Ptr, Ptr, Ptr), cairo, text, extents]
             ))
         ))
@@ -777,11 +781,11 @@ text_extents = |text, cairo| IO::from_func $ |_| (
 
 glyph_extents : Array Glyph -> Cairo -> IO TextExtents;
 glyph_extents = |glyphs, cairo| IO::from_func $ |_| (
-    let extents = TextExtents::create();
-    eval cairo._with_handle(|cairo| (
+    let extents = TextExtents::create;
+    let (_, extents) = cairo._with_handle(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
         glyphs.borrow_ptr(|glyphs| (
-            extents._with_handle(|extents| (
+            extents._with_ptr(|extents| (
                 FFI_CALL[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
             ))
         ))
@@ -924,8 +928,8 @@ namespace Pattern {
         }
     ));
 
-    create_radial : (F64, F64, F64) -> (F64, F64, F64) -> F64 -> Pattern;
-    create_radial = |(x0, y0, r0), (x1, y1, r1)| r1 (
+    create_radial : (F64, F64, F64) -> (F64, F64, F64) -> Pattern;
+    create_radial = |(x0, y0, r0), (x1, y1, r1)| (
         let handle = FFI_CALL[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
         Pattern::_create_from_handle(handle)
     );
@@ -1086,19 +1090,20 @@ namespace Pattern {
     set_matrix : Matrix -> Pattern -> IO ();
     set_matrix = |matrix, pattern| IO::from_func $ |_| (
         pattern._with_handle(|pattern| (
-            matrix.borrow_cairo_matrix(|matrix| (
+            let _ = matrix._with_ptr(|matrix| (
                 FFI_CALL[() cairo_pattern_set_matrix(Ptr, Ptr), pattern, matrix]
-            ))
+            ));
+            ()
         ))
     );
 
     get_matrix : Pattern -> IO Matrix;
     get_matrix = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let cairo_matrix = CairoMatrix::_create(Matrix::init_identity);
-        eval cairo_matrix.borrow(|cairo_matrix| (
-            FFI_CALL[() cairo_pattern_get_matrix(Ptr, Ptr), pattern, cairo_matrix]
+        let matrix = Matrix::init_identity;
+        let (_, matrix) = matrix._with_ptr(|matrix| (
+            FFI_CALL[() cairo_pattern_get_matrix(Ptr, Ptr), pattern, matrix]
         ));
-        cairo_matrix._get_matrix
+        matrix
     ));
 
     get_type : Pattern -> IO PatternType;
@@ -1190,7 +1195,7 @@ namespace Matrix {
     invert = |matrix| (
         let det = matrix.@xx * matrix.@yy - matrix.@yx * matrix.@xy;
         if det == 0.0 {
-            Option::none
+            Option::none()
         } else {
             let inv_det = 1.0 / det;
             let xx = matrix.@yy * inv_det;
@@ -1262,10 +1267,11 @@ namespace Region {
 
     create_rectangle : RectangleInt -> Region;
     create_rectangle = |rect| (
-        CairoRectangleInt::_create(rect)._with_handle(|rect| (
+        let (region, _) = rect._with_ptr(|rect| (
             let handle = FFI_CALL[Ptr cairo_region_create_rectangle(Ptr), rect];
             Region::_create_from_handle(handle)
-        ))
+        ));
+        region
     );
 
     create_rectangles : Array RectangleInt -> Region;
@@ -1782,6 +1788,9 @@ type FontExtents = unbox struct { ascent : F64, descent : F64, height : F64, max
 
 namespace FontExtents {
 
+    create : FontExtents;
+    create = FontExtents { ascent : 0.0, descent : 0.0, height : 0.0, max_x_advance : 0.0, max_y_advance : 0.0 };
+
     _with_ptr : (Ptr -> a) -> FontExtents -> (a, FontExtents);
     _with_ptr = |act, extents| (
         let arr = [extents];
@@ -1793,6 +1802,9 @@ namespace FontExtents {
 type TextExtents = unbox struct { x_bearing : F64, y_bearing : F64, width : F64, height : F64, x_advance : F64, y_advance : F64 };
 
 namespace TextExtents {
+
+    create : TextExtents;
+    create = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
 
     _with_ptr : (Ptr -> a) -> TextExtents -> (a, TextExtents);
     _with_ptr = |act, extents| (
