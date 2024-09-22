@@ -2,13 +2,13 @@ module Cairo.XlibSurface;
 
 import Cairo::{Surface, Surface::_create_from_handle};
 
-type _DisplayHandle = Ptr;
-type _WindowId = U64;
-type _BackBufferId = U64;
+type DisplayHandle = Ptr;
+type WindowId = U64;
+type BackBufferId = U64;
 
 type Window = box struct { 
-    _display : _DisplayHandle,
-    _window_id : _WindowId,
+    _display : DisplayHandle,
+    _window_id : WindowId,
     width : I32,
     height : I32
 };
@@ -17,27 +17,27 @@ create_simple_window : (I64, I64) -> IO Window;
 create_simple_window = |(width, height)| IO::from_func $ |_| (
     let width = width.to_I32;
     let height = height.to_I32;
-    let display : _DisplayHandle = CALL_C[Ptr XOpenDisplay(Ptr), nullptr];
-    let window : _WindowId = CALL_C[U64 cairo_fixlang_xlib_surface_create_x_window(Ptr, I32, I32), display, width, height];
+    let display : DisplayHandle = FFI_CALL[Ptr XOpenDisplay(Ptr), nullptr];
+    let window : WindowId = FFI_CALL[U64 cairo_fixlang_xlib_surface_create_x_window(Ptr, I32, I32), display, width, height];
     Window { _display : display, _window_id : window, width : width, height : height }
 );
 
 destroy_window : Window -> IO ();
 destroy_window = |window| IO::from_func $ |_| (
-    eval CALL_C[() XDestroyWindow(Ptr, U64), window.@_display, window.@_window_id];
-    CALL_C[() XCloseDisplay(Ptr), window.@_display]
+    eval FFI_CALL[() XDestroyWindow(Ptr, U64), window.@_display, window.@_window_id];
+    FFI_CALL[() XCloseDisplay(Ptr), window.@_display]
 );
 
 create_front_surface : Window -> Surface;
 create_front_surface = |window| (
-    let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_window_id, window.@width, window.@height];
+    let handle = FFI_CALL[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_window_id, window.@width, window.@height];
     Surface::_create_from_handle(handle)
 );
 
 create_back_surface : Window -> Surface;
 create_back_surface = |window| (
-    let back_buffer = CALL_C[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), window.@_display, window.@_window_id, XbeSwapAction::undefined];
-    let handle = CALL_C[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, back_buffer, window.@width, window.@height];
+    let back_buffer = FFI_CALL[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), window.@_display, window.@_window_id, XbeSwapAction::undefined];
+    let handle = FFI_CALL[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, back_buffer, window.@width, window.@height];
     Surface::_create_from_handle(handle)
 );
 
@@ -45,59 +45,59 @@ swap_buffers : XbeSwapAction -> Window -> IO ();
 swap_buffers = |swap_action, window| IO::from_func $ |_| (
     let swap_action = [(window.@_window_id, swap_action)];
     swap_action.borrow_ptr(|swap_action| 
-        CALL_C[() XdbeSwapBuffers(Ptr, Ptr, I32), window.@_display, swap_action, 1_I32]
+        FFI_CALL[() XdbeSwapBuffers(Ptr, Ptr, I32), window.@_display, swap_action, 1_I32]
     )
 );
 
 flush : Window -> IO ();
-flush = |window| IO::from_func $ |_| CALL_C[() XFlush(Ptr), window.@_display];
+flush = |window| IO::from_func $ |_| FFI_CALL[() XFlush(Ptr), window.@_display];
 
 next_event : Window -> IO Event;
 next_event = |window| IO::from_func $ |_| (
-    let event_ptr = CALL_C[Ptr cairo_fixlang_xlib_next_event(Ptr), window.@_display];
-    let event = Destructor::make(event_ptr, |event_ptr| CALL_C[() cairo_fixlang_xlib_free_event(Ptr), event_ptr]);
+    let event_ptr = FFI_CALL[Ptr cairo_fixlang_xlib_next_event(Ptr), window.@_display];
+    let event = Destructor::make(event_ptr, |event_ptr| FFI_CALL[() cairo_fixlang_xlib_free_event(Ptr), event_ptr]);
     event.borrow(|event_ptr| 
-        let event_type = CALL_C[I32 cairo_fixlang_xlib_event_type(Ptr), event_ptr];
+        let event_type = FFI_CALL[I32 cairo_fixlang_xlib_event_type(Ptr), event_ptr];
         if event_type == Event::_expose_id {
             let expose_event = ExposeEvent::_null;
             eval expose_event.unsafe_borrow_boxed_data_ptr(|expose_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_expose_event(Ptr, Ptr), event_ptr, expose_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_expose_event(Ptr, Ptr), event_ptr, expose_event_ptr]
             );
             Event::expose(expose_event)
         } else if event_type == Event::_destroy_notify_id {
             let destroy_notify_event = DestroyNotifyEvent::_null;
             eval destroy_notify_event.unsafe_borrow_boxed_data_ptr(|destroy_notify_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_destroy_notify_event(Ptr, Ptr), event_ptr, destroy_notify_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_destroy_notify_event(Ptr, Ptr), event_ptr, destroy_notify_event_ptr]
             );
             Event::destroy_notify(destroy_notify_event)
         } else if event_type == Event::_key_press_id {
             let key_press_event = KeyEvent::_null;
             eval key_press_event.unsafe_borrow_boxed_data_ptr(|key_press_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_press_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_press_event_ptr]
             );
             Event::key_press(key_press_event)
         } else if event_type == Event::_key_release_id {
             let key_release_event = KeyEvent::_null;
             eval key_release_event.unsafe_borrow_boxed_data_ptr(|key_release_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_release_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_key_event(Ptr, Ptr), event_ptr, key_release_event_ptr]
             );
             Event::key_release(key_release_event)
         } else if event_type == Event::_button_press_id {
             let button_press_event = ButtonEvent::_null;
             eval button_press_event.unsafe_borrow_boxed_data_ptr(|button_press_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_press_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_press_event_ptr]
             );
             Event::button_press(button_press_event)
         } else if event_type == Event::_button_release_id {
             let button_release_event = ButtonEvent::_null;
             eval button_release_event.unsafe_borrow_boxed_data_ptr(|button_release_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_release_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_button_event(Ptr, Ptr), event_ptr, button_release_event_ptr]
             );
             Event::button_release(button_release_event)
         } else if event_type == Event::_motion_notify_id {
             let motion_notify_event = MotionEvent::_null;
             eval motion_notify_event.unsafe_borrow_boxed_data_ptr(|motion_notify_event_ptr|
-                CALL_C[() cairo_fixlang_xlib_as_motion_notify_event(Ptr, Ptr), event_ptr, motion_notify_event_ptr]
+                FFI_CALL[() cairo_fixlang_xlib_as_motion_notify_event(Ptr, Ptr), event_ptr, motion_notify_event_ptr]
             );
             Event::motion_notify(motion_notify_event)
         } else {
@@ -108,12 +108,12 @@ next_event = |window| IO::from_func $ |_| (
 
 select_input : EventMask -> Window -> IO ();
 select_input = |event_mask, window| IO::from_func $ |_| (
-    CALL_C[() XSelectInput(Ptr, U64, U64), window.@_display, window.@_window_id, event_mask]
+    FFI_CALL[() XSelectInput(Ptr, U64, U64), window.@_display, window.@_window_id, event_mask]
 );
 
 events_queued : QueuedMode -> Window -> IO I64;
 events_queued = |mode, window| IO::from_func $ |_| (
-    CALL_C[I32 XEventsQueued(Ptr, I32), window.@_display, mode].to_I64
+    FFI_CALL[I32 XEventsQueued(Ptr, I32), window.@_display, mode].to_I64
 );
 
 type KeyCode = U32;
@@ -121,13 +121,13 @@ type KeySym = U64;
 
 keycode_to_keysym : KeyCode -> Window -> IO KeySym;
 keycode_to_keysym = |keycode, window| IO::from_func $ |_| (
-    CALL_C[U64 XKeycodeToKeysym(Ptr, U32, I32), window.@_display, keycode, 0_I32]
+    FFI_CALL[U64 XKeycodeToKeysym(Ptr, U32, I32), window.@_display, keycode, 0_I32]
 );
 
 string_to_keysym : String -> KeySym;
 string_to_keysym = |string| (
     string.borrow_c_str(|cstr|
-        CALL_C[U64 XStringToKeysym(Ptr), cstr]
+        FFI_CALL[U64 XStringToKeysym(Ptr), cstr]
     )
 );
 
