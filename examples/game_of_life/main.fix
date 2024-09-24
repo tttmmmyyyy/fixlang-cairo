@@ -4,7 +4,6 @@ import Cairo;
 import Cairo.XlibSurface;
 import Time;
 import Random;
-import Debug;
 
 cells_count : (I64, I64);
 cells_count = (200, 200);
