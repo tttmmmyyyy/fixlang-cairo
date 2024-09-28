@@ -1,12 +1,19 @@
 [general]
 name = "cairo-fix"
 version = "0.1.1"
+registries = [
+    "https://raw.githubusercontent.com/tttmmmyyyy/fixlang/refs/heads/main/registry.toml",
+]
 
 [build]
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
 dynamic_links = ["cairo", "X11", "Xext"]
 static_links = ["fixcairox11"]
-preliminary_commands = [
-    ["make", "libfixcairox11.a", "--quiet"]
-]
+preliminary_commands = [["make", "libfixcairox11.a", "--quiet"]]
 library_paths = ["."]
+
+
+[[dependencies]]
+name = "math"
+version = "0.1.0"
+git = { url = "https://github.com/tttmmmyyyy/fixlang-math.git" }
