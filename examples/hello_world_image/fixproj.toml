@@ -7,5 +7,5 @@ files = ["main.fix"]
 
 [[dependencies]]
 name = "cairo-fix"
-version = "0.1.0"
+version = "*"
 path = "../../"

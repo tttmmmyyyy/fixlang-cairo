@@ -1,11 +1,25 @@
 [general]
 name = "game-of-life"
-version = "0.1.0"
+version = "0.1.1"
+registries = [
+    "https://raw.githubusercontent.com/tttmmmyyyy/fixlang/refs/heads/main/registry.toml",
+]
 
 [build]
 files = ["main.fix"]
 
 [[dependencies]]
 name = "cairo-fix"
-version = "0.1.0"
+version = "*"
 path = "../../"
+
+
+[[dependencies]]
+name = "random"
+version = "0.1.0"
+git = { url = "https://github.com/tttmmmyyyy/fixlang-random.git" }
+
+[[dependencies]]
+name = "time"
+version = "0.1.0"
+git = { url = "https://github.com/tttmmmyyyy/fixlang-time.git" }
