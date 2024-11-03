@@ -557,27 +557,25 @@ rotate = |angle, cairo| (
 transform : Matrix -> Cairo -> IO ();
 transform = |matrix, cairo| (
     cairo._with_handle_io(|cairo| (
-        let _ = matrix._with_ptr(|matrix| (
+        matrix._with_ptr_io(|matrix| (
             FFI_CALL_IO[() cairo_transform(Ptr, Ptr), cairo, matrix]
-        ));
-        ()
+        ))
     ))
 );
 
 set_matrix : Matrix -> Cairo -> IO ();
 set_matrix = |matrix, cairo| (
     cairo._with_handle_io(|cairo| (
-        let _ = matrix._with_ptr(|matrix| (
+        matrix._with_ptr_io(|matrix| (
             FFI_CALL_IO[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
-        ));
-        ()
+        ))
     ))
 );
 
 get_matrix : Cairo -> IO Matrix;
 get_matrix = |cairo| cairo._with_handle_io(|cairo| (
     let matrix = Matrix::init_identity;
-    let (_, matrix) = matrix._with_ptr(|matrix| (
+    let (matrix, _) = *matrix._mutate_io(|matrix| (
         FFI_CALL_IO[() cairo_get_matrix(Ptr, Ptr), cairo, matrix]
     ));
     pure $ matrix
@@ -1162,12 +1160,17 @@ type Matrix = unbox struct { xx : F64, yx : F64, xy : F64, yy : F64, x0 : F64, y
 
 namespace Matrix {
 
-    // TODO: Rename this to `mutate`. Swap the order of the return values.
-    _with_ptr : (Ptr -> IO a) -> Matrix -> (a, Matrix);
-    _with_ptr = |act, matrix| (
+    _with_ptr_io : (Ptr -> IO a) -> Matrix -> IO a;
+    _with_ptr_io = |act, matrix| (
         let mat = Boxed { value : matrix };
-        let (mat, res) = mat.mutate_boxed(act);
-        (res, mat.@value)
+        mat.borrow_boxed_io(act)
+    );
+
+    _mutate_io : (Ptr -> IO a) -> Matrix -> IO (Matrix, a);
+    _mutate_io = |act, matrix| (
+        let mat = Boxed { value : matrix };
+        let (mat, res) = *mat.mutate_boxed_io(act);
+        pure $ (mat.@value, res)
     );
 
     init_identity : Matrix;
