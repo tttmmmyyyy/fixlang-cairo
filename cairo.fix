@@ -8,133 +8,137 @@ type CairoHandle = Ptr;
 _with_handle : (CairoHandle -> a) -> Cairo -> a;
 _with_handle = |act, cairo| cairo.@_dtor.borrow(act);
 
-create : Surface -> Cairo;
+_with_handle_io : (CairoHandle -> IO a) -> Cairo -> IO a;
+_with_handle_io = |act, cairo| cairo.@_dtor.borrow_io(act);
+
+create : Surface -> IO Cairo;
 create = |surface| (
-    surface._with_handle(|surface| (
-        let handle = FFI_CALL[Ptr cairo_create(Ptr), surface];
-        Cairo { _dtor : Destructor::make(handle, |handle| (
-            FFI_CALL[() cairo_destroy(Ptr), handle]
-        )) }
+    surface._with_handle_io(|surface| (
+        let handle = *FFI_CALL_IO[Ptr cairo_create(Ptr), surface];
+        pure $ Cairo { 
+            _dtor : Destructor::make(
+                handle,
+                |handle| FFI_CALL_IO[() cairo_destroy(Ptr), handle];; pure $ handle
+            )
+        }
     ))
 );
 
 status : Cairo -> IO Status;
-status = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let status = FFI_CALL[I32 cairo_status(Ptr), cairo];
-    status
+status = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[I32 cairo_status(Ptr), cairo]
 ));
 
 save : Cairo -> IO ();
-save = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_save(Ptr), cairo]
+save = |cairo| cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_save(Ptr), cairo]
 ));
 
 restore : Cairo -> IO ();
-restore = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_restore(Ptr), cairo]
+restore = |cairo| cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_restore(Ptr), cairo]
 ));
 
-get_target : Cairo -> Surface;
-get_target = |cairo| cairo._with_handle(|cairo| (
-    let surface = FFI_CALL[Ptr cairo_get_target(Ptr), cairo];
-    let _ = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
-    Surface::_create_from_handle(surface)
+get_target : Cairo -> IO Surface;
+get_target = |cairo| cairo._with_handle_io(|cairo| (
+    let surface = *FFI_CALL_IO[Ptr cairo_get_target(Ptr), cairo];
+    let surface = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
+    pure $ Surface::_create_from_handle(surface)
 ));
 
 push_group : Cairo -> IO ();
-push_group = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_push_group(Ptr), cairo]
+push_group = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_push_group(Ptr), cairo]
 ));
 
 push_group_with_content : Content -> Cairo -> IO ();
-push_group_with_content = |content, cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_push_group_with_content(Ptr, I32), cairo, content]
+push_group_with_content = |content, cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_push_group_with_content(Ptr, I32), cairo, content]
 ));
 
 pop_group : Cairo -> IO Pattern;
-pop_group = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let pattern = FFI_CALL[Ptr cairo_pop_group(Ptr), cairo];
-    Pattern::_create_from_handle(pattern)
+pop_group = |cairo| cairo._with_handle_io(|cairo| (
+    let pattern = *FFI_CALL_IO[Ptr cairo_pop_group(Ptr), cairo];
+    pure $ Pattern::_create_from_handle(pattern)
 ));
 
 pop_group_to_source : Cairo -> IO ();
-pop_group_to_source = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_pop_group_to_source(Ptr), cairo]
+pop_group_to_source = |cairo| cairo._with_handle(|cairo| (
+    FFI_CALL_IO[() cairo_pop_group_to_source(Ptr), cairo]
 ));
 
 get_group_target : Cairo -> IO Surface;
-get_group_target = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let surface = FFI_CALL[Ptr cairo_get_group_target(Ptr), cairo];
-    let _ = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
-    Surface::_create_from_handle(surface)
+get_group_target = |cairo| cairo._with_handle_io(|cairo| (
+    let surface = *FFI_CALL_IO[Ptr cairo_get_group_target(Ptr), cairo];
+    let surface = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
+    pure $ Surface::_create_from_handle(surface)
 ));
 
 set_source_rgb : (F64, F64, F64) -> Cairo -> IO ();
-set_source_rgb = |(r, g, b), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_source_rgb(Ptr, F64, F64, F64), cairo, r, g, b]
+set_source_rgb = |(r, g, b), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_source_rgb(Ptr, F64, F64, F64), cairo, r, g, b]
     ))
 );
 
 set_source_rgba : (F64, F64, F64,F64) -> Cairo -> IO ();
-set_source_rgba = |(r, g, b, a), cairo| IO::from_func $ |_| (
+set_source_rgba = |(r, g, b, a), cairo| (
     cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_source_rgba(Ptr, F64, F64, F64, F64), cairo, r, g, b, a]
+        FFI_CALL_IO[() cairo_set_source_rgba(Ptr, F64, F64, F64, F64), cairo, r, g, b, a]
     ))
 );
 
 set_source : Pattern -> Cairo -> IO ();
-set_source = |pattern, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_set_source(Ptr, Ptr), cairo, pattern]
+set_source = |pattern, cairo| (
+    cairo._with_handle_io(|cairo| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_set_source(Ptr, Ptr), cairo, pattern]
         ))
     ))
 );
 
 set_source_surface : Surface -> (F64, F64) -> Cairo -> IO ();
-set_source_surface = |surface, (x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        surface._with_handle(|surface| (
-            FFI_CALL[() cairo_set_source_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
+set_source_surface = |surface, (x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        surface._with_handle_io(|surface| (
+            FFI_CALL_IO[() cairo_set_source_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
         ))
     ))
 );
 
 get_source : Cairo -> IO Pattern;
-get_source = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let pattern = FFI_CALL[Ptr cairo_get_source(Ptr), cairo];
-    let _ = FFI_CALL[Ptr cairo_pattern_reference(Ptr), pattern];
-    Pattern::_create_from_handle(pattern)
+get_source = |cairo| cairo._with_handle_io(|cairo| (
+    let pattern = *FFI_CALL_IO[Ptr cairo_get_source(Ptr), cairo];
+    let pattern = FFI_CALL[Ptr cairo_pattern_reference(Ptr), pattern];
+    pure $ Pattern::_create_from_handle(pattern)
 ));
 
 set_antialias : Antialias -> Cairo -> IO ();
-set_antialias = |antialias, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_antialias(Ptr, I32), cairo, antialias]
+set_antialias = |antialias, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_antialias(Ptr, I32), cairo, antialias]
     ))
 );
 
 get_antialias : Cairo -> IO Antialias;
-get_antialias = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let antialias = FFI_CALL[I32 cairo_get_antialias(Ptr), cairo];
-    antialias
+get_antialias = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[I32 cairo_get_antialias(Ptr), cairo]
 ));
 
 set_dash : Array F64 -> F64 -> Cairo -> IO ();
-set_dash = |dashes, offset, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| ( 
+set_dash = |dashes, offset, cairo| (
+    cairo._with_handle_io(|cairo| ( 
         let num_dashes = dashes.get_size.to_I32;
-        dashes.borrow_ptr(|dashes| (
-            FFI_CALL[() cairo_set_dash(Ptr, Ptr, I32, F64), cairo, dashes, num_dashes, offset]
+        dashes.borrow_ptr_io(|dashes| (
+            FFI_CALL_IO[() cairo_set_dash(Ptr, Ptr, I32, F64), cairo, dashes, num_dashes, offset]
         ))
     ))
 );
 
 get_dash_count : Cairo -> IO I64;
-get_dash_count = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let count = FFI_CALL[I32 cairo_get_dash_count(Ptr), cairo];
-    count.to_I64
+get_dash_count = |cairo| cairo._with_handle_io(|cairo| (
+    let count = *FFI_CALL_IO[I32 cairo_get_dash_count(Ptr), cairo];
+    pure $ count.to_I64
 ));
 
 get_dash : Cairo -> IO (Array F64, F64);
@@ -147,29 +151,29 @@ get_dash = |cairo| (
 );
 
 set_fill_rule : FillRule -> Cairo -> IO ();
-set_fill_rule = |fill_rule, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_fill_rule(Ptr, I32), cairo, fill_rule]
+set_fill_rule = |fill_rule, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_fill_rule(Ptr, I32), cairo, fill_rule]
     ))
 );
 
 get_fill_rule : Cairo -> IO FillRule;
-get_fill_rule = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let fill_rule = FFI_CALL[I32 cairo_get_fill_rule(Ptr), cairo];
-    fill_rule
+get_fill_rule = |cairo| cairo._with_handle_io(|cairo| (
+    let fill_rule = *FFI_CALL_IO[I32 cairo_get_fill_rule(Ptr), cairo];
+    pure $ fill_rule
 ));
 
 set_line_cap : LineCap -> Cairo -> IO ();
-set_line_cap = |line_cap, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_line_cap(Ptr, I32), cairo, line_cap]
+set_line_cap = |line_cap, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_line_cap(Ptr, I32), cairo, line_cap]
     ))
 );
 
 get_line_cap : Cairo -> IO LineCap;
-get_line_cap = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let line_cap = FFI_CALL[I32 cairo_get_line_cap(Ptr), cairo];
-    line_cap
+get_line_cap = |cairo| cairo._with_handle_io(|cairo| (
+    let line_cap = *FFI_CALL_IO[I32 cairo_get_line_cap(Ptr), cairo];
+    pure $ line_cap
 ));
 
 set_line_join : LineJoin -> Cairo -> IO ();
@@ -802,6 +806,9 @@ namespace Surface {
     _with_handle : (SurfaceHandle -> a) -> Surface -> a;
     _with_handle = |act, surface| surface.@_dtor.borrow(act);
 
+    _with_handle_io : (SurfaceHandle -> IO a) -> Surface -> IO a;
+    _with_handle_io = |act, surface| surface.@_dtor.borrow_io(act);
+
     _create_from_handle : SurfaceHandle -> Surface;
     _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_surface_destroy(Ptr), handle]) };
 
@@ -823,6 +830,9 @@ namespace Pattern {
 
     _with_handle : (PatternHandle -> a) -> Pattern -> a;
     _with_handle = |act, pattern| pattern.@_dtor.borrow(act);
+
+    _with_handle_io : (PatternHandle -> IO a) -> Pattern -> IO a;
+    _with_handle_io = |act, pattern| pattern.@_dtor.borrow_io(act);
 
     _create_from_handle : PatternHandle -> Pattern;
     _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_pattern_destroy(Ptr), handle]) };

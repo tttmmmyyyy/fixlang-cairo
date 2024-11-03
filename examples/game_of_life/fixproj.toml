@@ -1,9 +1,6 @@
 [general]
 name = "game-of-life"
 version = "0.1.1"
-registries = [
-    "https://raw.githubusercontent.com/tttmmmyyyy/fixlang/refs/heads/main/registry.toml",
-]
 
 [build]
 files = ["main.fix"]
