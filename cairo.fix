@@ -63,7 +63,7 @@ pop_group = |cairo| cairo._with_handle_io(|cairo| (
 ));
 
 pop_group_to_source : Cairo -> IO ();
-pop_group_to_source = |cairo| cairo._with_handle(|cairo| (
+pop_group_to_source = |cairo| cairo._with_handle_io(|cairo| (
     FFI_CALL_IO[() cairo_pop_group_to_source(Ptr), cairo]
 ));
 
@@ -83,7 +83,7 @@ set_source_rgb = |(r, g, b), cairo| (
 
 set_source_rgba : (F64, F64, F64,F64) -> Cairo -> IO ();
 set_source_rgba = |(r, g, b, a), cairo| (
-    cairo._with_handle(|cairo| (
+    cairo._with_handle_io(|cairo| (
         FFI_CALL_IO[() cairo_set_source_rgba(Ptr, F64, F64, F64, F64), cairo, r, g, b, a]
     ))
 );
@@ -146,7 +146,7 @@ get_dash = |cairo| (
     let dash_count = *cairo.get_dash_count;
     let dashes : Array F64 = Array::fill(dash_count, 0.0);
     let offset : Array F64 = Array::fill(1, 0.0);
-    eval cairo._with_handle(|cairo| FFI_CALL[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes._get_ptr, offset._get_ptr]);
+    eval cairo._with_handle_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes._get_ptr, offset._get_ptr]);
     pure $ (dashes, offset.@(0))
 );
 
@@ -184,575 +184,573 @@ set_line_join = |line_join, cairo| (
 );
 
 get_line_join : Cairo -> IO LineJoin;
-get_line_join = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let line_join = FFI_CALL[I32 cairo_get_line_join(Ptr), cairo];
-    line_join
+get_line_join = |cairo| cairo._with_handle_io(|cairo| (
+    let line_join = *FFI_CALL_IO[I32 cairo_get_line_join(Ptr), cairo];
+    pure $ line_join
 ));
 
 set_line_width : F64 -> Cairo -> IO ();
-set_line_width = |width, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_line_width(Ptr, F64), cairo, width]
+set_line_width = |width, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_line_width(Ptr, F64), cairo, width]
     ))
 );
 
 get_line_width : Cairo -> IO F64;
-get_line_width = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let width = FFI_CALL[F64 cairo_get_line_width(Ptr), cairo];
-    width
+get_line_width = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[F64 cairo_get_line_width(Ptr), cairo]
 ));
 
 set_miter_limit : F64 -> Cairo -> IO ();
-set_miter_limit = |limit, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_miter_limit(Ptr, F64), cairo, limit]
+set_miter_limit = |limit, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_miter_limit(Ptr, F64), cairo, limit]
     ))
 );
 
 get_miter_limit : Cairo -> IO F64;
-get_miter_limit = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let limit = FFI_CALL[F64 cairo_get_miter_limit(Ptr), cairo];
-    limit
+get_miter_limit = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[F64 cairo_get_miter_limit(Ptr), cairo]
 ));
 
 set_operator : Operator -> Cairo -> IO ();
-set_operator = |op, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_operator(Ptr, I32), cairo, op]
+set_operator = |op, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_operator(Ptr, I32), cairo, op]
     ))
 );
 
 get_operator : Cairo -> IO Operator;
-get_operator = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let op = FFI_CALL[I32 cairo_get_operator(Ptr), cairo];
-    op
+get_operator = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[I32 cairo_get_operator(Ptr), cairo]
 ));
 
 set_tolerance : F64 -> Cairo -> IO ();
-set_tolerance = |tolerance, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_tolerance(Ptr, F64), cairo, tolerance]
+set_tolerance = |tolerance, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_tolerance(Ptr, F64), cairo, tolerance]
     ))
 );
 
 get_tolerance : Cairo -> IO F64;
-get_tolerance = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let tolerance = FFI_CALL[F64 cairo_get_tolerance(Ptr), cairo];
-    tolerance
+get_tolerance = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[F64 cairo_get_tolerance(Ptr), cairo]
 ));
 
 clip : Cairo -> IO ();
-clip = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_clip(Ptr), cairo]
+clip = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_clip(Ptr), cairo]
 ));
 
 clip_preserve : Cairo -> IO ();
-clip_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_clip_preserve(Ptr), cairo]
+clip_preserve = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_clip_preserve(Ptr), cairo]
 ));
 
 clip_extents : Cairo -> IO (F64, F64, F64, F64);
-clip_extents = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| 
+clip_extents = |cairo| cairo._with_handle_io(|cairo| 
     let x1 : Array F64 = Array::fill(1, 0.0);
     let y1 : Array F64 = Array::fill(1, 0.0);
     let x2 : Array F64 = Array::fill(1, 0.0);
     let y2 : Array F64 = Array::fill(1, 0.0);
-    eval FFI_CALL[() cairo_clip_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
-    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    FFI_CALL_IO[() cairo_clip_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
+    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
 );
 
 in_clip : (F64, F64) -> Cairo -> IO Bool;
-in_clip = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        let result = FFI_CALL[I32 cairo_in_clip(Ptr, F64, F64), cairo, x, y];
-        result != 1_I32
+in_clip = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        let result = *FFI_CALL_IO[I32 cairo_in_clip(Ptr, F64, F64), cairo, x, y];
+        pure $ result != 1_I32
     ))
 );
 
 reset_clip : Cairo -> IO ();
-reset_clip = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_reset_clip(Ptr), cairo]
+reset_clip = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_reset_clip(Ptr), cairo]
 ));
 
 copy_clip_rectangle_list : Cairo -> IO RectangleList;
-copy_clip_rectangle_list = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let list = FFI_CALL[Ptr cairo_copy_clip_rectangle_list(Ptr), cairo];
-    RectangleList::_create_from_handle(list)
+copy_clip_rectangle_list = |cairo| cairo._with_handle_io(|cairo| (
+    let list = *FFI_CALL_IO[Ptr cairo_copy_clip_rectangle_list(Ptr), cairo];
+    pure $ RectangleList::_create_from_handle(list)
 ));
 
 fill : Cairo -> IO ();
-fill = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_fill(Ptr), cairo]
+fill = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_fill(Ptr), cairo]
 ));
 
 fill_preserve : Cairo -> IO ();
-fill_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_fill_preserve(Ptr), cairo]
+fill_preserve = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_fill_preserve(Ptr), cairo]
 ));
 
 fill_extents : Cairo -> IO (F64, F64, F64, F64);
-fill_extents = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo|
+fill_extents = |cairo| cairo._with_handle_io(|cairo|
     let x1 : Array F64 = Array::fill(1, 0.0);
     let y1 : Array F64 = Array::fill(1, 0.0);
     let x2 : Array F64 = Array::fill(1, 0.0);
     let y2 : Array F64 = Array::fill(1, 0.0);
-    eval FFI_CALL[() cairo_fill_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
-    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    FFI_CALL_IO[() cairo_fill_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
+    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
 );
 
 in_fill : (F64, F64) -> Cairo -> IO Bool;
-in_fill = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        let result = FFI_CALL[I32 cairo_in_fill(Ptr, F64, F64), cairo, x, y];
-        result != 1_I32
+in_fill = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        let result = *FFI_CALL_IO[I32 cairo_in_fill(Ptr, F64, F64), cairo, x, y];
+        pure $ result != 1_I32
     ))
 );
 
 mask : Pattern -> Cairo -> IO ();
-mask = |pattern, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mask(Ptr, Ptr), cairo, pattern]
+mask = |pattern, cairo| (
+    cairo._with_handle_io(|cairo| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mask(Ptr, Ptr), cairo, pattern]
         ))
     ))
 );
 
 mask_surface : Surface -> (F64, F64) -> Cairo -> IO ();
-mask_surface = |surface, (x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        surface._with_handle(|surface| (
-            FFI_CALL[() cairo_mask_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
+mask_surface = |surface, (x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        surface._with_handle_io(|surface| (
+            FFI_CALL_IO[() cairo_mask_surface(Ptr, Ptr, F64, F64), cairo, surface, x, y]
         ))
     ))
 );
 
 paint : Cairo -> IO ();
-paint = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_paint(Ptr), cairo]
+paint = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_paint(Ptr), cairo]
 ));
 
 paint_with_alpha : F64 -> Cairo -> IO ();
-paint_with_alpha = |alpha, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_paint_with_alpha(Ptr, F64), cairo, alpha]
+paint_with_alpha = |alpha, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_paint_with_alpha(Ptr, F64), cairo, alpha]
     ))
 );
 
 stroke : Cairo -> IO ();
-stroke = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_stroke(Ptr), cairo]
+stroke = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_stroke(Ptr), cairo]
 ));
 
 stroke_preserve : Cairo -> IO ();
-stroke_preserve = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_stroke_preserve(Ptr), cairo]
+stroke_preserve = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_stroke_preserve(Ptr), cairo]
 ));
 
 stroke_extents : Cairo -> IO (F64, F64, F64, F64);
-stroke_extents = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo|
+stroke_extents = |cairo| cairo._with_handle_io(|cairo|
     let x1 : Array F64 = Array::fill(1, 0.0);
     let y1 : Array F64 = Array::fill(1, 0.0);
     let x2 : Array F64 = Array::fill(1, 0.0);
     let y2 : Array F64 = Array::fill(1, 0.0);
-    eval FFI_CALL[() cairo_stroke_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
-    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    FFI_CALL_IO[() cairo_stroke_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
+    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
 );
 
 in_stroke : (F64, F64) -> Cairo -> IO Bool;
-in_stroke = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        let result = FFI_CALL[I32 cairo_in_stroke(Ptr, F64, F64), cairo, x, y];
-        result != 1_I32
+in_stroke = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        let result = *FFI_CALL_IO[I32 cairo_in_stroke(Ptr, F64, F64), cairo, x, y];
+        pure $ result != 1_I32
     ))
 );
 
 copy_page : Cairo -> IO ();
-copy_page = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_copy_page(Ptr), cairo]
+copy_page = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_copy_page(Ptr), cairo]
 ));
 
 show_page : Cairo -> IO ();
-show_page = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_show_page(Ptr), cairo]
+show_page = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_show_page(Ptr), cairo]
 ));
 
 set_hairline : Bool -> Cairo -> IO ();
-set_hairline = |hairline, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_antialias(Ptr, I32), cairo, if hairline { 1_I32 } else { 0_I32 }]
+set_hairline = |hairline, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_antialias(Ptr, I32), cairo, if hairline { 1_I32 } else { 0_I32 }]
     ))
 );
 
 get_hairline : Cairo -> IO Bool;
-get_hairline = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let hairline = FFI_CALL[I32 cairo_get_hairline(Ptr), cairo];
-    hairline == 1_I32
+get_hairline = |cairo| cairo._with_handle_io(|cairo| (
+    let hairline = *FFI_CALL_IO[I32 cairo_get_hairline(Ptr), cairo];
+    pure $ hairline == 1_I32
 ));
 
 copy_path : Cairo -> IO Cairo::Path;
-copy_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let path = FFI_CALL[Ptr cairo_copy_path(Ptr), cairo];
-    Path::_create_from_handle(path)
+copy_path = |cairo| cairo._with_handle_io(|cairo| (
+    let path = *FFI_CALL_IO[Ptr cairo_copy_path(Ptr), cairo];
+    pure $ Path::_create_from_handle(path)
 ));
 
 copy_path_flat : Cairo -> IO Cairo::Path;
-copy_path_flat = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    let path = FFI_CALL[Ptr cairo_copy_path_flat(Ptr), cairo];
-    Path::_create_from_handle(path)
+copy_path_flat = |cairo| cairo._with_handle_io(|cairo| (
+    let path = *FFI_CALL_IO[Ptr cairo_copy_path_flat(Ptr), cairo];
+    pure $ Path::_create_from_handle(path)
 ));
 
 append_path : Cairo::Path -> Cairo -> IO ();
-append_path = |path, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        path._with_handle(|path| (
-            FFI_CALL[() cairo_append_path(Ptr, Ptr), cairo, path]
+append_path = |path, cairo| (
+    cairo._with_handle_io(|cairo| (
+        path._with_handle_io(|path| (
+            FFI_CALL_IO[() cairo_append_path(Ptr, Ptr), cairo, path]
         ))
     ))
 );
 
 has_current_point : Cairo -> IO Bool;
-has_current_point = |cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        let result = FFI_CALL[I32 cairo_has_current_point(Ptr), cairo];
-        result != 0_I32
+has_current_point = |cairo| (
+    cairo._with_handle_io(|cairo| (
+        let result = *FFI_CALL_IO[I32 cairo_has_current_point(Ptr), cairo];
+        pure $ result != 0_I32
     ))
 );
 
 get_current_point : Cairo -> IO (F64, F64);
-get_current_point = |cairo| IO::from_func $ |_| (
-    let x : Array F64 = Array::fill(1, 0.0);
-    let y : Array F64 = Array::fill(1, 0.0);
-    eval cairo._with_handle(|cairo| FFI_CALL[() cairo_get_current_point(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]);
-    (x.@(0), y.@(0))
+get_current_point = |cairo| cairo._with_handle_io(|cairo|
+    let x = Boxed { value : 0.0 };
+    let y = Boxed { value : 0.0 };
+    let (x, (y, _)) = *x.mutate_boxed_io(|x_ptr| y.mutate_boxed_io(|y_ptr|
+        FFI_CALL_IO[() cairo_get_current_point(Ptr, Ptr, Ptr), cairo, x_ptr, y_ptr])
+    );
+    pure $ (x.@value, y.@value)
 );
 
 new_path : Cairo -> IO ();
-new_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_new_path(Ptr), cairo]
+new_path = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_new_path(Ptr), cairo]
 ));
 
 new_sub_path : Cairo -> IO ();
-new_sub_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_new_sub_path(Ptr), cairo]
+new_sub_path = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_new_sub_path(Ptr), cairo]
 ));
 
 close_path : Cairo -> IO ();
-close_path = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_close_path(Ptr), cairo]
+close_path = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_close_path(Ptr), cairo]
 ));
 
 arc : (F64, F64) -> F64 -> F64 -> F64 -> Cairo -> IO ();
-arc = |(x, y), radius, angle1, angle2, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_arc(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
+arc = |(x, y), radius, angle1, angle2, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_arc(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
     ))
 );
 
 arc_negative : (F64, F64) -> F64 -> F64 -> F64 -> Cairo -> IO ();
-arc_negative = |(x, y), radius, angle1, angle2, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_arc_negative(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
+arc_negative = |(x, y), radius, angle1, angle2, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_arc_negative(Ptr, F64, F64, F64, F64, F64), cairo, x, y, radius, angle1, angle2]
     ))
 );
 
 curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Cairo -> IO ();
-curve_to = |(x1, y1), (x2, y2), (x3, y3), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, x1, y1, x2, y2, x3, y3]
+curve_to = |(x1, y1), (x2, y2), (x3, y3), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, x1, y1, x2, y2, x3, y3]
     ))
 );
 
 line_to : (F64, F64) -> Cairo -> IO ();
-line_to = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_line_to(Ptr, F64, F64), cairo, x, y]
+line_to = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_line_to(Ptr, F64, F64), cairo, x, y]
     ))
 );
 
 move_to : (F64, F64) -> Cairo -> IO ();
-move_to = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_move_to(Ptr, F64, F64), cairo, x, y]
+move_to = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_move_to(Ptr, F64, F64), cairo, x, y]
     ))
 );
 
 rectangle : (F64, F64) -> (F64, F64) -> Cairo -> IO ();
-rectangle = |(x, y), (width, height), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_rectangle(Ptr, F64, F64, F64, F64), cairo, x, y, width, height]
+rectangle = |(x, y), (width, height), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_rectangle(Ptr, F64, F64, F64, F64), cairo, x, y, width, height]
     ))
 );
 
 glyph_path : Array Glyph -> Cairo -> IO ();
-glyph_path = |glyphs, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+glyph_path = |glyphs, cairo| (
+    cairo._with_handle_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
         glyphs.borrow_ptr(|glyphs| (
-            FFI_CALL[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
+            FFI_CALL_IO[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
 );
 
 text_path : String -> Cairo -> IO ();
-text_path = |text, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+text_path = |text, cairo| (
+    cairo._with_handle_io(|cairo| (
         text.borrow_c_str(|text| (
-            FFI_CALL[() cairo_text_path(Ptr, Ptr), cairo, text]
+            FFI_CALL_IO[() cairo_text_path(Ptr, Ptr), cairo, text]
         ))
     ))
 );
 
 rel_curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Cairo -> IO ();
-rel_curve_to = |(dx1, dy1), (dx2, dy2), (dx3, dy3), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_rel_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, dx1, dy1, dx2, dy2, dx3, dy3]
+rel_curve_to = |(dx1, dy1), (dx2, dy2), (dx3, dy3), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_rel_curve_to(Ptr, F64, F64, F64, F64, F64, F64), cairo, dx1, dy1, dx2, dy2, dx3, dy3]
     ))
 );
 
 rel_line_to : (F64, F64) -> Cairo -> IO ();
-rel_line_to = |(dx, dy), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_rel_line_to(Ptr, F64, F64), cairo, dx, dy]
+rel_line_to = |(dx, dy), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_rel_line_to(Ptr, F64, F64), cairo, dx, dy]
     ))
 );
 
 rel_move_to : (F64, F64) -> Cairo -> IO ();
-rel_move_to = |(dx, dy), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_rel_move_to(Ptr, F64, F64), cairo, dx, dy]
+rel_move_to = |(dx, dy), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_rel_move_to(Ptr, F64, F64), cairo, dx, dy]
     ))
 );
 
 path_extents : Cairo -> IO (F64, F64, F64, F64);
-path_extents = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo|
-    let x1 : Array F64 = Array::fill(1, 0.0);
-    let y1 : Array F64 = Array::fill(1, 0.0);
-    let x2 : Array F64 = Array::fill(1, 0.0);
-    let y2 : Array F64 = Array::fill(1, 0.0);
-    eval FFI_CALL[() cairo_path_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];
-    (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+path_extents = |cairo| cairo._with_handle_io(|cairo|
+    let x1 = Boxed { value : 0.0 };
+    let y1 = Boxed { value : 0.0 };
+    let x2 = Boxed { value : 0.0 };
+    let y2 = Boxed { value : 0.0 };
+    let (x1, (y1, (x2, (y2, _)))) = *x1.mutate_boxed_io(|x1_ptr| y1.mutate_boxed_io(|y1_ptr| x2.mutate_boxed_io(|x2_ptr| y2.mutate_boxed_io(|y2_ptr| 
+        FFI_CALL_IO[() cairo_path_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1_ptr, y1_ptr, x2_ptr, y2_ptr]
+    ))));
+    pure $ (x1.@value, y1.@value, x2.@value, y2.@value)
 );
 
 translate : (F64, F64) -> Cairo -> IO ();
-translate = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_translate(Ptr, F64, F64), cairo, x, y]
+translate = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_translate(Ptr, F64, F64), cairo, x, y]
     ))
 );
 
 scale : (F64, F64) -> Cairo -> IO ();
-scale = |(x, y), cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_scale(Ptr, F64, F64), cairo, x, y]
+scale = |(x, y), cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_scale(Ptr, F64, F64), cairo, x, y]
     ))
 );
 
 rotate : F64 -> Cairo -> IO ();
-rotate = |angle, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_rotate(Ptr, F64), cairo, angle]
+rotate = |angle, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_rotate(Ptr, F64), cairo, angle]
     ))
 );
 
 transform : Matrix -> Cairo -> IO ();
-transform = |matrix, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+transform = |matrix, cairo| (
+    cairo._with_handle_io(|cairo| (
         let _ = matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_transform(Ptr, Ptr), cairo, matrix]
+            FFI_CALL_IO[() cairo_transform(Ptr, Ptr), cairo, matrix]
         ));
         ()
     ))
 );
 
 set_matrix : Matrix -> Cairo -> IO ();
-set_matrix = |matrix, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+set_matrix = |matrix, cairo| (
+    cairo._with_handle_io(|cairo| (
         let _ = matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
+            FFI_CALL_IO[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
         ));
         ()
     ))
 );
 
 get_matrix : Cairo -> IO Matrix;
-get_matrix = |cairo| IO::from_func $ |_| (
+get_matrix = |cairo| cairo._with_handle_io(|cairo| (
     let matrix = Matrix::init_identity;
-    let (_, matrix) = cairo._with_handle(|cairo| (
-        matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_get_matrix(Ptr, Ptr), cairo, matrix]
-        ))
+    let (_, matrix) = matrix._with_ptr(|matrix| (
+        FFI_CALL_IO[() cairo_get_matrix(Ptr, Ptr), cairo, matrix]
     ));
-    matrix
-);
+    pure $ matrix
+));
 
 identity_matrix : Cairo -> IO ();
-identity_matrix = |cairo| IO::from_func $ |_| cairo._with_handle(|cairo| (
-    FFI_CALL[() cairo_identity_matrix(Ptr), cairo]
+identity_matrix = |cairo| cairo._with_handle_io(|cairo| (
+    FFI_CALL_IO[() cairo_identity_matrix(Ptr), cairo]
 ));
 
 user_to_device : (F64, F64) -> Cairo -> IO (F64, F64);
-user_to_device = |(x, y), cairo| IO::from_func $ |_| (
+user_to_device = |(x, y), cairo| (
     let x : Array F64 = Array::fill(1, x);
     let y : Array F64 = Array::fill(1, y);
-    eval cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
+    eval cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
     ));
     (x.@(0), y.@(0))
 );
 
 
 user_to_device_distance : (F64, F64) -> Cairo -> IO (F64, F64);
-user_to_device_distance = |(dx, dy), cairo| IO::from_func $ |_| (
+user_to_device_distance = |(dx, dy), cairo| (
     let dx : Array F64 = Array::fill(1, dx);
     let dy : Array F64 = Array::fill(1, dy);
-    eval cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
+    eval cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
     ));
     (dx.@(0), dy.@(0))
 );
 
 device_to_user : (F64, F64) -> Cairo -> IO (F64, F64);
-device_to_user = |(x, y), cairo| IO::from_func $ |_| (
+device_to_user = |(x, y), cairo| (
     let x : Array F64 = Array::fill(1, x);
     let y : Array F64 = Array::fill(1, y);
-    eval cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
+    eval cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
     ));
     (x.@(0), y.@(0))
 );
 
 device_to_user_distance : (F64, F64) -> Cairo -> IO (F64, F64);
-device_to_user_distance = |(dx, dy), cairo| IO::from_func $ |_| (
+device_to_user_distance = |(dx, dy), cairo| (
     let dx : Array F64 = Array::fill(1, dx);
     let dy : Array F64 = Array::fill(1, dy);
-    eval cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
+    eval cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
     ));
     (dx.@(0), dy.@(0))
 );
 
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
-select_font_face = |font, slant, weight, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+select_font_face = |font, slant, weight, cairo| (
+    cairo._with_handle_io(|cairo| (
         font.borrow_c_str(|font| (
-            FFI_CALL[() cairo_select_font_face(Ptr, Ptr, I32, I32), cairo, font, slant, weight]
+            FFI_CALL_IO[() cairo_select_font_face(Ptr, Ptr, I32, I32), cairo, font, slant, weight]
         ))
     ))
 );
 
 set_font_size : F64 -> Cairo -> IO ();
-set_font_size = |size, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_font_size(Ptr, F64), cairo, size]
+set_font_size = |size, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_font_size(Ptr, F64), cairo, size]
     ))
 );
 
 set_font_matrix : Matrix -> Cairo -> IO ();
-set_font_matrix = |matrix, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+set_font_matrix = |matrix, cairo| (
+    cairo._with_handle_io(|cairo| (
         let _ = matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
+            FFI_CALL_IO[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
         ));
         ()
     ))
 );
 
 get_font_matrix : Cairo -> IO Matrix;
-get_font_matrix = |cairo| IO::from_func $ |_| (
+get_font_matrix = |cairo| (
     let matrix = Matrix::init_identity;
-    let (_, matrix) = cairo._with_handle(|cairo| (
+    let (_, matrix) = cairo._with_handle_io(|cairo| (
         matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
+            FFI_CALL_IO[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
         ))
     ));
     matrix
 );
 
 set_font_options : FontOptions -> Cairo -> IO ();
-set_font_options = |options, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        options._with_handle(|options| (
-            FFI_CALL[() cairo_set_font_options(Ptr, Ptr), cairo, options]
+set_font_options = |options, cairo| (
+    cairo._with_handle_io(|cairo| (
+        options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_set_font_options(Ptr, Ptr), cairo, options]
         ))
     ))
 );
 
 get_font_options : Cairo -> IO FontOptions;
-get_font_options = |cairo| IO::from_func $ |_| (
+get_font_options = |cairo| (
     let options = FontOptions::create();
-    eval cairo._with_handle(|cairo| (
-        options._with_handle(|options| (
-            FFI_CALL[() cairo_get_font_options(Ptr, Ptr), cairo, options]
+    eval cairo._with_handle_io(|cairo| (
+        options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_get_font_options(Ptr, Ptr), cairo, options]
         ))
     ));
     options
 );
 
 set_font_face : FontFace -> Cairo -> IO ();
-set_font_face = |face, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        face._with_handle(|face| (
-            FFI_CALL[() cairo_set_font_face(Ptr, Ptr), cairo, face]
+set_font_face = |face, cairo| (
+    cairo._with_handle_io(|cairo| (
+        face._with_handle_io(|face| (
+            FFI_CALL_IO[() cairo_set_font_face(Ptr, Ptr), cairo, face]
         ))
     ))
 );
 
 get_font_face : Cairo -> IO FontFace;
-get_font_face = |cairo| IO::from_func $ |_| (
-    let face = cairo._with_handle(|cairo| (
-        FFI_CALL[Ptr cairo_get_font_face(Ptr), cairo]
+get_font_face = |cairo| (
+    let face = cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[Ptr cairo_get_font_face(Ptr), cairo]
     ));
-    let face = FFI_CALL[Ptr cairo_font_face_reference(Ptr), face];
+    let face = FFI_CALL_IO[Ptr cairo_font_face_reference(Ptr), face];
     FontFace::_create_from_handle(face)
 );
 
 set_scaled_font : ScaledFont -> Cairo -> IO ();
-set_scaled_font = |scaled_font, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        scaled_font._with_handle(|scaled_font| (
-            FFI_CALL[() cairo_set_scaled_font(Ptr, Ptr), cairo, scaled_font]
+set_scaled_font = |scaled_font, cairo| (
+    cairo._with_handle_io(|cairo| (
+        scaled_font._with_handle_io(|scaled_font| (
+            FFI_CALL_IO[() cairo_set_scaled_font(Ptr, Ptr), cairo, scaled_font]
         ))
     ))
 );
 
 get_scaled_font : Cairo -> IO ScaledFont;
-get_scaled_font = |cairo| IO::from_func $ |_| (
-    let scaled_font = cairo._with_handle(|cairo| (
-        FFI_CALL[Ptr cairo_get_scaled_font(Ptr), cairo]
+get_scaled_font = |cairo| (
+    let scaled_font = cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[Ptr cairo_get_scaled_font(Ptr), cairo]
     ));
-    let scaled_font = FFI_CALL[Ptr cairo_scaled_font_reference(Ptr), scaled_font];
+    let scaled_font = FFI_CALL_IO[Ptr cairo_scaled_font_reference(Ptr), scaled_font];
     ScaledFont::_create_from_handle(scaled_font)
 );
 
 show_text : String -> Cairo -> IO ();
-show_text = |text, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+show_text = |text, cairo| (
+    cairo._with_handle_io(|cairo| (
         text.borrow_c_str(|text| (
-            FFI_CALL[() cairo_show_text(Ptr, Ptr), cairo, text]
+            FFI_CALL_IO[() cairo_show_text(Ptr, Ptr), cairo, text]
         ))
     ))
 );
 
 show_glyphs : Array Glyph -> Cairo -> IO ();
-show_glyphs = |glyphs, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+show_glyphs = |glyphs, cairo| (
+    cairo._with_handle_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
         glyphs.borrow_ptr(|glyphs| (
-            FFI_CALL[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
+            FFI_CALL_IO[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
 );
 
 show_text_glyphs : String -> Array Glyph -> Array TextCluster -> TextClusterFlags -> Cairo -> IO ();
-show_text_glyphs = |text, glyphs, clusters, flags, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
+show_text_glyphs = |text, glyphs, clusters, flags, cairo| (
+    cairo._with_handle_io(|cairo| (
         let text_len = text.get_size.to_I32;
         text.borrow_c_str(|text| (
             let num_glyphs = glyphs.get_size.to_I32;
             let num_clusters = clusters.get_size.to_I32;
             glyphs.borrow_ptr(|glyphs| (
                 clusters.borrow_ptr(|clusters| (
-                    FFI_CALL[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
+                    FFI_CALL_IO[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
                 ))
             ))
         ))
@@ -760,23 +758,23 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| IO::from_func $ |_| (
 );
 
 font_extents : Cairo -> IO FontExtents;
-font_extents = |cairo| IO::from_func $ |_| (
+font_extents = |cairo| (
     let extents = FontExtents::create;
-    let (_, extents) = cairo._with_handle(|cairo| (
+    let (_, extents) = cairo._with_handle_io(|cairo| (
         extents._with_ptr(|extents| (
-            FFI_CALL[() cairo_font_extents(Ptr, Ptr), cairo, extents]
+            FFI_CALL_IO[() cairo_font_extents(Ptr, Ptr), cairo, extents]
         ))
     ));
     extents
 );
 
 text_extents : String -> Cairo -> IO TextExtents;
-text_extents = |text, cairo| IO::from_func $ |_| (
+text_extents = |text, cairo| (
     let extents = TextExtents::create;
-    let (_, extents) = cairo._with_handle(|cairo| (
+    let (_, extents) = cairo._with_handle_io(|cairo| (
         text.borrow_c_str(|text| (
             extents._with_ptr(|extents| (
-                FFI_CALL[() cairo_text_extents(Ptr, Ptr, Ptr), cairo, text, extents]
+                FFI_CALL_IO[() cairo_text_extents(Ptr, Ptr, Ptr), cairo, text, extents]
             ))
         ))
     ));
@@ -784,13 +782,13 @@ text_extents = |text, cairo| IO::from_func $ |_| (
 );
 
 glyph_extents : Array Glyph -> Cairo -> IO TextExtents;
-glyph_extents = |glyphs, cairo| IO::from_func $ |_| (
+glyph_extents = |glyphs, cairo| (
     let extents = TextExtents::create;
-    let (_, extents) = cairo._with_handle(|cairo| (
+    let (_, extents) = cairo._with_handle_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
         glyphs.borrow_ptr(|glyphs| (
             extents._with_ptr(|extents| (
-                FFI_CALL[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
+                FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
             ))
         ))
     ));
@@ -810,13 +808,13 @@ namespace Surface {
     _with_handle_io = |act, surface| surface.@_dtor.borrow_io(act);
 
     _create_from_handle : SurfaceHandle -> Surface;
-    _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_surface_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_surface_destroy(Ptr), handle]) };
 
     write_to_png : Std::Path -> Surface -> IO ();
-    write_to_png = |path, surface| IO::from_func $ |_| (
-        surface._with_handle(|surface| (
+    write_to_png = |path, surface| (
+        surface._with_handle_io(|surface| (
             path.to_string.borrow_c_str(|path| (
-                FFI_CALL[() cairo_surface_write_to_png(Ptr, Ptr), surface, path]
+                FFI_CALL_IO[() cairo_surface_write_to_png(Ptr, Ptr), surface, path]
             )) 
         ))
     );
@@ -835,35 +833,35 @@ namespace Pattern {
     _with_handle_io = |act, pattern| pattern.@_dtor.borrow_io(act);
 
     _create_from_handle : PatternHandle -> Pattern;
-    _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_pattern_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_pattern_destroy(Ptr), handle]) };
 
     add_color_stop_rgb : F64 -> (F64, F64, F64) -> Pattern -> IO ();
-    add_color_stop_rgb = |offset, (r, g, b), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_pattern_add_color_stop_rgb(Ptr, F64, F64, F64, F64), pattern, offset, r, g, b]
+    add_color_stop_rgb = |offset, (r, g, b), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_pattern_add_color_stop_rgb(Ptr, F64, F64, F64, F64), pattern, offset, r, g, b]
         ))
     );
 
     add_color_stop_rgba : F64 -> (F64, F64, F64, F64) -> Pattern -> IO ();
-    add_color_stop_rgba = |offset, (r, g, b, a), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_pattern_add_color_stop_rgba(Ptr, F64, F64, F64, F64, F64), pattern, offset, r, g, b, a]
+    add_color_stop_rgba = |offset, (r, g, b, a), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_pattern_add_color_stop_rgba(Ptr, F64, F64, F64, F64, F64), pattern, offset, r, g, b, a]
         ))
     );
 
     get_color_stop_count : Pattern -> IO I64;
-    get_color_stop_count = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let count = FFI_CALL[I32 cairo_pattern_get_color_stop_count(Ptr), pattern];
+    get_color_stop_count = |pattern| pattern._with_handle_io(|pattern| (
+        let count = FFI_CALL_IO[I32 cairo_pattern_get_color_stop_count(Ptr), pattern];
         count.to_I64
     ));
 
     get_color_stop_rgba : I32 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
-    get_color_stop_rgba = |index, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_color_stop_rgba = |index, pattern| pattern._with_handle_io(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
         let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), pattern, index, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), pattern, index, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
         if status == Status::success {
             Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
         } else {
@@ -873,23 +871,23 @@ namespace Pattern {
 
     create_rgb : (F64, F64, F64) -> Pattern;
     create_rgb = |(r, g, b)| (
-        let handle = FFI_CALL[Ptr cairo_pattern_create_rgb(F64, F64, F64), r, g, b];
+        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_rgb(F64, F64, F64), r, g, b];
         Pattern::_create_from_handle(handle)
     );
 
     create_rgba : (F64, F64, F64, F64) -> Pattern;
     create_rgba = |(r, g, b, a)| (
-        let handle = FFI_CALL[Ptr cairo_pattern_create_rgba(F64, F64, F64, F64), r, g, b, a];
+        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_rgba(F64, F64, F64, F64), r, g, b, a];
         Pattern::_create_from_handle(handle)
     );
 
     get_rgba : Pattern -> IO (Result Status (F64, F64, F64, F64));
-    get_rgba = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_rgba = |pattern| pattern._with_handle_io(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
         let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
         if status == Status::success {
             Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
         } else {
@@ -898,20 +896,20 @@ namespace Pattern {
     ));
 
     create_for_surface : Surface -> IO Pattern;
-    create_for_surface = |surface| IO::from_func $ |_| (
-        surface._with_handle(|surface| (
-            let handle = FFI_CALL[Ptr cairo_pattern_create_for_surface(Ptr), surface];
+    create_for_surface = |surface| (
+        surface._with_handle_io(|surface| (
+            let handle = FFI_CALL_IO[Ptr cairo_pattern_create_for_surface(Ptr), surface];
             Pattern::_create_from_handle(handle)
         ))
     );
 
     get_surface : Pattern -> IO (Result Status Surface);
-    get_surface = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_surface = |pattern| pattern._with_handle_io(|pattern| (
         let surface : Array Ptr = Array::fill(1, nullptr);
-        let status = FFI_CALL[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface._get_ptr];
         if status == Status::success {
             let surface = surface.@(0);
-            let surface = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
+            let surface = FFI_CALL_IO[Ptr cairo_surface_reference(Ptr), surface];
             Result::ok $ Surface::_create_from_handle(surface)
         } else {
             Result::err $ status
@@ -920,17 +918,17 @@ namespace Pattern {
 
     create_linear : (F64, F64) -> (F64, F64) -> Pattern;
     create_linear = |(x0, y0), (x1, y1)| (
-        let handle = FFI_CALL[Ptr cairo_pattern_create_linear(F64, F64, F64, F64), x0, y0, x1, y1];
+        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_linear(F64, F64, F64, F64), x0, y0, x1, y1];
         Pattern::_create_from_handle(handle)
     );
 
     get_linear_points : Pattern -> IO (Result Status ((F64, F64), (F64, F64)));
-    get_linear_points = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_linear_points = |pattern| pattern._with_handle_io(|pattern| (
         let x0 : Array F64 = Array::fill(1, 0.0);
         let y0 : Array F64 = Array::fill(1, 0.0);
         let x1 : Array F64 = Array::fill(1, 0.0);
         let y1 : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
         if status == Status::success {
             Result::ok $ ((x0.@(0), y0.@(0)), (x1.@(0), y1.@(0)))
         } else {
@@ -940,19 +938,19 @@ namespace Pattern {
 
     create_radial : (F64, F64, F64) -> (F64, F64, F64) -> Pattern;
     create_radial = |(x0, y0, r0), (x1, y1, r1)| (
-        let handle = FFI_CALL[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
+        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
         Pattern::_create_from_handle(handle)
     );
 
     get_radial_circles : Pattern -> IO (Result Status ((F64, F64, F64), (F64, F64, F64)));
-    get_radial_circles = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_radial_circles = |pattern| pattern._with_handle_io(|pattern| (
         let x0 : Array F64 = Array::fill(1, 0.0);
         let y0 : Array F64 = Array::fill(1, 0.0);
         let r0 : Array F64 = Array::fill(1, 0.0);
         let x1 : Array F64 = Array::fill(1, 0.0);
         let y1 : Array F64 = Array::fill(1, 0.0);
         let r1 : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, r0._get_ptr, x1._get_ptr, y1._get_ptr, r1._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, r0._get_ptr, x1._get_ptr, y1._get_ptr, r1._get_ptr];
         if status == Status::success {
             Result::ok $ ((x0.@(0), y0.@(0), r0.@(0)), (x1.@(0), y1.@(0), r1.@(0)))
         } else {
@@ -962,70 +960,70 @@ namespace Pattern {
 
     create_mesh : Pattern;
     create_mesh = (
-        let handle = FFI_CALL[Ptr cairo_pattern_create_mesh()];
+        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_mesh()];
         Pattern::_create_from_handle(handle)
     );
 
     mesh_begin_patch : Pattern -> IO ();
-    mesh_begin_patch = |pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_begin_patch(Ptr), pattern]
+    mesh_begin_patch = |pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_begin_patch(Ptr), pattern]
         ))
     );
 
     mesh_end_patch : Pattern -> IO ();
-    mesh_end_patch = |pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_end_patch(Ptr), pattern]
+    mesh_end_patch = |pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_end_patch(Ptr), pattern]
         ))
     );
 
     mesh_move_to : (F64, F64) -> Pattern -> IO ();
-    mesh_move_to = |(x, y), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_move_to(Ptr, F64, F64), pattern, x, y]
+    mesh_move_to = |(x, y), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_move_to(Ptr, F64, F64), pattern, x, y]
         ))
     );
 
     mesh_line_to : (F64, F64) -> Pattern -> IO ();
-    mesh_line_to = |(x, y), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_line_to(Ptr, F64, F64), pattern, x, y]
+    mesh_line_to = |(x, y), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_line_to(Ptr, F64, F64), pattern, x, y]
         ))
     );
 
     mesh_curve_to : (F64, F64) -> (F64, F64) -> (F64, F64) -> Pattern -> IO ();
-    mesh_curve_to = |(x1, y1), (x2, y2), (x3, y3), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_curve_to(Ptr, F64, F64, F64, F64, F64, F64), pattern, x1, y1, x2, y2, x3, y3]
+    mesh_curve_to = |(x1, y1), (x2, y2), (x3, y3), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_curve_to(Ptr, F64, F64, F64, F64, F64, F64), pattern, x1, y1, x2, y2, x3, y3]
         ))
     );
 
     mesh_set_control_point : (F64, F64) -> Pattern -> IO ();
-    mesh_set_control_point = |(x, y), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_set_control_point(Ptr, F64, F64), pattern, x, y]
+    mesh_set_control_point = |(x, y), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_set_control_point(Ptr, F64, F64), pattern, x, y]
         ))
     );
 
     mesh_set_corner_color_rgb : I64 -> (F64, F64, F64) -> Pattern -> IO ();
-    mesh_set_corner_color_rgb = |corner, (r, g, b), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_set_corner_color_rgb(Ptr, U32, F64, F64, F64), pattern, corner.to_U32, r, g, b]
+    mesh_set_corner_color_rgb = |corner, (r, g, b), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_set_corner_color_rgb(Ptr, U32, F64, F64, F64), pattern, corner.to_U32, r, g, b]
         ))
     );
 
     mesh_set_corner_color_rgba : I64 -> (F64, F64, F64, F64) -> Pattern -> IO ();
-    mesh_set_corner_color_rgba = |corner, (r, g, b, a), pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_mesh_pattern_set_corner_color_rgba(Ptr, U32, F64, F64, F64, F64), pattern, corner.to_U32, r, g, b, a]
+    mesh_set_corner_color_rgba = |corner, (r, g, b, a), pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_mesh_pattern_set_corner_color_rgba(Ptr, U32, F64, F64, F64, F64), pattern, corner.to_U32, r, g, b, a]
         ))
     );
 
     mesh_get_patch_count : Pattern -> IO (Result Status I64);
-    mesh_get_patch_count = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_patch_count = |pattern| pattern._with_handle_io(|pattern| (
         let count : Array U32 = Array::fill(1, 0_U32);
-        let status = FFI_CALL[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count._get_ptr];
         if status == Status::success {
             Result::ok $ count.@(0).to_I64
         } else {
@@ -1034,16 +1032,16 @@ namespace Pattern {
     ));
 
     mesh_get_path : I64 -> Pattern -> IO Cairo::Path;
-    mesh_get_path = |patch_num, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let path = FFI_CALL[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
+    mesh_get_path = |patch_num, pattern| pattern._with_handle_io(|pattern| (
+        let path = FFI_CALL_IO[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
         Path::_create_from_handle(path)
     ));
 
     mesh_get_control_point : I64 -> Pattern -> IO (Result Status (F64, F64));
-    mesh_get_control_point = |corner, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_control_point = |corner, pattern| pattern._with_handle_io(|pattern| (
         let x : Array F64 = Array::fill(1, 0.0);
         let y : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, x._get_ptr, y._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, x._get_ptr, y._get_ptr];
         if status == Status::success {
             Result::ok $ (x.@(0), y.@(0))
         } else {
@@ -1052,12 +1050,12 @@ namespace Pattern {
     ));
 
     mesh_get_corner_color_rgba : I64 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
-    mesh_get_corner_color_rgba = |corner, pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    mesh_get_corner_color_rgba = |corner, pattern| pattern._with_handle_io(|pattern| (
         let r : Array F64 = Array::fill(1, 0.0);
         let g : Array F64 = Array::fill(1, 0.0);
         let b : Array F64 = Array::fill(1, 0.0);
         let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL[I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr), pattern, corner.to_U32, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr), pattern, corner.to_U32, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
         if status == Status::success {
             Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
         } else {
@@ -1066,59 +1064,59 @@ namespace Pattern {
     ));
 
     status : Pattern -> IO Status;
-    status = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let status = FFI_CALL[I32 cairo_pattern_status(Ptr), pattern];
+    status = |pattern| pattern._with_handle_io(|pattern| (
+        let status = FFI_CALL_IO[I32 cairo_pattern_status(Ptr), pattern];
         status
     ));
 
     set_extend : Extend -> Pattern -> IO ();
-    set_extend = |extend, pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_pattern_set_extend(Ptr, I32), pattern, extend]
+    set_extend = |extend, pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_pattern_set_extend(Ptr, I32), pattern, extend]
         ))
     );
 
     get_extend : Pattern -> IO Extend;
-    get_extend = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let extend = FFI_CALL[I32 cairo_pattern_get_extend(Ptr), pattern];
+    get_extend = |pattern| pattern._with_handle_io(|pattern| (
+        let extend = FFI_CALL_IO[I32 cairo_pattern_get_extend(Ptr), pattern];
         extend
     ));
 
     set_filter : Filter -> Pattern -> IO ();
-    set_filter = |filter, pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
-            FFI_CALL[() cairo_pattern_set_filter(Ptr, I32), pattern, filter]
+    set_filter = |filter, pattern| (
+        pattern._with_handle_io(|pattern| (
+            FFI_CALL_IO[() cairo_pattern_set_filter(Ptr, I32), pattern, filter]
         ))
     );
 
     get_filter : Pattern -> IO Filter;
-    get_filter = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let filter = FFI_CALL[I32 cairo_pattern_get_filter(Ptr), pattern];
+    get_filter = |pattern| pattern._with_handle_io(|pattern| (
+        let filter = FFI_CALL_IO[I32 cairo_pattern_get_filter(Ptr), pattern];
         filter
     ));
 
     set_matrix : Matrix -> Pattern -> IO ();
-    set_matrix = |matrix, pattern| IO::from_func $ |_| (
-        pattern._with_handle(|pattern| (
+    set_matrix = |matrix, pattern| (
+        pattern._with_handle_io(|pattern| (
             let _ = matrix._with_ptr(|matrix| (
-                FFI_CALL[() cairo_pattern_set_matrix(Ptr, Ptr), pattern, matrix]
+                FFI_CALL_IO[() cairo_pattern_set_matrix(Ptr, Ptr), pattern, matrix]
             ));
             ()
         ))
     );
 
     get_matrix : Pattern -> IO Matrix;
-    get_matrix = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
+    get_matrix = |pattern| pattern._with_handle_io(|pattern| (
         let matrix = Matrix::init_identity;
         let (_, matrix) = matrix._with_ptr(|matrix| (
-            FFI_CALL[() cairo_pattern_get_matrix(Ptr, Ptr), pattern, matrix]
+            FFI_CALL_IO[() cairo_pattern_get_matrix(Ptr, Ptr), pattern, matrix]
         ));
         matrix
     ));
 
     get_type : Pattern -> IO PatternType;
-    get_type = |pattern| IO::from_func $ |_| pattern._with_handle(|pattern| (
-        let pattern_type = FFI_CALL[I32 cairo_pattern_get_type(Ptr), pattern];
+    get_type = |pattern| pattern._with_handle_io(|pattern| (
+        let pattern_type = FFI_CALL_IO[I32 cairo_pattern_get_type(Ptr), pattern];
         pattern_type
     ));
 }
@@ -1133,7 +1131,7 @@ namespace RectangleList {
     _with_handle = |act, list| list.@_dtor.borrow(act);
 
     _create_from_handle : RectangleListHandle -> RectangleList;
-    _create_from_handle = |handle| RectangleList { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_rectangle_list_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| RectangleList { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_rectangle_list_destroy(Ptr), handle]) };
 
     // TODO: add a function RectangleList -> Iterator Rectangle, where Rectangle is a struct with x, y, width, height fields.
     // TODO: add a function RectangleList -> I64 that returns the number of rectangles in the list.
@@ -1148,8 +1146,11 @@ namespace Path {
     _with_handle : (PathHandle -> a) -> Cairo::Path -> a;
     _with_handle = |act, path| path.@_dtor.borrow(act);
 
+    _with_handle_io : (PathHandle -> IO a) -> Cairo::Path -> IO a;
+    _with_handle_io = |act, path| path.@_dtor.borrow_io(act);
+
     _create_from_handle : PathHandle -> Cairo::Path;
-    _create_from_handle = |handle| Cairo::Path { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_path_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Cairo::Path { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_path_destroy(Ptr), handle]) };
 
     // TODO: add a function Path -> Iterator PathData, where PathData is Fix's equivalent of cairo_path_data_t.
     // TODO: add a function Path -> I64 that returns the number of elements in the path.
@@ -1161,11 +1162,12 @@ type Matrix = unbox struct { xx : F64, yx : F64, xy : F64, yy : F64, x0 : F64, y
 
 namespace Matrix {
 
-    _with_ptr : (Ptr -> a) -> Matrix -> (a, Matrix);
+    // TODO: Rename this to `mutate`. Swap the order of the return values.
+    _with_ptr : (Ptr -> IO a) -> Matrix -> (a, Matrix);
     _with_ptr = |act, matrix| (
-        let arr = [matrix];
-        let res = arr.borrow_ptr(act);
-        (res, arr.@(0))
+        let mat = Boxed { value : matrix };
+        let (mat, res) = mat.mutate_boxed(act);
+        (res, mat.@value)
     );
 
     init_identity : Matrix;
@@ -1255,7 +1257,7 @@ namespace Region {
     _with_handle = |act, region| region.@_dtor.borrow(act);
 
     _create_from_handle : RegionHandle -> Region;
-    _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_region_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle]) };
 
     _force_unique : Region -> Region;
     _force_unique = |region| (
@@ -1263,22 +1265,22 @@ namespace Region {
             let (is_unique, dtor) = dtor.unsafe_is_unique;
             if is_unique { dtor };    
             dtor.borrow(|dtor| (
-                let handle = FFI_CALL[Ptr cairo_region_copy(Ptr), dtor];
-                Destructor::make(handle, |handle| FFI_CALL[() cairo_region_destroy(Ptr), handle])
+                let handle = FFI_CALL_IO[Ptr cairo_region_copy(Ptr), dtor];
+                Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle])
             ))
         ))
     );
 
     create : () -> Region;
     create = |_| (
-        let handle = FFI_CALL[Ptr cairo_region_create()];
+        let handle = FFI_CALL_IO[Ptr cairo_region_create()];
         Region::_create_from_handle(handle)
     );
 
     create_rectangle : RectangleInt -> Region;
     create_rectangle = |rect| (
         let (region, _) = rect._with_ptr(|rect| (
-            let handle = FFI_CALL[Ptr cairo_region_create_rectangle(Ptr), rect];
+            let handle = FFI_CALL_IO[Ptr cairo_region_create_rectangle(Ptr), rect];
             Region::_create_from_handle(handle)
         ));
         region
@@ -1287,65 +1289,65 @@ namespace Region {
     create_rectangles : Array RectangleInt -> Region;
     create_rectangles = |rects| (
         let len = rects.get_size;
-        let region = rects.borrow_ptr(|handles| FFI_CALL[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
+        let region = rects.borrow_ptr(|handles| FFI_CALL_IO[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
         Region::_create_from_handle(region)
     );
 
     status : Region -> Status;
-    status = |region| region._with_handle(|region| (
-        let status = FFI_CALL[I32 cairo_region_status(Ptr), region];
+    status = |region| region._with_handle_io(|region| (
+        let status = FFI_CALL_IO[I32 cairo_region_status(Ptr), region];
         status
     ));
 
     get_extents : Region -> RectangleInt;
-    get_extents = |region| region._with_handle(|region| (
+    get_extents = |region| region._with_handle_io(|region| (
         let rect = RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
         let (_, rect) = rect._with_ptr(|rect| (
-            FFI_CALL[() cairo_region_get_extents(Ptr, Ptr), region, rect]
+            FFI_CALL_IO[() cairo_region_get_extents(Ptr, Ptr), region, rect]
         ));
         rect
     ));
 
     num_rectangles : Region -> I32;
-    num_rectangles = |region| region._with_handle(|region| (
-        let num_rectangles = FFI_CALL[I32 cairo_region_num_rectangles(Ptr), region];
+    num_rectangles = |region| region._with_handle_io(|region| (
+        let num_rectangles = FFI_CALL_IO[I32 cairo_region_num_rectangles(Ptr), region];
         num_rectangles
     ));
 
     get_rectangle : I32 -> Region -> RectangleInt;
-    get_rectangle = |index, region| region._with_handle(|region| (
+    get_rectangle = |index, region| region._with_handle_io(|region| (
         let rect = RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
         let (_, rect) = rect._with_ptr(|rect| (
-            FFI_CALL[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect]
+            FFI_CALL_IO[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect]
         ));
         rect
     ));
 
     is_empty : Region -> Bool;
-    is_empty = |region| region._with_handle(|region| (
-        let is_empty = FFI_CALL[I32 cairo_region_is_empty(Ptr), region];
+    is_empty = |region| region._with_handle_io(|region| (
+        let is_empty = FFI_CALL_IO[I32 cairo_region_is_empty(Ptr), region];
         is_empty != 0_I32
     ));
 
     contains_point : (I32, I32) -> Region -> Bool;
-    contains_point = |(x, y), region| region._with_handle(|region| (
-        let contains_point = FFI_CALL[I32 cairo_region_contains_point(Ptr, I32, I32), region, x, y];
+    contains_point = |(x, y), region| region._with_handle_io(|region| (
+        let contains_point = FFI_CALL_IO[I32 cairo_region_contains_point(Ptr, I32, I32), region, x, y];
         contains_point != 0_I32
     ));
 
     contains_rectangle : RectangleInt -> Region -> Overlap;
     contains_rectangle = |rect, region| (
-        let (overlap, _) = rect._with_ptr(|rect| region._with_handle(|region|
-            FFI_CALL[I32 cairo_region_contains_rectangle(Ptr, Ptr), region, rect]
+        let (overlap, _) = rect._with_ptr(|rect| region._with_handle_io(|region|
+            FFI_CALL_IO[I32 cairo_region_contains_rectangle(Ptr, Ptr), region, rect]
         ));
         overlap
     );
 
     equal : Region -> Region -> Bool;
     equal = |region1, region2| (
-        region1._with_handle(|region1| (
-            region2._with_handle(|region2| (
-                let equal = FFI_CALL[I32 cairo_region_equal(Ptr, Ptr), region1, region2];
+        region1._with_handle_io(|region1| (
+            region2._with_handle_io(|region2| (
+                let equal = FFI_CALL_IO[I32 cairo_region_equal(Ptr, Ptr), region1, region2];
                 equal != 0_I32
             ))
         ))
@@ -1354,8 +1356,8 @@ namespace Region {
     translate : (I32, I32) -> Region -> Region;
     translate = |(dx, dy), region| (
         let region = region._force_unique;
-        eval region._with_handle(|region| (
-            FFI_CALL[() cairo_region_translate(Ptr, I32, I32), region, dx, dy]
+        eval region._with_handle_io(|region| (
+            FFI_CALL_IO[() cairo_region_translate(Ptr, I32, I32), region, dx, dy]
         ));
         region
     );
@@ -1363,9 +1365,9 @@ namespace Region {
     intersect : Region -> Region -> Result Status Region;
     intersect = |region1, region2| (
         let region1 = region1._force_unique;
-        let status = region1._with_handle(|region1| 
-            region2._with_handle(|region2| 
-                FFI_CALL[I32 cairo_region_intersect(Ptr, Ptr), region1, region2]
+        let status = region1._with_handle_io(|region1| 
+            region2._with_handle_io(|region2| 
+                FFI_CALL_IO[I32 cairo_region_intersect(Ptr, Ptr), region1, region2]
             )
         );
         if status == Status::success {
@@ -1379,8 +1381,8 @@ namespace Region {
     intersect_rectangle = |rect, region| (
         let region = region._force_unique;
         let (status, _) = rect._with_ptr(|rect| 
-            region._with_handle(|region| 
-                FFI_CALL[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
+            region._with_handle_io(|region| 
+                FFI_CALL_IO[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
             )
         );
         if status == Status::success {
@@ -1393,9 +1395,9 @@ namespace Region {
     subtract : Region -> Region -> Result Status Region;
     subtract = |other, dst| (
         let dst = dst._force_unique;
-        let status = dst._with_handle(|dst| (
-            other._with_handle(|other| (
-                FFI_CALL[I32 cairo_region_subtract(Ptr, Ptr), dst, other]
+        let status = dst._with_handle_io(|dst| (
+            other._with_handle_io(|other| (
+                FFI_CALL_IO[I32 cairo_region_subtract(Ptr, Ptr), dst, other]
             ))
         ));
         if status == Status::success {
@@ -1409,8 +1411,8 @@ namespace Region {
     subtract_rectangle = |rect, dst| (
         let dst = dst._force_unique;
         let (status, _) = rect._with_ptr(|rect| (
-            dst._with_handle(|dst| (
-                FFI_CALL[I32 cairo_region_subtract_rectangle(Ptr, Ptr), dst, rect]
+            dst._with_handle_io(|dst| (
+                FFI_CALL_IO[I32 cairo_region_subtract_rectangle(Ptr, Ptr), dst, rect]
             ))
         ));
         if status == Status::success {
@@ -1423,9 +1425,9 @@ namespace Region {
     union_ : Region -> Region -> Result Status Region;
     union_ = |other, dst| (
         let dst = dst._force_unique;
-        let status = dst._with_handle(|dst| (
-            other._with_handle(|other| (
-                FFI_CALL[I32 cairo_region_union(Ptr, Ptr), dst, other]
+        let status = dst._with_handle_io(|dst| (
+            other._with_handle_io(|other| (
+                FFI_CALL_IO[I32 cairo_region_union(Ptr, Ptr), dst, other]
             ))
         ));
         if status == Status::success {
@@ -1439,8 +1441,8 @@ namespace Region {
     union_rectangle = |rect, dst| (
         let dst = dst._force_unique;
         let (status, _) = rect._with_ptr(|rect| (
-            dst._with_handle(|dst| (
-                FFI_CALL[I32 cairo_region_union_rectangle(Ptr, Ptr), dst, rect]
+            dst._with_handle_io(|dst| (
+                FFI_CALL_IO[I32 cairo_region_union_rectangle(Ptr, Ptr), dst, rect]
             ))
         ));
         if status == Status::success {
@@ -1453,9 +1455,9 @@ namespace Region {
     xor : Region -> Region -> Result Status Region;
     xor = |other, dst| (
         let dst = dst._force_unique;
-        let status = dst._with_handle(|dst| (
-            other._with_handle(|other| (
-                FFI_CALL[I32 cairo_region_xor(Ptr, Ptr), dst, other]
+        let status = dst._with_handle_io(|dst| (
+            other._with_handle_io(|other| (
+                FFI_CALL_IO[I32 cairo_region_xor(Ptr, Ptr), dst, other]
             ))
         ));
         if status == Status::success {
@@ -1469,8 +1471,8 @@ namespace Region {
     xor_rectangle = |rect, dst| (
         let dst = dst._force_unique;
         let (status, _) = rect._with_ptr(|rect| (
-            dst._with_handle(|dst| (
-                FFI_CALL[I32 cairo_region_xor_rectangle(Ptr, Ptr), dst, rect]
+            dst._with_handle_io(|dst| (
+                FFI_CALL_IO[I32 cairo_region_xor_rectangle(Ptr, Ptr), dst, rect]
             ))
         ));
         if status == Status::success {
@@ -1503,7 +1505,7 @@ namespace FontOptions {
     _with_handle = |act, options| options.@_dtor.borrow(act);
 
     _create_from_handle : FontOptionsHandle -> FontOptions;
-    _create_from_handle = |handle| FontOptions { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_font_options_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| FontOptions { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_options_destroy(Ptr), handle]) };
 
     _force_unique : FontOptions -> FontOptions;
     _force_unique = |options| (
@@ -1511,46 +1513,46 @@ namespace FontOptions {
             let (is_unique, dtor) = dtor.unsafe_is_unique;
             if is_unique { dtor };    
             dtor.borrow(|dtor| (
-                let handle = FFI_CALL[Ptr cairo_font_options_copy(Ptr), dtor];
-                Destructor::make(handle, |handle| FFI_CALL[() cairo_font_options_destroy(Ptr), handle])
+                let handle = FFI_CALL_IO[Ptr cairo_font_options_copy(Ptr), dtor];
+                Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_options_destroy(Ptr), handle])
             ))
         ))
     );
 
     create : () -> FontOptions;
     create = |_| (
-        let handle = FFI_CALL[Ptr cairo_font_options_create()];
+        let handle = FFI_CALL_IO[Ptr cairo_font_options_create()];
         FontOptions::_create_from_handle(handle)
     );
 
     status : FontOptions -> Status;
-    status = |options| options._with_handle(|options| (
-        let status = FFI_CALL[I32 cairo_font_options_status(Ptr), options];
+    status = |options| options._with_handle_io(|options| (
+        let status = FFI_CALL_IO[I32 cairo_font_options_status(Ptr), options];
         status
     ));
 
     merge : FontOptions -> FontOptions -> FontOptions;
     merge = |other, options| (
         let options = options._force_unique;
-        eval options._with_handle(|options| (
-            other._with_handle(|other| (
-                FFI_CALL[() cairo_font_options_merge(Ptr, Ptr), options, other]
+        eval options._with_handle_io(|options| (
+            other._with_handle_io(|other| (
+                FFI_CALL_IO[() cairo_font_options_merge(Ptr, Ptr), options, other]
             ))
         ));
         options
     );
 
     hash : FontOptions -> U64;
-    hash = |options| options._with_handle(|options| (
-        let hash = FFI_CALL[U64 cairo_font_options_hash(Ptr), options];
+    hash = |options| options._with_handle_io(|options| (
+        let hash = FFI_CALL_IO[U64 cairo_font_options_hash(Ptr), options];
         hash
     ));
 
     equal : FontOptions -> FontOptions -> Bool;
     equal = |options1, options2| (
-        options1._with_handle(|options1| (
-            options2._with_handle(|options2| (
-                let equal = FFI_CALL[I32 cairo_font_options_equal(Ptr, Ptr), options1, options2];
+        options1._with_handle_io(|options1| (
+            options2._with_handle_io(|options2| (
+                let equal = FFI_CALL_IO[I32 cairo_font_options_equal(Ptr, Ptr), options1, options2];
                 equal != 0_I32
             ))
         ))
@@ -1559,66 +1561,66 @@ namespace FontOptions {
     set_antialias : Antialias -> FontOptions -> FontOptions;
     set_antialias = |antialias, options| (
         let options = options._force_unique;
-        eval options._with_handle(|options| (
-            FFI_CALL[() cairo_font_options_set_antialias(Ptr, I32), options, antialias]
+        eval options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_font_options_set_antialias(Ptr, I32), options, antialias]
         ));
         options
     );
 
     get_antialias : FontOptions -> Antialias;
-    get_antialias = |options| options._with_handle(|options| (
-        let antialias = FFI_CALL[I32 cairo_font_options_get_antialias(Ptr), options];
+    get_antialias = |options| options._with_handle_io(|options| (
+        let antialias = FFI_CALL_IO[I32 cairo_font_options_get_antialias(Ptr), options];
         antialias
     ));
 
     set_subpixel_order : SubpixelOrder -> FontOptions -> FontOptions;
     set_subpixel_order = |order, options| (
         let options = options._force_unique;
-        eval options._with_handle(|options| (
-            FFI_CALL[() cairo_font_options_set_subpixel_order(Ptr, I32), options, order]
+        eval options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_font_options_set_subpixel_order(Ptr, I32), options, order]
         ));
         options
     );
 
     get_subpixel_order : FontOptions -> SubpixelOrder;
-    get_subpixel_order = |options| options._with_handle(|options| (
-        let order = FFI_CALL[I32 cairo_font_options_get_subpixel_order(Ptr), options];
+    get_subpixel_order = |options| options._with_handle_io(|options| (
+        let order = FFI_CALL_IO[I32 cairo_font_options_get_subpixel_order(Ptr), options];
         order
     ));
 
     set_hint_style : HintStyle -> FontOptions -> FontOptions;
     set_hint_style = |style, options| (
         let options = options._force_unique;
-        eval options._with_handle(|options| (
-            FFI_CALL[() cairo_font_options_set_hint_style(Ptr, I32), options, style]
+        eval options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_font_options_set_hint_style(Ptr, I32), options, style]
         ));
         options
     );
 
     get_hint_style : FontOptions -> HintStyle;
-    get_hint_style = |options| options._with_handle(|options| (
-        let style = FFI_CALL[I32 cairo_font_options_get_hint_style(Ptr), options];
+    get_hint_style = |options| options._with_handle_io(|options| (
+        let style = FFI_CALL_IO[I32 cairo_font_options_get_hint_style(Ptr), options];
         style
     ));
 
     set_hint_metrics : HintMetrics -> FontOptions -> FontOptions;
     set_hint_metrics = |metrics, options| (
         let options = options._force_unique;
-        eval options._with_handle(|options| (
-            FFI_CALL[() cairo_font_options_set_hint_metrics(Ptr, I32), options, metrics]
+        eval options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_font_options_set_hint_metrics(Ptr, I32), options, metrics]
         ));
         options
     );
 
     get_hint_metrics : FontOptions -> HintMetrics;
-    get_hint_metrics = |options| options._with_handle(|options| (
-        let metrics = FFI_CALL[I32 cairo_font_options_get_hint_metrics(Ptr), options];
+    get_hint_metrics = |options| options._with_handle_io(|options| (
+        let metrics = FFI_CALL_IO[I32 cairo_font_options_get_hint_metrics(Ptr), options];
         metrics
     ));
 
     get_variations : FontOptions -> String;
-    get_variations = |options| options._with_handle(|options| (
-        let variations = FFI_CALL[Ptr cairo_font_options_get_variations(Ptr), options];
+    get_variations = |options| options._with_handle_io(|options| (
+        let variations = FFI_CALL_IO[Ptr cairo_font_options_get_variations(Ptr), options];
         String::_unsafe_from_c_str_ptr(variations)
     ));
 
@@ -1626,8 +1628,8 @@ namespace FontOptions {
     set_variations = |variations, options| (
         let options = options._force_unique;
         eval variations.borrow_c_str(|variations| 
-            options._with_handle(|options| 
-                FFI_CALL[() cairo_font_options_set_variations(Ptr, Ptr), options, variations]
+            options._with_handle_io(|options| 
+                FFI_CALL_IO[() cairo_font_options_set_variations(Ptr, Ptr), options, variations]
             )
         );
         options
@@ -1644,17 +1646,17 @@ namespace FontFace {
     _with_handle = |act, face| face.@_dtor.borrow(act);
 
     _create_from_handle : FontFaceHandle -> FontFace;
-    _create_from_handle = |handle| FontFace { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_font_face_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| FontFace { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_face_destroy(Ptr), handle]) };
 
     status : FontFace -> Status;
-    status = |face| face._with_handle(|face| (
-        let status = FFI_CALL[I32 cairo_font_face_status(Ptr), face];
+    status = |face| face._with_handle_io(|face| (
+        let status = FFI_CALL_IO[I32 cairo_font_face_status(Ptr), face];
         status
     ));
 
     get_type : FontFace -> FontType;
-    get_type = |face| face._with_handle(|face| (
-        let face_type = FFI_CALL[I32 cairo_font_face_get_type(Ptr), face];
+    get_type = |face| face._with_handle_io(|face| (
+        let face_type = FFI_CALL_IO[I32 cairo_font_face_get_type(Ptr), face];
         face_type
     ));
 }
@@ -1664,26 +1666,26 @@ namespace ToyFontFace {
     create : String -> FontSlant -> FontWeight -> FontFace;
     create = |family, slant, weight| (
         family.borrow_c_str(|family| (
-            let handle = FFI_CALL[Ptr cairo_toy_font_face_create(Ptr, I32, I32), family, slant, weight];
+            let handle = FFI_CALL_IO[Ptr cairo_toy_font_face_create(Ptr, I32, I32), family, slant, weight];
             FontFace::_create_from_handle(handle)
         ))
     );
 
     get_family : FontFace -> String;
-    get_family = |face| face._with_handle(|face| (
-        let family = FFI_CALL[Ptr cairo_toy_font_face_get_family(Ptr), face];
+    get_family = |face| face._with_handle_io(|face| (
+        let family = FFI_CALL_IO[Ptr cairo_toy_font_face_get_family(Ptr), face];
         String::_unsafe_from_c_str_ptr(family)
     ));
 
     get_slant : FontFace -> FontSlant;
-    get_slant = |face| face._with_handle(|face| (
-        let slant = FFI_CALL[I32 cairo_toy_font_face_get_slant(Ptr), face];
+    get_slant = |face| face._with_handle_io(|face| (
+        let slant = FFI_CALL_IO[I32 cairo_toy_font_face_get_slant(Ptr), face];
         slant
     ));
 
     get_weight : FontFace -> FontWeight;
-    get_weight = |face| face._with_handle(|face| (
-        let weight = FFI_CALL[I32 cairo_toy_font_face_get_weight(Ptr), face];
+    get_weight = |face| face._with_handle_io(|face| (
+        let weight = FFI_CALL_IO[I32 cairo_toy_font_face_get_weight(Ptr), face];
         weight
     ));
 }
@@ -1698,29 +1700,29 @@ namespace ScaledFont {
     _with_handle = |act, font| font.@_dtor.borrow(act);
 
     _create_from_handle : ScaledFontHandle -> ScaledFont;
-    _create_from_handle = |handle| ScaledFont { _dtor : Destructor::make(handle, |handle| FFI_CALL[() cairo_scaled_font_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| ScaledFont { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_scaled_font_destroy(Ptr), handle]) };
 
     status : ScaledFont -> Status;
-    status = |font| font._with_handle(|font| (
-        let status = FFI_CALL[I32 cairo_scaled_font_status(Ptr), font];
+    status = |font| font._with_handle_io(|font| (
+        let status = FFI_CALL_IO[I32 cairo_scaled_font_status(Ptr), font];
         status
     ));
 
     extents : ScaledFont -> FontExtents;
-    extents = |font| font._with_handle(|font| (
+    extents = |font| font._with_handle_io(|font| (
         let extents = FontExtents { ascent : 0.0, descent : 0.0, height : 0.0, max_x_advance : 0.0, max_y_advance : 0.0 };
         let (_, extents) = extents._with_ptr(|extents| (
-            FFI_CALL[() cairo_scaled_font_extents(Ptr, Ptr), font, extents]
+            FFI_CALL_IO[() cairo_scaled_font_extents(Ptr, Ptr), font, extents]
         ));
         extents
     ));
 
     text_extents : String -> ScaledFont -> TextExtents;
-    text_extents = |text, font| font._with_handle(|font| (
+    text_extents = |text, font| font._with_handle_io(|font| (
         let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
         let (_, extents) = text.borrow_c_str(|text| 
             extents._with_ptr(|extents| 
-                FFI_CALL[() cairo_scaled_font_text_extents(Ptr, Ptr, Ptr), font, text, extents]
+                FFI_CALL_IO[() cairo_scaled_font_text_extents(Ptr, Ptr, Ptr), font, text, extents]
             )
         );
         extents
@@ -1730,9 +1732,9 @@ namespace ScaledFont {
     glyph_extents = |glyphs, font| (
         let len = glyphs.get_size;
         let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
-        let (_, extents) = font._with_handle(|font| extents._with_ptr(|extents| (
+        let (_, extents) = font._with_handle_io(|font| extents._with_ptr(|extents| (
             glyphs.borrow_ptr(|glyphs| (
-                FFI_CALL[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
+                FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
             ))
         )));
         extents
@@ -1742,48 +1744,48 @@ namespace ScaledFont {
     // It is hard to wrap cairo_scaled_font_text_to_glyphs in current state of FFI of Fix.
 
     get_font_face : ScaledFont -> FontFace;
-    get_font_face = |font| font._with_handle(|font| (
-        let face = FFI_CALL[Ptr cairo_scaled_font_get_font_face(Ptr), font];
-        let face = FFI_CALL[Ptr cairo_font_face_reference(Ptr), face];
+    get_font_face = |font| font._with_handle_io(|font| (
+        let face = FFI_CALL_IO[Ptr cairo_scaled_font_get_font_face(Ptr), font];
+        let face = FFI_CALL_IO[Ptr cairo_font_face_reference(Ptr), face];
         FontFace::_create_from_handle(face)
     ));
 
     get_font_options : ScaledFont -> FontOptions;
-    get_font_options = |font| font._with_handle(|font| (
+    get_font_options = |font| font._with_handle_io(|font| (
         let options = FontOptions::create();
-        eval options._with_handle(|options| (
-            FFI_CALL[() cairo_scaled_font_get_font_options(Ptr, Ptr), font, options]
+        eval options._with_handle_io(|options| (
+            FFI_CALL_IO[() cairo_scaled_font_get_font_options(Ptr, Ptr), font, options]
         ));
         options
     ));
 
     get_font_matrix : ScaledFont -> Matrix;
-    get_font_matrix = |font| font._with_handle(|font| (
+    get_font_matrix = |font| font._with_handle_io(|font| (
         let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-            FFI_CALL[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
+            FFI_CALL_IO[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
         );
         matrix
     ));
 
     get_ctm : ScaledFont -> Matrix;
-    get_ctm = |font| font._with_handle(|font| (
+    get_ctm = |font| font._with_handle_io(|font| (
         let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-            FFI_CALL[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
+            FFI_CALL_IO[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
         );
         matrix
     ));
 
     get_scale_matrix : ScaledFont -> Matrix;
-    get_scale_matrix = |font| font._with_handle(|font| (
+    get_scale_matrix = |font| font._with_handle_io(|font| (
         let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-            FFI_CALL[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
+            FFI_CALL_IO[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
         );
         matrix
     ));
 
     get_type : ScaledFont -> FontType;
-    get_type = |font| font._with_handle(|font| (
-        let font_type = FFI_CALL[I32 cairo_scaled_font_get_type(Ptr), font];
+    get_type = |font| font._with_handle_io(|font| (
+        let font_type = FFI_CALL_IO[I32 cairo_scaled_font_get_type(Ptr), font];
         font_type
     ));
 }
