@@ -177,9 +177,9 @@ get_line_cap = |cairo| cairo._with_handle_io(|cairo| (
 ));
 
 set_line_join : LineJoin -> Cairo -> IO ();
-set_line_join = |line_join, cairo| IO::from_func $ |_| (
-    cairo._with_handle(|cairo| (
-        FFI_CALL[() cairo_set_line_join(Ptr, I32), cairo, line_join]
+set_line_join = |line_join, cairo| (
+    cairo._with_handle_io(|cairo| (
+        FFI_CALL_IO[() cairo_set_line_join(Ptr, I32), cairo, line_join]
     ))
 );
 
