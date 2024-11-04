@@ -924,43 +924,47 @@ namespace Pattern {
 
     get_linear_points : Pattern -> IO (Result Status ((F64, F64), (F64, F64)));
     get_linear_points = |pattern| pattern._with_handle_io(|pattern| (
-        let x0 : Array F64 = Array::fill(1, 0.0);
-        let y0 : Array F64 = Array::fill(1, 0.0);
-        let x1 : Array F64 = Array::fill(1, 0.0);
-        let y1 : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, x1._get_ptr, y1._get_ptr];
+        let coords = Array::fill(4, 0.0);
+        let (coords, status) = *coords.mutate_boxed_io(|p|
+            FFI_CALL_IO[
+                I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), 
+                pattern, 
+                p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+            ]
+        );
         if status == Status::success {
-            Result::ok $ ((x0.@(0), y0.@(0)), (x1.@(0), y1.@(0)))
+            pure $ Result::ok $ ((coords.@(0), coords.@(1)), (coords.@(2), coords.@(3)))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     create_radial : (F64, F64, F64) -> (F64, F64, F64) -> Pattern;
     create_radial = |(x0, y0, r0), (x1, y1, r1)| (
-        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
+        let handle = FFI_CALL[Ptr cairo_pattern_create_radial(F64, F64, F64, F64, F64, F64), x0, y0, r0, x1, y1, r1];
         Pattern::_create_from_handle(handle)
     );
 
     get_radial_circles : Pattern -> IO (Result Status ((F64, F64, F64), (F64, F64, F64)));
     get_radial_circles = |pattern| pattern._with_handle_io(|pattern| (
-        let x0 : Array F64 = Array::fill(1, 0.0);
-        let y0 : Array F64 = Array::fill(1, 0.0);
-        let r0 : Array F64 = Array::fill(1, 0.0);
-        let x1 : Array F64 = Array::fill(1, 0.0);
-        let y1 : Array F64 = Array::fill(1, 0.0);
-        let r1 : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), pattern, x0._get_ptr, y0._get_ptr, r0._get_ptr, x1._get_ptr, y1._get_ptr, r1._get_ptr];
+        let coords = Array::fill(6, 0.0);
+        let (coords, status) = *coords.mutate_boxed_io(|p|
+            FFI_CALL_IO[
+                I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), 
+                pattern, 
+                p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3), p.add_offset(8 * 4), p.add_offset(8 * 5)
+            ]
+        );
         if status == Status::success {
-            Result::ok $ ((x0.@(0), y0.@(0), r0.@(0)), (x1.@(0), y1.@(0), r1.@(0)))
+            pure $ Result::ok $ ((coords.@(0), coords.@(1), coords.@(2)), (coords.@(3), coords.@(4), coords.@(5)))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     create_mesh : Pattern;
     create_mesh = (
-        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_mesh()];
+        let handle = FFI_CALL[Ptr cairo_pattern_create_mesh()];
         Pattern::_create_from_handle(handle)
     );
 
@@ -1022,51 +1026,54 @@ namespace Pattern {
 
     mesh_get_patch_count : Pattern -> IO (Result Status I64);
     mesh_get_patch_count = |pattern| pattern._with_handle_io(|pattern| (
-        let count : Array U32 = Array::fill(1, 0_U32);
-        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count._get_ptr];
+        let count = Boxed { value : 0_U32 };
+        let (count, status) = *count.mutate_boxed_io(|count|FFI_CALL_IO[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count]);
         if status == Status::success {
-            Result::ok $ count.@(0).to_I64
+            pure $ Result::ok $ count.@value.to_I64
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     mesh_get_path : I64 -> Pattern -> IO Cairo::Path;
     mesh_get_path = |patch_num, pattern| pattern._with_handle_io(|pattern| (
-        let path = FFI_CALL_IO[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
-        Path::_create_from_handle(path)
+        let path = *FFI_CALL_IO[Ptr cairo_mesh_pattern_get_path(Ptr, U32), pattern, patch_num.to_U32];
+        pure $ Path::_create_from_handle(path)
     ));
 
     mesh_get_control_point : I64 -> Pattern -> IO (Result Status (F64, F64));
     mesh_get_control_point = |corner, pattern| pattern._with_handle_io(|pattern| (
-        let x : Array F64 = Array::fill(1, 0.0);
-        let y : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, x._get_ptr, y._get_ptr];
+        let xy = Array::fill(2, 0.0);
+        let (xy, status) = *xy.mutate_boxed_io(|p| 
+            FFI_CALL_IO[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, p, p.add_offset(8)]
+        );
         if status == Status::success {
-            Result::ok $ (x.@(0), y.@(0))
+            pure $ Result::ok $ (xy.@(0), xy.@(1))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     mesh_get_corner_color_rgba : I64 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
     mesh_get_corner_color_rgba = |corner, pattern| pattern._with_handle_io(|pattern| (
-        let r : Array F64 = Array::fill(1, 0.0);
-        let g : Array F64 = Array::fill(1, 0.0);
-        let b : Array F64 = Array::fill(1, 0.0);
-        let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr), pattern, corner.to_U32, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let rgba = Array::fill(4, 0.0);
+        let (rgba, status) = *rgba.mutate_boxed_io(|p| 
+            FFI_CALL_IO[
+                I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr, Ptr),
+                pattern, corner.to_U32,
+                p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3), p.add_offset(8 * 4)
+            ]
+        );
         if status == Status::success {
-            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+            pure $ Result::ok $ (rgba.@(0), rgba.@(1), rgba.@(2), rgba.@(3))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     status : Pattern -> IO Status;
     status = |pattern| pattern._with_handle_io(|pattern| (
-        let status = FFI_CALL_IO[I32 cairo_pattern_status(Ptr), pattern];
-        status
+        FFI_CALL_IO[I32 cairo_pattern_status(Ptr), pattern]
     ));
 
     set_extend : Extend -> Pattern -> IO ();
@@ -1078,8 +1085,7 @@ namespace Pattern {
 
     get_extend : Pattern -> IO Extend;
     get_extend = |pattern| pattern._with_handle_io(|pattern| (
-        let extend = FFI_CALL_IO[I32 cairo_pattern_get_extend(Ptr), pattern];
-        extend
+        FFI_CALL_IO[I32 cairo_pattern_get_extend(Ptr), pattern]
     ));
 
     set_filter : Filter -> Pattern -> IO ();
@@ -1091,17 +1097,15 @@ namespace Pattern {
 
     get_filter : Pattern -> IO Filter;
     get_filter = |pattern| pattern._with_handle_io(|pattern| (
-        let filter = FFI_CALL_IO[I32 cairo_pattern_get_filter(Ptr), pattern];
-        filter
+        FFI_CALL_IO[I32 cairo_pattern_get_filter(Ptr), pattern]
     ));
 
     set_matrix : Matrix -> Pattern -> IO ();
     set_matrix = |matrix, pattern| (
         pattern._with_handle_io(|pattern| (
-            let _ = matrix._with_ptr(|matrix| (
+            matrix._with_ptr_io(|matrix| (
                 FFI_CALL_IO[() cairo_pattern_set_matrix(Ptr, Ptr), pattern, matrix]
-            ));
-            ()
+            ))
         ))
     );
 
