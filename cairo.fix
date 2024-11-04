@@ -587,119 +587,113 @@ identity_matrix = |cairo| cairo._with_handle_io(|cairo| (
 ));
 
 user_to_device : (F64, F64) -> Cairo -> IO (F64, F64);
-user_to_device = |(x, y), cairo| (
-    let x : Array F64 = Array::fill(1, x);
-    let y : Array F64 = Array::fill(1, y);
-    eval cairo._with_handle_io(|cairo| (
-        FFI_CALL_IO[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
-    ));
-    (x.@(0), y.@(0))
-);
-
+user_to_device = |(x, y), cairo| cairo._with_handle_io(|cairo| (
+    let x = Boxed { value : x };
+    let y = Boxed { value : y };
+    x.mutate_boxed_io(|x| y.mutate_boxed_io(|y| 
+        FFI_CALL_IO[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x, y]
+    ));;
+    pure $ (x.@value, y.@value)
+));
 
 user_to_device_distance : (F64, F64) -> Cairo -> IO (F64, F64);
-user_to_device_distance = |(dx, dy), cairo| (
-    let dx : Array F64 = Array::fill(1, dx);
-    let dy : Array F64 = Array::fill(1, dy);
-    eval cairo._with_handle_io(|cairo| (
-        FFI_CALL_IO[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
-    ));
-    (dx.@(0), dy.@(0))
+user_to_device_distance = |(dx, dy), cairo| cairo._with_handle_io(|cairo| (
+        let dx = Boxed { value : dx };
+        let dy = Boxed { value : dy };
+        dx.mutate_boxed_io(|dx| dy.mutate_boxed_io(|dy| 
+            FFI_CALL_IO[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx, dy]
+        ));;
+        pure $ (dx.@value, dy.@value)
+    )
 );
 
 device_to_user : (F64, F64) -> Cairo -> IO (F64, F64);
-device_to_user = |(x, y), cairo| (
-    let x : Array F64 = Array::fill(1, x);
-    let y : Array F64 = Array::fill(1, y);
-    eval cairo._with_handle_io(|cairo| (
-        FFI_CALL_IO[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x._get_ptr, y._get_ptr]
-    ));
-    (x.@(0), y.@(0))
+device_to_user = |(x, y), cairo| cairo._with_handle_io(|cairo| (
+        let x = Boxed { value : x };
+        let y = Boxed { value : y };
+        x.mutate_boxed_io(|x| y.mutate_boxed_io(|y| 
+            FFI_CALL_IO[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x, y]
+        ));;
+        pure $ (x.@value, y.@value)
+    )
 );
 
 device_to_user_distance : (F64, F64) -> Cairo -> IO (F64, F64);
-device_to_user_distance = |(dx, dy), cairo| (
-    let dx : Array F64 = Array::fill(1, dx);
-    let dy : Array F64 = Array::fill(1, dy);
-    eval cairo._with_handle_io(|cairo| (
-        FFI_CALL_IO[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx._get_ptr, dy._get_ptr]
-    ));
-    (dx.@(0), dy.@(0))
+device_to_user_distance = |(dx, dy), cairo| cairo._with_handle_io(|cairo| (
+        let dx = Boxed { value : dx };
+        let dy = Boxed { value : dy };
+        dx.mutate_boxed_io(|dx| dy.mutate_boxed_io(|dy| 
+            FFI_CALL_IO[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx, dy]
+        ));;
+        pure $ (dx.@value, dy.@value)
+    )
 );
 
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
-select_font_face = |font, slant, weight, cairo| (
-    cairo._with_handle_io(|cairo| (
+select_font_face = |font, slant, weight, cairo| cairo._with_handle_io(|cairo| (
         font.borrow_c_str(|font| (
             FFI_CALL_IO[() cairo_select_font_face(Ptr, Ptr, I32, I32), cairo, font, slant, weight]
         ))
-    ))
+    )
 );
 
 set_font_size : F64 -> Cairo -> IO ();
-set_font_size = |size, cairo| (
-    cairo._with_handle_io(|cairo| (
+set_font_size = |size, cairo| cairo._with_handle_io(|cairo| (
         FFI_CALL_IO[() cairo_set_font_size(Ptr, F64), cairo, size]
-    ))
+    )
 );
 
 set_font_matrix : Matrix -> Cairo -> IO ();
-set_font_matrix = |matrix, cairo| (
-    cairo._with_handle_io(|cairo| (
-        let _ = matrix._with_ptr(|matrix| (
+set_font_matrix = |matrix, cairo| cairo._with_handle_io(|cairo| (
+        matrix._with_ptr_io(|matrix| (
             FFI_CALL_IO[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
-        ));
-        ()
-    ))
+        ))
+    )
 );
 
 get_font_matrix : Cairo -> IO Matrix;
-get_font_matrix = |cairo| (
+get_font_matrix = |cairo| cairo._with_handle_io(|cairo|
     let matrix = Matrix::init_identity;
-    let (_, matrix) = cairo._with_handle_io(|cairo| (
-        matrix._with_ptr(|matrix| (
-            FFI_CALL_IO[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
-        ))
+    let (matrix, _) = *matrix._mutate_io(|matrix| (
+        FFI_CALL_IO[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
     ));
-    matrix
+    pure $ matrix
 );
 
 set_font_options : FontOptions -> Cairo -> IO ();
-set_font_options = |options, cairo| (
-    cairo._with_handle_io(|cairo| (
+set_font_options = |options, cairo| cairo._with_handle_io(|cairo| (
         options._with_handle_io(|options| (
             FFI_CALL_IO[() cairo_set_font_options(Ptr, Ptr), cairo, options]
         ))
-    ))
+    )
 );
 
 get_font_options : Cairo -> IO FontOptions;
 get_font_options = |cairo| (
-    let options = FontOptions::create();
-    eval cairo._with_handle_io(|cairo| (
-        options._with_handle_io(|options| (
+    cairo._with_handle_io(|cairo| (
+        let options = FontOptions::create();
+        let (options, _) = *options._mutate_io(|options| (
             FFI_CALL_IO[() cairo_get_font_options(Ptr, Ptr), cairo, options]
-        ))
-    ));
-    options
+        ));
+        pure $ options
+    ))
 );
 
 set_font_face : FontFace -> Cairo -> IO ();
-set_font_face = |face, cairo| (
-    cairo._with_handle_io(|cairo| (
+set_font_face = |face, cairo| cairo._with_handle_io(|cairo| (
         face._with_handle_io(|face| (
             FFI_CALL_IO[() cairo_set_font_face(Ptr, Ptr), cairo, face]
         ))
-    ))
+    )
 );
 
 get_font_face : Cairo -> IO FontFace;
 get_font_face = |cairo| (
-    let face = cairo._with_handle_io(|cairo| (
+    let face = *cairo._with_handle_io(|cairo| (
         FFI_CALL_IO[Ptr cairo_get_font_face(Ptr), cairo]
     ));
-    let face = FFI_CALL_IO[Ptr cairo_font_face_reference(Ptr), face];
-    FontFace::_create_from_handle(face)
+    let face = *FFI_CALL_IO[Ptr cairo_font_face_reference(Ptr), face];
+    pure $ FontFace::_create_from_handle(face)
 );
 
 set_scaled_font : ScaledFont -> Cairo -> IO ();
@@ -713,11 +707,11 @@ set_scaled_font = |scaled_font, cairo| (
 
 get_scaled_font : Cairo -> IO ScaledFont;
 get_scaled_font = |cairo| (
-    let scaled_font = cairo._with_handle_io(|cairo| (
+    let scaled_font = *cairo._with_handle_io(|cairo| (
         FFI_CALL_IO[Ptr cairo_get_scaled_font(Ptr), cairo]
     ));
-    let scaled_font = FFI_CALL_IO[Ptr cairo_scaled_font_reference(Ptr), scaled_font];
-    ScaledFont::_create_from_handle(scaled_font)
+    let scaled_font = *FFI_CALL_IO[Ptr cairo_scaled_font_reference(Ptr), scaled_font];
+    pure $ ScaledFont::_create_from_handle(scaled_font)
 );
 
 show_text : String -> Cairo -> IO ();
@@ -757,40 +751,40 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| (
 
 font_extents : Cairo -> IO FontExtents;
 font_extents = |cairo| (
-    let extents = FontExtents::create;
-    let (_, extents) = cairo._with_handle_io(|cairo| (
-        extents._with_ptr(|extents| (
+    cairo._with_handle_io(|cairo| (
+        let extents = FontExtents::create;
+        let (extents, _) = *extents._mutate_io(|extents| (
             FFI_CALL_IO[() cairo_font_extents(Ptr, Ptr), cairo, extents]
-        ))
-    ));
-    extents
+        ));
+        pure $ extents
+    ))
 );
 
 text_extents : String -> Cairo -> IO TextExtents;
 text_extents = |text, cairo| (
-    let extents = TextExtents::create;
-    let (_, extents) = cairo._with_handle_io(|cairo| (
-        text.borrow_c_str(|text| (
-            extents._with_ptr(|extents| (
+    cairo._with_handle_io(|cairo| (
+        let extents = TextExtents::create;
+        let (extents, _) = *text.borrow_c_str_io(|text| (
+            extents._mutate_io(|extents| (
                 FFI_CALL_IO[() cairo_text_extents(Ptr, Ptr, Ptr), cairo, text, extents]
             ))
-        ))
-    ));
-    extents
+        ));
+        pure $ extents
+    ))
 );
 
 glyph_extents : Array Glyph -> Cairo -> IO TextExtents;
 glyph_extents = |glyphs, cairo| (
-    let extents = TextExtents::create;
-    let (_, extents) = cairo._with_handle_io(|cairo| (
+    cairo._with_handle_io(|cairo| (
+        let extents = TextExtents::create;
         let num_glyphs = glyphs.get_size.to_I32;
-        glyphs.borrow_ptr(|glyphs| (
-            extents._with_ptr(|extents| (
+        let (extents, _) = *glyphs.borrow_ptr(|glyphs| (
+            extents._mutate_io(|extents| (
                 FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
             ))
-        ))
-    ));
-    extents
+        ));
+        pure $ extents
+    ))
 );
 
 type Surface = unbox struct { _dtor : Destructor (SurfaceHandle) };
@@ -806,7 +800,7 @@ namespace Surface {
     _with_handle_io = |act, surface| surface.@_dtor.borrow_io(act);
 
     _create_from_handle : SurfaceHandle -> Surface;
-    _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_surface_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Surface { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_surface_destroy(Ptr), handle];; pure $ nullptr) };
 
     write_to_png : Std::Path -> Surface -> IO ();
     write_to_png = |path, surface| (
@@ -831,7 +825,7 @@ namespace Pattern {
     _with_handle_io = |act, pattern| pattern.@_dtor.borrow_io(act);
 
     _create_from_handle : PatternHandle -> Pattern;
-    _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_pattern_destroy(Ptr), handle]) };
+    _create_from_handle = |handle| Pattern { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_pattern_destroy(Ptr), handle];; pure $ nullptr) };
 
     add_color_stop_rgb : F64 -> (F64, F64, F64) -> Pattern -> IO ();
     add_color_stop_rgb = |offset, (r, g, b), pattern| (
@@ -849,74 +843,82 @@ namespace Pattern {
 
     get_color_stop_count : Pattern -> IO I64;
     get_color_stop_count = |pattern| pattern._with_handle_io(|pattern| (
-        let count = FFI_CALL_IO[I32 cairo_pattern_get_color_stop_count(Ptr), pattern];
-        count.to_I64
+        let count = *FFI_CALL_IO[I32 cairo_pattern_get_color_stop_count(Ptr), pattern];
+        pure $ count.to_I64
     ));
 
     get_color_stop_rgba : I32 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
     get_color_stop_rgba = |index, pattern| pattern._with_handle_io(|pattern| (
-        let r : Array F64 = Array::fill(1, 0.0);
-        let g : Array F64 = Array::fill(1, 0.0);
-        let b : Array F64 = Array::fill(1, 0.0);
-        let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), pattern, index, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let rgba = Array::fill(4, 0.0);
+        let (rgba, status) = *rgba.mutate_boxed_io(|p|
+            FFI_CALL_IO[
+                I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), 
+                pattern, index, 
+                p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+            ]
+        );
         if status == Status::success {
-            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+            pure $ Result::ok $ (rgba.@(0), rgba.@(1), rgba.@(2), rgba.@(3))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     create_rgb : (F64, F64, F64) -> Pattern;
     create_rgb = |(r, g, b)| (
-        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_rgb(F64, F64, F64), r, g, b];
+        let handle = FFI_CALL[Ptr cairo_pattern_create_rgb(F64, F64, F64), r, g, b];
         Pattern::_create_from_handle(handle)
     );
 
     create_rgba : (F64, F64, F64, F64) -> Pattern;
     create_rgba = |(r, g, b, a)| (
-        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_rgba(F64, F64, F64, F64), r, g, b, a];
+        let handle = FFI_CALL[Ptr cairo_pattern_create_rgba(F64, F64, F64, F64), r, g, b, a];
         Pattern::_create_from_handle(handle)
     );
 
     get_rgba : Pattern -> IO (Result Status (F64, F64, F64, F64));
     get_rgba = |pattern| pattern._with_handle_io(|pattern| (
-        let r : Array F64 = Array::fill(1, 0.0);
-        let g : Array F64 = Array::fill(1, 0.0);
-        let b : Array F64 = Array::fill(1, 0.0);
-        let a : Array F64 = Array::fill(1, 0.0);
-        let status = FFI_CALL_IO[I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), pattern, r._get_ptr, g._get_ptr, b._get_ptr, a._get_ptr];
+        let rgba = Array::fill(4, 0.0);
+        let (rgba, status) = *rgba.mutate_boxed_io(|p| 
+            FFI_CALL_IO[
+                I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), 
+                pattern, 
+                p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+            ]
+        );
         if status == Status::success {
-            Result::ok $ (r.@(0), g.@(0), b.@(0), a.@(0))
+            pure $ Result::ok $ (rgba.@(0), rgba.@(1), rgba.@(2), rgba.@(3))
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     create_for_surface : Surface -> IO Pattern;
     create_for_surface = |surface| (
         surface._with_handle_io(|surface| (
-            let handle = FFI_CALL_IO[Ptr cairo_pattern_create_for_surface(Ptr), surface];
-            Pattern::_create_from_handle(handle)
+            let handle = *FFI_CALL_IO[Ptr cairo_pattern_create_for_surface(Ptr), surface];
+            pure $ Pattern::_create_from_handle(handle)
         ))
     );
 
     get_surface : Pattern -> IO (Result Status Surface);
     get_surface = |pattern| pattern._with_handle_io(|pattern| (
-        let surface : Array Ptr = Array::fill(1, nullptr);
-        let status = FFI_CALL_IO[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface._get_ptr];
+        let surface = Boxed { value : nullptr };
+        let (surface, status) = *surface.mutate_boxed_io(|surface| (
+            FFI_CALL_IO[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface]
+        ));
         if status == Status::success {
-            let surface = surface.@(0);
-            let surface = FFI_CALL_IO[Ptr cairo_surface_reference(Ptr), surface];
-            Result::ok $ Surface::_create_from_handle(surface)
+            let surface = surface.@value;
+            let surface = FFI_CALL[Ptr cairo_surface_reference(Ptr), surface];
+            pure $ Result::ok $ Surface::_create_from_handle(surface)
         } else {
-            Result::err $ status
+            pure $ Result::err $ status
         }
     ));
 
     create_linear : (F64, F64) -> (F64, F64) -> Pattern;
     create_linear = |(x0, y0), (x1, y1)| (
-        let handle = FFI_CALL_IO[Ptr cairo_pattern_create_linear(F64, F64, F64, F64), x0, y0, x1, y1];
+        let handle = FFI_CALL[Ptr cairo_pattern_create_linear(F64, F64, F64, F64), x0, y0, x1, y1];
         Pattern::_create_from_handle(handle)
     );
 
@@ -1507,6 +1509,16 @@ namespace FontOptions {
     _with_handle : (FontOptionsHandle -> a) -> FontOptions -> a;
     _with_handle = |act, options| options.@_dtor.borrow(act);
 
+    _with_handle_io : (FontOptionsHandle -> IO a) -> FontOptions -> IO a;
+    _with_handle_io = |act, options| options.@_dtor.borrow_io(act);
+
+    _mutate_io : (FontOptionsHandle -> IO a) -> FontOptions -> IO (FontOptions, a);
+    _mutate_io = |act, options| (
+        let options = Boxed { value : options };
+        let (options, res) = *options.mutate_boxed_io(|options| act(options));
+        pure $ (options.@value, res)
+    );
+
     _create_from_handle : FontOptionsHandle -> FontOptions;
     _create_from_handle = |handle| FontOptions { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_options_destroy(Ptr), handle]) };
 
@@ -1648,6 +1660,9 @@ namespace FontFace {
     _with_handle : (FontFaceHandle -> a) -> FontFace -> a;
     _with_handle = |act, face| face.@_dtor.borrow(act);
 
+    _with_handle_io : (FontFaceHandle -> IO a) -> FontFace -> IO a;
+    _with_handle_io = |act, face| face.@_dtor.borrow_io(act);
+
     _create_from_handle : FontFaceHandle -> FontFace;
     _create_from_handle = |handle| FontFace { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_face_destroy(Ptr), handle]) };
 
@@ -1701,6 +1716,9 @@ namespace ScaledFont {
 
     _with_handle : (ScaledFontHandle -> a) -> ScaledFont -> a;
     _with_handle = |act, font| font.@_dtor.borrow(act);
+
+    _with_handle_io : (ScaledFontHandle -> IO a) -> ScaledFont -> IO a;
+    _with_handle_io = |act, font| font.@_dtor.borrow_io(act);
 
     _create_from_handle : ScaledFontHandle -> ScaledFont;
     _create_from_handle = |handle| ScaledFont { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_scaled_font_destroy(Ptr), handle]) };
@@ -1806,6 +1824,13 @@ namespace FontExtents {
         let res = arr.borrow_ptr(act);
         (res, arr.@(0))
     );
+
+    _mutate_io : (Ptr -> IO a) -> FontExtents -> IO (FontExtents, a);
+    _mutate_io = |act, extents| (
+        let extents = Boxed { value : extents };
+        let (extents, res) = *extents.mutate_boxed_io(act);
+        pure $ (extents.@value, res)
+    );
 }
 
 type TextExtents = unbox struct { x_bearing : F64, y_bearing : F64, width : F64, height : F64, x_advance : F64, y_advance : F64 };
@@ -1820,6 +1845,13 @@ namespace TextExtents {
         let arr = [extents];
         let res = arr.borrow_ptr(act);
         (res, arr.@(0))
+    );
+
+    _mutate_io : (Ptr -> IO a) -> TextExtents -> IO (TextExtents, a);
+    _mutate_io = |act, extents| (
+        let extents = Boxed { value : extents };
+        let (extents, res) = *extents.mutate_boxed_io(act);
+        pure $ (extents.@value, res)
     );
 }
 
