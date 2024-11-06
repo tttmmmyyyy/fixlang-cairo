@@ -1268,21 +1268,21 @@ namespace Region {
     _create_from_handle : RegionHandle -> Region;
     _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle];; pure $ nullptr) };
 
-    _force_unique : Region -> Region;
-    _force_unique = |region| (
-        // region.mod__dtor(|dtor| (
-        //     let (is_unique, dtor) = dtor.unsafe_is_unique;
-        //     if is_unique { dtor };    
-        //     dtor.borrow(|dtor| (
-        //         let handle = FFI_CALL_IO[Ptr cairo_region_copy(Ptr), dtor];
-        //         Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle])
-        //     ))
-        // ))
-        undefined("")
-    );
+    // _force_unique : Region -> Region;
+    // _force_unique = |region| (
+    //     // region.mod__dtor(|dtor| (
+    //     //     let (is_unique, dtor) = dtor.unsafe_is_unique;
+    //     //     if is_unique { dtor };    
+    //     //     dtor.borrow(|dtor| (
+    //     //         let handle = FFI_CALL_IO[Ptr cairo_region_copy(Ptr), dtor];
+    //     //         Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle])
+    //     //     ))
+    //     // ))
+    //     undefined("")
+    // );
 
-    create : () -> Region;
-    create = |_| (
+    create : Region;
+    create = (
         let handle = FFI_CALL[Ptr cairo_region_create()];
         Region::_create_from_handle(handle)
     );
@@ -1308,14 +1308,13 @@ namespace Region {
     ));
 
     get_extents : Region -> RectangleInt;
-    get_extents = undefined("");
-    // get_extents = |region| region._with_handle_io(|region| (
-    //     let rect = RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
-    //     let (rect, _) = *rect._mutate_io(|rect| (
-    //         FFI_CALL_IO[() cairo_region_get_extents(Ptr, Ptr), region, rect]
-    //     ));
-    //     pure $ rect
-    // ));
+    get_extents = |region| region._with_handle(|region| (
+        let rect = Boxed { value : RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 } };
+        let (rect, _) = rect.mutate_boxed(|rect| (
+            FFI_CALL_IO[() cairo_region_get_extents(Ptr, Ptr), region, rect]
+        ));
+        rect.@value
+    ));
 
     num_rectangles : Region -> I32;
     num_rectangles = |region| region._with_handle(|region| (
@@ -1323,14 +1322,13 @@ namespace Region {
     ));
 
     get_rectangle : I32 -> Region -> RectangleInt;
-    get_rectangle = undefined("");
-    // get_rectangle = |index, region| region._with_handle(|region| (
-    //     let rect = RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
-    //     let (rect, _) = *rect._mutate_io(|rect| (
-    //         FFI_CALL_IO[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect]
-    //     ));
-    //     rect
-    // ));
+    get_rectangle = |index, region| region._with_handle(|region| (
+        let rect = Boxed { value : RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 } };
+        let (rect, _) = rect.mutate_boxed(|rect| (
+            FFI_CALL_IO[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect]
+        ));
+        rect.@value
+    ));
 
     is_empty : Region -> Bool;
     is_empty = |region| region._with_handle(|region| (
