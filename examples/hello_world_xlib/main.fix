@@ -17,7 +17,7 @@ main = (
     ));
     
     let surface = XlibSurface::create_front_surface(window);
-    let cairo = Cairo::create(surface);
+    let cairo = *Cairo::create(surface);
 
     eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
     eval *cairo.set_font_size(32.0);

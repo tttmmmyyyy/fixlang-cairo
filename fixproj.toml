@@ -9,7 +9,6 @@ static_links = ["fixcairox11"]
 preliminary_commands = [["make", "libfixcairox11.a", "--quiet"]]
 library_paths = ["."]
 
-
 [[dependencies]]
 name = "math"
 version = "0.1.0"

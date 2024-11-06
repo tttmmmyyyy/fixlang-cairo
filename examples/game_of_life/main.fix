@@ -137,7 +137,7 @@ main = (
     ));
     
     let surface = XlibSurface::create_back_surface(window);
-    let cairo = Cairo::create(surface);
+    let cairo = *Cairo::create(surface);
 
     let time = (*Time::get_now_monotonic).to_F64;
     let rand = Random::init_by_seed(time.to_U64);

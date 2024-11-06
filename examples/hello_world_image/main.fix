@@ -7,7 +7,7 @@ main : IO ();
 main = (
     let surface = ImageSurface::create(Format::argb, (240_I32, 80_I32));
     
-    let cairo = Cairo::create(surface);
+    let cairo = *Cairo::create(surface);
     eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
     eval *cairo.set_font_size(32.0);
     eval *cairo.set_source_rgb((0.0, 0.0, 1.0));

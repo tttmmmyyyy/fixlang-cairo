@@ -13,10 +13,10 @@ path = "../../"
 
 [[dependencies]]
 name = "random"
-version = "0.1.0"
+version = "*"
 git = { url = "https://github.com/tttmmmyyyy/fixlang-random.git" }
 
 [[dependencies]]
 name = "time"
-version = "0.1.0"
+version = "*"
 git = { url = "https://github.com/tttmmmyyyy/fixlang-time.git" }
