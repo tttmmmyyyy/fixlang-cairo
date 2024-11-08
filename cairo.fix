@@ -1268,18 +1268,12 @@ namespace Region {
     _create_from_handle : RegionHandle -> Region;
     _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle];; pure $ nullptr) };
 
-    // _force_unique : Region -> Region;
-    // _force_unique = |region| (
-    //     // region.mod__dtor(|dtor| (
-    //     //     let (is_unique, dtor) = dtor.unsafe_is_unique;
-    //     //     if is_unique { dtor };    
-    //     //     dtor.borrow(|dtor| (
-    //     //         let handle = FFI_CALL_IO[Ptr cairo_region_copy(Ptr), dtor];
-    //     //         Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle])
-    //     //     ))
-    //     // ))
-    //     undefined("")
-    // );
+    _mutate : (RegionHandle -> IO a) -> Region -> (Region, a);
+    _mutate = |act, region| (
+        let dtor = region.@_dtor;
+        let (dtor, res) = dtor.mutate_unique(|region| FFI_CALL_IO[Ptr cairo_region_copy(Ptr), region], act);
+        (Region { _dtor : dtor }, res)
+    );
 
     create : Region;
     create = (
@@ -1361,12 +1355,10 @@ namespace Region {
 
     translate : (I32, I32) -> Region -> Region;
     translate = |(dx, dy), region| (
-        // let region = region._force_unique;
-        // let (region, _) = region._mutate_io(|region| (
-        //     FFI_CALL_IO[() cairo_region_translate(Ptr, I32, I32), region, dx, dy]
-        // ));
-        // region
-        undefined("")
+        let (region, _) = region._mutate(|region| (
+            FFI_CALL_IO[() cairo_region_translate(Ptr, I32, I32), region, dx, dy]
+        ));
+        region
     );
 
     intersect : Region -> Region -> Result Status Region;
