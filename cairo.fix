@@ -557,7 +557,7 @@ rotate = |angle, cairo| (
 transform : Matrix -> Cairo -> IO ();
 transform = |matrix, cairo| (
     cairo._borrow_io(|cairo| (
-        matrix._with_ptr_io(|matrix| (
+        matrix._borrow_io(|matrix| (
             FFI_CALL_IO[() cairo_transform(Ptr, Ptr), cairo, matrix]
         ))
     ))
@@ -566,7 +566,7 @@ transform = |matrix, cairo| (
 set_matrix : Matrix -> Cairo -> IO ();
 set_matrix = |matrix, cairo| (
     cairo._borrow_io(|cairo| (
-        matrix._with_ptr_io(|matrix| (
+        matrix._borrow_io(|matrix| (
             FFI_CALL_IO[() cairo_set_matrix(Ptr, Ptr), cairo, matrix]
         ))
     ))
@@ -645,7 +645,7 @@ set_font_size = |size, cairo| cairo._borrow_io(|cairo| (
 
 set_font_matrix : Matrix -> Cairo -> IO ();
 set_font_matrix = |matrix, cairo| cairo._borrow_io(|cairo| (
-        matrix._with_ptr_io(|matrix| (
+        matrix._borrow_io(|matrix| (
             FFI_CALL_IO[() cairo_set_font_matrix(Ptr, Ptr), cairo, matrix]
         ))
     )
@@ -1102,7 +1102,7 @@ namespace Pattern {
     set_matrix : Matrix -> Pattern -> IO ();
     set_matrix = |matrix, pattern| (
         pattern._borrow_io(|pattern| (
-            matrix._with_ptr_io(|matrix| (
+            matrix._borrow_io(|matrix| (
                 FFI_CALL_IO[() cairo_pattern_set_matrix(Ptr, Ptr), pattern, matrix]
             ))
         ))
@@ -1165,8 +1165,8 @@ type Matrix = unbox struct { xx : F64, yx : F64, xy : F64, yy : F64, x0 : F64, y
 
 namespace Matrix {
 
-    _with_ptr_io : (Ptr -> IO a) -> Matrix -> IO a;
-    _with_ptr_io = |act, matrix| (
+    _borrow_io : (Ptr -> IO a) -> Matrix -> IO a;
+    _borrow_io = |act, matrix| (
         let mat = Boxed { value : matrix };
         mat.borrow_boxed_io(act)
     );
@@ -1292,7 +1292,7 @@ namespace Region {
 
     create_rectangle : RectangleInt -> Region;
     create_rectangle = |rect| (
-        let rect = rect._with_ptr(|rect| (
+        let rect = rect._borrow(|rect| (
             FFI_CALL[Ptr cairo_region_create_rectangle(Ptr), rect]
         ));
         Region::_create_from_handle(rect)
@@ -1347,7 +1347,7 @@ namespace Region {
 
     contains_rectangle : RectangleInt -> Region -> Overlap;
     contains_rectangle = |rect, region| (
-        rect._with_ptr(|rect| region._borrow(|region|
+        rect._borrow(|rect| region._borrow(|region|
             FFI_CALL[I32 cairo_region_contains_rectangle(Ptr, Ptr), region, rect]
         ))
     );
@@ -1386,7 +1386,7 @@ namespace Region {
 
     intersect_rectangle : RectangleInt -> Region -> Result Status Region;
     intersect_rectangle = |rect, region| (
-        let (region, status) = rect._with_ptr(|rect| 
+        let (region, status) = rect._borrow(|rect| 
             region._mutate(|region|
                 FFI_CALL_IO[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
             )
@@ -1414,7 +1414,7 @@ namespace Region {
 
     subtract_rectangle : RectangleInt -> Region -> Result Status Region;
     subtract_rectangle = |rect, dst| (
-        let (dst, status) = rect._with_ptr(|rect| (
+        let (dst, status) = rect._borrow(|rect| (
             dst._mutate(|dst| (
                 FFI_CALL_IO[I32 cairo_region_subtract_rectangle(Ptr, Ptr), dst, rect]
             ))
@@ -1442,7 +1442,7 @@ namespace Region {
 
     union_rectangle : RectangleInt -> Region -> Result Status Region;
     union_rectangle = |rect, dst| (
-        let (dst, status) = rect._with_ptr(|rect| (
+        let (dst, status) = rect._borrow(|rect| (
             dst._mutate(|dst| (
                 FFI_CALL_IO[I32 cairo_region_union_rectangle(Ptr, Ptr), dst, rect]
             ))
@@ -1470,7 +1470,7 @@ namespace Region {
 
     xor_rectangle : RectangleInt -> Region -> Result Status Region;
     xor_rectangle = |rect, dst| (
-        let (dst, status) = rect._with_ptr(|rect| (
+        let (dst, status) = rect._borrow(|rect| (
             dst._mutate(|dst| (
                 FFI_CALL_IO[I32 cairo_region_xor_rectangle(Ptr, Ptr), dst, rect]
             ))
@@ -1487,8 +1487,8 @@ type RectangleInt = unbox struct { x : I32, y : I32, width : I32, height : I32 }
 
 namespace RectangleInt {
 
-    _with_ptr : (Ptr -> a) -> RectangleInt -> a;
-    _with_ptr = |act, rect| (
+    _borrow : (Ptr -> a) -> RectangleInt -> a;
+    _borrow = |act, rect| (
         let rect = Boxed { value : rect };
         rect.borrow_boxed(act)
     );
@@ -1826,16 +1826,6 @@ namespace TextExtents {
 }
 
 type TextCluster = unbox struct { num_bytes : I32, num_glyphs : I32 };
-
-namespace TextCluster {
-
-    _with_ptr : (Ptr -> a) -> TextCluster -> (a, TextCluster);
-    _with_ptr = |act, cluster| (
-        let arr = [cluster];
-        let res = arr.borrow_ptr(act);
-        (res, arr.@(0))
-    );
-}
 
 type Status = I32;
 
