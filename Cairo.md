@@ -184,7 +184,9 @@
 
 ## `namespace Cairo`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::Cairo -> a`
+### `_borrow : (Std::Ptr -> a) -> Cairo::Cairo -> a`
+
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Cairo -> Std::IO a`
 
 ### `append_path : Cairo::Path -> Cairo::Cairo -> Std::IO ()`
 
@@ -208,7 +210,7 @@
 
 ### `copy_path_flat : Cairo::Cairo -> Std::IO Cairo::Path`
 
-### `create : Cairo::Surface -> Cairo::Cairo`
+### `create : Cairo::Surface -> Std::IO Cairo::Cairo`
 
 ### `curve_to : (Std::F64, Std::F64) -> (Std::F64, Std::F64) -> (Std::F64, Std::F64) -> Cairo::Cairo -> Std::IO ()`
 
@@ -260,7 +262,7 @@
 
 ### `get_source : Cairo::Cairo -> Std::IO Cairo::Pattern`
 
-### `get_target : Cairo::Cairo -> Cairo::Surface`
+### `get_target : Cairo::Cairo -> Std::IO Cairo::Surface`
 
 ### `get_tolerance : Cairo::Cairo -> Std::IO Std::F64`
 
@@ -486,7 +488,9 @@ Retrieves the field `max_x_advance` from a value of `FontExtents`.
 
 Retrieves the field `max_y_advance` from a value of `FontExtents`.
 
-### `_with_ptr : (Std::Ptr -> a) -> Cairo::FontExtents -> (a, Cairo::FontExtents)`
+### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::FontExtents -> (Cairo::FontExtents, a)`
+
+### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::FontExtents -> Std::IO (Cairo::FontExtents, a)`
 
 ### `act_ascent : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
 
@@ -556,9 +560,11 @@ Updates a value of `FontExtents` by setting field `max_y_advance` to a specified
 
 Retrieves the field `_dtor` from a value of `FontFace`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::FontFace`
+### `_borrow : (Std::Ptr -> a) -> Cairo::FontFace -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::FontFace -> a`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::FontFace -> Std::IO a`
+
+### `_create_from_handle : Std::Ptr -> Cairo::FontFace`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::FontFace -> f Cairo::FontFace`
 
@@ -582,17 +588,19 @@ Updates a value of `FontFace` by setting field `_dtor` to a specified one.
 
 Retrieves the field `_dtor` from a value of `FontOptions`.
 
+### `_borrow : (Std::Ptr -> a) -> Cairo::FontOptions -> a`
+
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::FontOptions -> Std::IO a`
+
 ### `_create_from_handle : Std::Ptr -> Cairo::FontOptions`
 
-### `_force_unique : Cairo::FontOptions -> Cairo::FontOptions`
-
-### `_with_handle : (Std::Ptr -> a) -> Cairo::FontOptions -> a`
+### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::FontOptions -> (Cairo::FontOptions, a)`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::FontOptions -> f Cairo::FontOptions`
 
 Updates a value of `FontOptions` by applying a functorial action to field `_dtor`.
 
-### `create : () -> Cairo::FontOptions`
+### `default : Cairo::FontOptions`
 
 ### `equal : Cairo::FontOptions -> Cairo::FontOptions -> Std::Bool`
 
@@ -782,7 +790,11 @@ Retrieves the field `yx` from a value of `Matrix`.
 
 Retrieves the field `yy` from a value of `Matrix`.
 
-### `_with_ptr : (Std::Ptr -> a) -> Cairo::Matrix -> (a, Cairo::Matrix)`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> Std::IO a`
+
+### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> (Cairo::Matrix, a)`
+
+### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> Std::IO (Cairo::Matrix, a)`
 
 ### `act_x0 : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
 
@@ -808,7 +820,7 @@ Updates a value of `Matrix` by applying a functorial action to field `yx`.
 
 Updates a value of `Matrix` by applying a functorial action to field `yy`.
 
-### `init_identity : Cairo::Matrix`
+### `identity : Cairo::Matrix`
 
 ### `init_rotate : Std::F64 -> Cairo::Matrix`
 
@@ -954,9 +966,11 @@ Updates a value of `Matrix` by setting field `yy` to a specified one.
 
 Retrieves the field `_dtor` from a value of `Path`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::Path`
+### `_borrow : (Std::Ptr -> a) -> Cairo::Path -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::Path -> a`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Path -> Std::IO a`
+
+### `_create_from_handle : Std::Ptr -> Cairo::Path`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Path -> f Cairo::Path`
 
@@ -976,9 +990,11 @@ Updates a value of `Path` by setting field `_dtor` to a specified one.
 
 Retrieves the field `_dtor` from a value of `Pattern`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::Pattern`
+### `_borrow : (Std::Ptr -> a) -> Cairo::Pattern -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::Pattern -> a`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Pattern -> Std::IO a`
+
+### `_create_from_handle : Std::Ptr -> Cairo::Pattern`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Pattern -> f Cairo::Pattern`
 
@@ -1090,7 +1106,9 @@ Retrieves the field `x` from a value of `RectangleInt`.
 
 Retrieves the field `y` from a value of `RectangleInt`.
 
-### `_with_ptr : (Std::Ptr -> a) -> Cairo::RectangleInt -> (a, Cairo::RectangleInt)`
+### `_borrow : (Std::Ptr -> a) -> Cairo::RectangleInt -> a`
+
+### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::RectangleInt -> Std::IO (Cairo::RectangleInt, a)`
 
 ### `act_height : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::RectangleInt -> f Cairo::RectangleInt`
 
@@ -1146,9 +1164,9 @@ Updates a value of `RectangleInt` by setting field `y` to a specified one.
 
 Retrieves the field `_dtor` from a value of `RectangleList`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::RectangleList`
+### `_borrow : (Std::Ptr -> a) -> Cairo::RectangleList -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::RectangleList -> a`
+### `_create_from_handle : Std::Ptr -> Cairo::RectangleList`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::RectangleList -> f Cairo::RectangleList`
 
@@ -1168,11 +1186,13 @@ Updates a value of `RectangleList` by setting field `_dtor` to a specified one.
 
 Retrieves the field `_dtor` from a value of `Region`.
 
+### `_borrow : (Std::Ptr -> a) -> Cairo::Region -> a`
+
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Region -> Std::IO a`
+
 ### `_create_from_handle : Std::Ptr -> Cairo::Region`
 
-### `_force_unique : Cairo::Region -> Cairo::Region`
-
-### `_with_handle : (Std::Ptr -> a) -> Cairo::Region -> a`
+### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::Region -> (Cairo::Region, a)`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Region -> f Cairo::Region`
 
@@ -1182,7 +1202,7 @@ Updates a value of `Region` by applying a functorial action to field `_dtor`.
 
 ### `contains_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::I32`
 
-### `create : () -> Cairo::Region`
+### `create : Cairo::Region`
 
 ### `create_rectangle : Cairo::RectangleInt -> Cairo::Region`
 
@@ -1232,9 +1252,11 @@ Updates a value of `Region` by setting field `_dtor` to a specified one.
 
 Retrieves the field `_dtor` from a value of `ScaledFont`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::ScaledFont`
+### `_borrow : (Std::Ptr -> a) -> Cairo::ScaledFont -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::ScaledFont -> a`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::ScaledFont -> Std::IO a`
+
+### `_create_from_handle : Std::Ptr -> Cairo::ScaledFont`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::ScaledFont -> f Cairo::ScaledFont`
 
@@ -1360,9 +1382,11 @@ Updates a value of `ScaledFont` by setting field `_dtor` to a specified one.
 
 Retrieves the field `_dtor` from a value of `Surface`.
 
-### `_create_from_handle : Std::Ptr -> Cairo::Surface`
+### `_borrow : (Std::Ptr -> a) -> Cairo::Surface -> a`
 
-### `_with_handle : (Std::Ptr -> a) -> Cairo::Surface -> a`
+### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Surface -> Std::IO a`
+
+### `_create_from_handle : Std::Ptr -> Cairo::Surface`
 
 ### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Surface -> f Cairo::Surface`
 
@@ -1387,8 +1411,6 @@ Retrieves the field `num_bytes` from a value of `TextCluster`.
 ### `@num_glyphs : Cairo::TextCluster -> Std::I32`
 
 Retrieves the field `num_glyphs` from a value of `TextCluster`.
-
-### `_with_ptr : (Std::Ptr -> a) -> Cairo::TextCluster -> (a, Cairo::TextCluster)`
 
 ### `act_num_bytes : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::TextCluster -> f Cairo::TextCluster`
 
@@ -1444,7 +1466,9 @@ Retrieves the field `y_advance` from a value of `TextExtents`.
 
 Retrieves the field `y_bearing` from a value of `TextExtents`.
 
-### `_with_ptr : (Std::Ptr -> a) -> Cairo::TextExtents -> (a, Cairo::TextExtents)`
+### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::TextExtents -> (Cairo::TextExtents, a)`
+
+### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::TextExtents -> Std::IO (Cairo::TextExtents, a)`
 
 ### `act_height : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
 
