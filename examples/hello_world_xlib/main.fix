@@ -7,34 +7,34 @@ main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window((640, 480));
     let event_mask = EventMask::exposure.bit_or(EventMask::key_press);
-    eval *window.select_input(event_mask);
+    window.select_input(event_mask);;
 
     // Wait for the window to be exposed.
-    eval *loop_m((), |_| (
+    loop_m((), |_| (
         let event = *window.next_event;
         if event.is_expose { break_m $ () };
         continue_m $ ()
-    ));
+    ));;
     
     let surface = XlibSurface::create_front_surface(window);
     let cairo = *Cairo::create(surface);
 
-    eval *cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);
-    eval *cairo.set_font_size(32.0);
-    eval *cairo.set_source_rgb((0.0, 0.0, 1.0));
-    eval *cairo.move_to((10.0, 50.0));
-    eval *cairo.show_text("Hello world!");
+    cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);;
+    cairo.set_font_size(32.0);;
+    cairo.set_source_rgb((0.0, 0.0, 1.0));;
+    cairo.move_to((10.0, 50.0));;
+    cairo.show_text("Hello world!");;
 
-    eval *window.flush;
+    window.flush;;
 
     // Wait for any key is pressed.
-    eval *loop_m((), |_| (
+    loop_m((), |_| (
         let event = *window.next_event;
         if event.is_key_press { break_m $ () };
         continue_m $ ()
-    ));
+    ));;
 
-    eval *window.destroy_window;
+    window.destroy_window;;
 
     pure()
 );
