@@ -1,6 +1,6 @@
 [general]
 name = "cairo-fix"
-version = "0.1.3"
+version = "0.1.4"
 
 [build]
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
