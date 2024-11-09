@@ -671,8 +671,7 @@ set_font_options = |options, cairo| cairo._with_handle_io(|cairo| (
 get_font_options : Cairo -> IO FontOptions;
 get_font_options = |cairo| (
     cairo._with_handle_io(|cairo| (
-        let options = FontOptions::create();
-        let (options, _) = *options._mutate_io(|options| (
+        let (options, _) = FontOptions::default._mutate(|options| (
             FFI_CALL_IO[() cairo_get_font_options(Ptr, Ptr), cairo, options]
         ));
         pure $ options
@@ -1172,6 +1171,13 @@ namespace Matrix {
         mat.borrow_boxed_io(act)
     );
 
+    _mutate : (Ptr -> IO a) -> Matrix -> (Matrix, a);
+    _mutate = |act, matrix| (
+        let mat = Boxed { value : matrix };
+        let (mat, res) = mat.mutate_boxed(act);
+        (mat.@value, res)
+    );
+
     _mutate_io : (Ptr -> IO a) -> Matrix -> IO (Matrix, a);
     _mutate_io = |act, matrix| (
         let mat = Boxed { value : matrix };
@@ -1264,6 +1270,9 @@ namespace Region {
 
     _with_handle : (RegionHandle -> a) -> Region -> a;
     _with_handle = |act, region| region.@_dtor.borrow(act);
+
+    _with_handle_io : (RegionHandle -> IO a) -> Region -> IO a;
+    _with_handle_io = |act, region| region.@_dtor.borrow_io(act);
 
     _create_from_handle : RegionHandle -> Region;
     _create_from_handle = |handle| Region { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_region_destroy(Ptr), handle];; pure $ nullptr) };
@@ -1363,130 +1372,114 @@ namespace Region {
 
     intersect : Region -> Region -> Result Status Region;
     intersect = |region1, region2| (
-        // let region1 = region1._force_unique;
-        // let status = region1._with_handle_io(|region1| 
-        //     region2._with_handle_io(|region2| 
-        //         FFI_CALL_IO[I32 cairo_region_intersect(Ptr, Ptr), region1, region2]
-        //     )
-        // );
-        // if status == Status::success {
-        //     Result::ok $ region1
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (region, status) = region2._with_handle(|region2|
+            region1._mutate(|region1|
+                FFI_CALL_IO[I32 cairo_region_intersect(Ptr, Ptr), region1, region2]
+            )
+        );
+        if status == Status::success {
+            Result::ok $ region1
+        } else {
+            Result::err $ status
+        }
     );
 
     intersect_rectangle : RectangleInt -> Region -> Result Status Region;
     intersect_rectangle = |rect, region| (
-        // let region = region._force_unique;
-        // let (status, _) = rect._with_ptr(|rect| 
-        //     region._with_handle_io(|region| 
-        //         FFI_CALL_IO[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
-        //     )
-        // );
-        // if status == Status::success {
-        //     Result::ok $ region
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (region, status) = rect._with_ptr(|rect| 
+            region._mutate(|region|
+                FFI_CALL_IO[I32 cairo_region_intersect_rectangle(Ptr, Ptr), region, rect]
+            )
+        );
+        if status == Status::success {
+            Result::ok $ region
+        } else {
+            Result::err $ status
+        }
     );
 
     subtract : Region -> Region -> Result Status Region;
     subtract = |other, dst| (
-        // let dst = dst._force_unique;
-        // let status = dst._with_handle_io(|dst| (
-        //     other._with_handle_io(|other| (
-        //         FFI_CALL_IO[I32 cairo_region_subtract(Ptr, Ptr), dst, other]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = other._with_handle(|other| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_subtract(Ptr, Ptr), dst, other]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 
     subtract_rectangle : RectangleInt -> Region -> Result Status Region;
     subtract_rectangle = |rect, dst| (
-        // let dst = dst._force_unique;
-        // let (status, _) = rect._with_ptr(|rect| (
-        //     dst._with_handle_io(|dst| (
-        //         FFI_CALL_IO[I32 cairo_region_subtract_rectangle(Ptr, Ptr), dst, rect]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = rect._with_ptr(|rect| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_subtract_rectangle(Ptr, Ptr), dst, rect]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 
     union_ : Region -> Region -> Result Status Region;
     union_ = |other, dst| (
-        // let dst = dst._force_unique;
-        // let status = dst._with_handle_io(|dst| (
-        //     other._with_handle_io(|other| (
-        //         FFI_CALL_IO[I32 cairo_region_union(Ptr, Ptr), dst, other]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = other._with_handle(|other| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_union(Ptr, Ptr), dst, other]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 
     union_rectangle : RectangleInt -> Region -> Result Status Region;
     union_rectangle = |rect, dst| (
-        // let dst = dst._force_unique;
-        // let (status, _) = rect._with_ptr(|rect| (
-        //     dst._with_handle_io(|dst| (
-        //         FFI_CALL_IO[I32 cairo_region_union_rectangle(Ptr, Ptr), dst, rect]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = rect._with_ptr(|rect| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_union_rectangle(Ptr, Ptr), dst, rect]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 
     xor : Region -> Region -> Result Status Region;
     xor = |other, dst| (
-        // let dst = dst._force_unique;
-        // let status = dst._with_handle_io(|dst| (
-        //     other._with_handle_io(|other| (
-        //         FFI_CALL_IO[I32 cairo_region_xor(Ptr, Ptr), dst, other]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = other._with_handle(|other| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_xor(Ptr, Ptr), dst, other]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 
     xor_rectangle : RectangleInt -> Region -> Result Status Region;
     xor_rectangle = |rect, dst| (
-        // let dst = dst._force_unique;
-        // let (status, _) = rect._with_ptr(|rect| (
-        //     dst._with_handle_io(|dst| (
-        //         FFI_CALL_IO[I32 cairo_region_xor_rectangle(Ptr, Ptr), dst, rect]
-        //     ))
-        // ));
-        // if status == Status::success {
-        //     Result::ok $ dst
-        // } else {
-        //     Result::err $ status
-        // }
-        undefined("")
+        let (dst, status) = rect._with_ptr(|rect| (
+            dst._mutate(|dst| (
+                FFI_CALL_IO[I32 cairo_region_xor_rectangle(Ptr, Ptr), dst, rect]
+            ))
+        ));
+        if status == Status::success {
+            Result::ok $ dst
+        } else {
+            Result::err $ status
+        }
     );
 }
 
@@ -1520,31 +1513,18 @@ namespace FontOptions {
     _with_handle_io : (FontOptionsHandle -> IO a) -> FontOptions -> IO a;
     _with_handle_io = |act, options| options.@_dtor.borrow_io(act);
 
-    _mutate_io : (FontOptionsHandle -> IO a) -> FontOptions -> IO (FontOptions, a);
-    _mutate_io = |act, options| (
-        let options = Boxed { value : options };
-        let (options, res) = *options.mutate_boxed_io(|options| act(options));
-        pure $ (options.@value, res)
+    _mutate : (FontOptionsHandle -> IO a) -> FontOptions -> (FontOptions, a);
+    _mutate = |act, fo| (
+        let dtor = fo.@_dtor;
+        let (dtor, res) = dtor.mutate_unique(|fo| FFI_CALL_IO[Ptr cairo_font_options_copy(Ptr), fo], act);
+        (FontOptions { _dtor : dtor }, res)
     );
 
     _create_from_handle : FontOptionsHandle -> FontOptions;
     _create_from_handle = |handle| FontOptions { _dtor : Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_options_destroy(Ptr), handle];; pure $ nullptr) };
 
-    _force_unique : FontOptions -> FontOptions;
-    _force_unique = undefined("");
-    // _force_unique = |options| (
-    //     options.mod__dtor(|dtor| (
-    //         let (is_unique, dtor) = dtor.unsafe_is_unique;
-    //         if is_unique { dtor };    
-    //         dtor.borrow(|dtor| (
-    //             let handle = FFI_CALL_IO[Ptr cairo_font_options_copy(Ptr), dtor];
-    //             Destructor::make(handle, |handle| FFI_CALL_IO[() cairo_font_options_destroy(Ptr), handle])
-    //         ))
-    //     ))
-    // );
-
-    create : () -> FontOptions;
-    create = |_| (
+    default : FontOptions;
+    default = (
         let handle = FFI_CALL[Ptr cairo_font_options_create()];
         FontOptions::_create_from_handle(handle)
     );
@@ -1556,9 +1536,8 @@ namespace FontOptions {
 
     merge : FontOptions -> FontOptions -> FontOptions;
     merge = |other, options| (
-        let options = options._force_unique;
-        eval options._with_handle_io(|options| (
-            other._with_handle_io(|other| (
+        let (options, _) = other._with_handle(|other| (
+            options._mutate(|options| (
                 FFI_CALL_IO[() cairo_font_options_merge(Ptr, Ptr), options, other]
             ))
         ));
@@ -1582,8 +1561,7 @@ namespace FontOptions {
 
     set_antialias : Antialias -> FontOptions -> FontOptions;
     set_antialias = |antialias, options| (
-        let options = options._force_unique;
-        eval options._with_handle_io(|options| (
+        let (options, _) = options._mutate(|options| (
             FFI_CALL_IO[() cairo_font_options_set_antialias(Ptr, I32), options, antialias]
         ));
         options
@@ -1596,8 +1574,7 @@ namespace FontOptions {
 
     set_subpixel_order : SubpixelOrder -> FontOptions -> FontOptions;
     set_subpixel_order = |order, options| (
-        let options = options._force_unique;
-        eval options._with_handle_io(|options| (
+        let (options, _) = options._mutate(|options| (
             FFI_CALL_IO[() cairo_font_options_set_subpixel_order(Ptr, I32), options, order]
         ));
         options
@@ -1609,14 +1586,12 @@ namespace FontOptions {
     ));
 
     set_hint_style : HintStyle -> FontOptions -> FontOptions;
-    set_hint_style = undefined("");
-    // set_hint_style = |style, options| (
-    //     let options = options._force_unique;
-    //     eval options._with_handle_io(|options| (
-    //         FFI_CALL_IO[() cairo_font_options_set_hint_style(Ptr, I32), options, style]
-    //     ));
-    //     options
-    // );
+    set_hint_style = |style, options| (
+        let (option, _) = options._mutate(|options| (
+            FFI_CALL_IO[() cairo_font_options_set_hint_style(Ptr, I32), options, style]
+        ));
+        options
+    );
 
     get_hint_style : FontOptions -> HintStyle;
     get_hint_style = |options| options._with_handle(|options| (
@@ -1625,8 +1600,7 @@ namespace FontOptions {
 
     set_hint_metrics : HintMetrics -> FontOptions -> FontOptions;
     set_hint_metrics = |metrics, options| (
-        let options = options._force_unique;
-        eval options._with_handle_io(|options| (
+        let (options, _) = options._mutate(|options| (
             FFI_CALL_IO[() cairo_font_options_set_hint_metrics(Ptr, I32), options, metrics]
         ));
         options
@@ -1645,9 +1619,8 @@ namespace FontOptions {
 
     set_variations : String -> FontOptions -> FontOptions;
     set_variations = |variations, options| (
-        let options = options._force_unique;
-        eval variations.borrow_c_str(|variations| 
-            options._with_handle_io(|options| 
+        let (options, _) = variations.borrow_c_str(|variations| 
+            options._mutate(|options| 
                 FFI_CALL_IO[() cairo_font_options_set_variations(Ptr, Ptr), options, variations]
             )
         );
@@ -1729,39 +1702,35 @@ namespace ScaledFont {
     ));
 
     extents : ScaledFont -> FontExtents;
-    extents = undefined("");
-    // extents = |font| font._with_handle_io(|font| (
-    //     let extents = FontExtents { ascent : 0.0, descent : 0.0, height : 0.0, max_x_advance : 0.0, max_y_advance : 0.0 };
-    //     let (_, extents) = extents._with_ptr(|extents| (
-    //         FFI_CALL_IO[() cairo_scaled_font_extents(Ptr, Ptr), font, extents]
-    //     ));
-    //     extents
-    // ));
+    extents = |font| font._with_handle(|font| (
+        let extents = FontExtents { ascent : 0.0, descent : 0.0, height : 0.0, max_x_advance : 0.0, max_y_advance : 0.0 };
+        let (extents, _) = extents._mutate(|extents| (
+            FFI_CALL_IO[() cairo_scaled_font_extents(Ptr, Ptr), font, extents]
+        ));
+        extents
+    ));
 
     text_extents : String -> ScaledFont -> TextExtents;
-    text_extents = undefined("");
-    // text_extents = |text, font| font._with_handle_io(|font| (
-    //     let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
-    //     let (_, extents) = text.borrow_c_str(|text| 
-    //         extents._with_ptr(|extents| 
-    //             FFI_CALL_IO[() cairo_scaled_font_text_extents(Ptr, Ptr, Ptr), font, text, extents]
-    //         )
-    //     );
-    //     extents
-    // ));
+    text_extents = |text, font| font._with_handle(|font| (
+        let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
+        let (extents, _) = text.borrow_c_str(|text| 
+            extents._mutate(|extents| 
+                FFI_CALL_IO[() cairo_scaled_font_text_extents(Ptr, Ptr, Ptr), font, text, extents]
+            )
+        );
+        extents
+    ));
 
     glyph_extents : Array Glyph -> ScaledFont -> TextExtents;
-    glyph_extents = undefined("");
-    // glyph_extents = |glyphs, font| (
-    //     let len = glyphs.get_size;
-    //     let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
-    //     let (_, extents) = font._with_handle_io(|font| extents._with_ptr(|extents| (
-    //         glyphs.borrow_ptr(|glyphs| (
-    //             FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
-    //         ))
-    //     )));
-    //     extents
-    // );
+    glyph_extents = |glyphs, font| (
+        let len = glyphs.get_size;
+        let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
+        let (extents, _) = glyphs.borrow_ptr(|glyphs| (font._with_handle(|font| extents._mutate(|extents| (
+                FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
+            ))
+        )));
+        extents
+    );
 
     // text_to_glyphs : (F64, F64) -> String -> ScaledFont -> Result Status (Array Glyph, Array TextCluster, TextClusterFlags);
     // It is hard to wrap cairo_scaled_font_text_to_glyphs in current state of FFI of Fix.
@@ -1774,41 +1743,37 @@ namespace ScaledFont {
     ));
 
     get_font_options : ScaledFont -> FontOptions;
-    get_font_options = undefined("");
-    // get_font_options = |font| font._with_handle_io(|font| (
-    //     let options = FontOptions::create();
-    //     eval options._with_handle_io(|options| (
-    //         FFI_CALL_IO[() cairo_scaled_font_get_font_options(Ptr, Ptr), font, options]
-    //     ));
-    //     options
-    // ));
+    get_font_options = |font| font._with_handle(|font| (
+        let options = FontOptions::default;
+        let (options, _) = options._mutate(|options| (
+            FFI_CALL_IO[() cairo_scaled_font_get_font_options(Ptr, Ptr), font, options]
+        ));
+        options
+    ));
 
     get_font_matrix : ScaledFont -> Matrix;
-    get_font_matrix = undefined("");
-    // get_font_matrix = |font| font._with_handle_io(|font| (
-    //     let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-    //         FFI_CALL_IO[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
-    //     );
-    //     matrix
-    // ));
+    get_font_matrix = |font| font._with_handle(|font| (
+        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+            FFI_CALL_IO[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
+        );
+        matrix
+    ));
 
     get_ctm : ScaledFont -> Matrix;
-    get_ctm = undefined("");
-    // get_ctm = |font| font._with_handle_io(|font| (
-    //     let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-    //         FFI_CALL_IO[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
-    //     );
-    //     matrix
-    // ));
+    get_ctm = |font| font._with_handle(|font| (
+        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+            FFI_CALL_IO[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
+        );
+        matrix
+    ));
 
     get_scale_matrix : ScaledFont -> Matrix;
-    get_scale_matrix = undefined("");
-    // get_scale_matrix = |font| font._with_handle_io(|font| (
-    //     let (_, matrix) = Matrix::init_identity._with_ptr(|matrix| 
-    //         FFI_CALL_IO[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
-    //     );
-    //     matrix
-    // ));
+    get_scale_matrix = |font| font._with_handle(|font| (
+        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+            FFI_CALL_IO[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
+        );
+        matrix
+    ));
 
     get_type : ScaledFont -> FontType;
     get_type = |font| font._with_handle(|font| (
@@ -1823,11 +1788,11 @@ namespace FontExtents {
     create : FontExtents;
     create = FontExtents { ascent : 0.0, descent : 0.0, height : 0.0, max_x_advance : 0.0, max_y_advance : 0.0 };
 
-    _with_ptr : (Ptr -> a) -> FontExtents -> (a, FontExtents);
-    _with_ptr = |act, extents| (
-        let arr = [extents];
-        let res = arr.borrow_ptr(act);
-        (res, arr.@(0))
+    _mutate : (Ptr -> IO a) -> FontExtents -> (FontExtents, a);
+    _mutate = |act, extents| (
+        let extents = Boxed { value : extents };
+        let (extents, res) = extents.mutate_boxed(act);
+        (extents.@value, res)
     );
 
     _mutate_io : (Ptr -> IO a) -> FontExtents -> IO (FontExtents, a);
@@ -1845,11 +1810,11 @@ namespace TextExtents {
     create : TextExtents;
     create = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
 
-    _with_ptr : (Ptr -> a) -> TextExtents -> (a, TextExtents);
-    _with_ptr = |act, extents| (
-        let arr = [extents];
-        let res = arr.borrow_ptr(act);
-        (res, arr.@(0))
+    _mutate : (Ptr -> IO a) -> TextExtents -> (TextExtents, a);
+    _mutate = |act, extents| (
+        let extents = Boxed { value : extents };
+        let (extents, res) = extents.mutate_boxed(act);
+        (extents.@value, res)
     );
 
     _mutate_io : (Ptr -> IO a) -> TextExtents -> IO (TextExtents, a);
