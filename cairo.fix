@@ -31,12 +31,12 @@ status = |cairo| cairo._borrow_io(|cairo| (
 
 save : Cairo -> IO ();
 save = |cairo| cairo._borrow_io(|cairo| (
-        FFI_CALL_IO[() cairo_save(Ptr), cairo]
+    FFI_CALL_IO[() cairo_save(Ptr), cairo]
 ));
 
 restore : Cairo -> IO ();
 restore = |cairo| cairo._borrow_io(|cairo| (
-        FFI_CALL_IO[() cairo_restore(Ptr), cairo]
+    FFI_CALL_IO[() cairo_restore(Ptr), cairo]
 ));
 
 get_target : Cairo -> IO Surface;
@@ -576,7 +576,7 @@ set_matrix = |matrix, cairo| (
 
 get_matrix : Cairo -> IO Matrix;
 get_matrix = |cairo| cairo._borrow_io(|cairo| (
-    let matrix = Matrix::init_identity;
+    let matrix = Matrix::identity;
     let (matrix, _) = *matrix._mutate_io(|matrix| (
         FFI_CALL_IO[() cairo_get_matrix(Ptr, Ptr), cairo, matrix]
     ));
@@ -655,7 +655,7 @@ set_font_matrix = |matrix, cairo| cairo._borrow_io(|cairo| (
 
 get_font_matrix : Cairo -> IO Matrix;
 get_font_matrix = |cairo| cairo._borrow_io(|cairo|
-    let matrix = Matrix::init_identity;
+    let matrix = Matrix::identity;
     let (matrix, _) = *matrix._mutate_io(|matrix| (
         FFI_CALL_IO[() cairo_get_font_matrix(Ptr, Ptr), cairo, matrix]
     ));
@@ -1112,7 +1112,7 @@ namespace Pattern {
 
     get_matrix : Pattern -> IO Matrix;
     get_matrix = |pattern| pattern._borrow_io(|pattern| (
-        let matrix = Matrix::init_identity;
+        let matrix = Matrix::identity;
         let (matrix, _) = *matrix._mutate_io(|matrix| (
             FFI_CALL_IO[() cairo_pattern_get_matrix(Ptr, Ptr), pattern, matrix]
         ));
@@ -1187,8 +1187,8 @@ namespace Matrix {
         pure $ (mat.@value, res)
     );
 
-    init_identity : Matrix;
-    init_identity = Matrix { xx : 1.0, yx : 0.0, xy : 0.0, yy : 1.0, x0 : 0.0, y0 : 0.0 };
+    identity : Matrix;
+    identity = Matrix { xx : 1.0, yx : 0.0, xy : 0.0, yy : 1.0, x0 : 0.0, y0 : 0.0 };
 
     init_translate : (F64, F64) -> Matrix;
     init_translate = |(x, y)| Matrix { xx : 1.0, yx : 0.0, xy : 0.0, yy : 1.0, x0 : x, y0 : y };
@@ -1755,7 +1755,7 @@ namespace ScaledFont {
 
     get_font_matrix : ScaledFont -> Matrix;
     get_font_matrix = |font| font._borrow(|font| (
-        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+        let (matrix, _) = Matrix::identity._mutate(|matrix| 
             FFI_CALL_IO[() cairo_scaled_font_get_font_matrix(Ptr, Ptr), font, matrix]
         );
         matrix
@@ -1763,7 +1763,7 @@ namespace ScaledFont {
 
     get_ctm : ScaledFont -> Matrix;
     get_ctm = |font| font._borrow(|font| (
-        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+        let (matrix, _) = Matrix::identity._mutate(|matrix| 
             FFI_CALL_IO[() cairo_scaled_font_get_ctm(Ptr, Ptr), font, matrix]
         );
         matrix
@@ -1771,7 +1771,7 @@ namespace ScaledFont {
 
     get_scale_matrix : ScaledFont -> Matrix;
     get_scale_matrix = |font| font._borrow(|font| (
-        let (matrix, _) = Matrix::init_identity._mutate(|matrix| 
+        let (matrix, _) = Matrix::identity._mutate(|matrix| 
             FFI_CALL_IO[() cairo_scaled_font_get_scale_matrix(Ptr, Ptr), font, matrix]
         );
         matrix
