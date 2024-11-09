@@ -106,19 +106,19 @@ namespace GameState {
 
     render : Cairo -> GameState -> IO ();
     render = |cairo, state| (
-        eval *cairo.set_source_rgb((1.0, 1.0, 1.0));
+        cairo.set_source_rgb((1.0, 1.0, 1.0));;
 
-        eval *Iterator::range(0, cells_count.@1).product(Iterator::range(0, cells_count.@0)).loop_iter_m((), |_, (y, x)|
+        Iterator::range(0, cells_count.@1).product(Iterator::range(0, cells_count.@0)).loop_iter_m((), |_, (y, x)|
             let is_alive = state.@current_state.@(x).@(y);
-            eval *Monad::when(is_alive, 
+            Monad::when(is_alive, 
                 let pos = ((x * cell_size.@0).to_F64, (y * cell_size.@1).to_F64);
                 let cell_size = (cell_size.@0.to_F64, cell_size.@1.to_F64);
                 cairo.rectangle(pos, cell_size)
-            );
+            );;
             continue_m $ ()
-        );
+        );;
 
-        eval *cairo.fill;
+        cairo.fill;;
         pure()
     );
 }
@@ -127,14 +127,14 @@ main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window(window_size);
     let event_mask = EventMask::exposure.bit_or(EventMask::button_press).bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion).bit_or(EventMask::key_press);
-    eval *window.select_input(event_mask);
+    window.select_input(event_mask);;
 
     // Wait for the window to be exposed.
-    eval *loop_m((), |_| (
+    loop_m((), |_| (
         let event = *window.next_event;
         if event.is_expose { break_m $ () };
         continue_m $ ()
-    ));
+    ));;
     
     let surface = XlibSurface::create_back_surface(window);
     let cairo = *Cairo::create(surface);
@@ -143,7 +143,7 @@ main = (
     let rand = Random::init_by_seed(time.to_U64);
     let (rand, state) = GameState::initialize.randomize(rand);
 
-    eval *loop_m((state, rand, time), |(state, rand, prev_time)|
+    loop_m((state, rand, time), |(state, rand, prev_time)|
         // First, process X events updating the state.
         let opt_state = *loop_m(state, |state| (
             if *window.events_queued(QueuedMode::already) == 0 { break_m $ Option::some(state) };
@@ -190,17 +190,17 @@ main = (
 
         // Update the cells.
         let (state, time) = consumed_time_while_lazy(|_| state.proceed_cells);
-        eval *println("Time to update cells: " + time.to_string);
+        println("Time to update cells: " + time.to_string);;
 
         // Render the cells.
-        eval *state.render(cairo);
-        eval *window.flush;
-        eval *window.swap_buffers(XbeSwapAction::background);
+        state.render(cairo);;
+        window.flush;;
+        window.swap_buffers(XbeSwapAction::background);;
 
         continue_m $ (state, rand, now_time)
-    );
+    );;
 
-    eval *window.destroy_window;
+    window.destroy_window;;
 
     pure()
 );
