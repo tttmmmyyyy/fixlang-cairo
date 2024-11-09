@@ -6,15 +6,8 @@ import Cairo.XlibSurface;
 main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window((640, 480));
-    let event_mask = EventMask::exposure.bit_or(EventMask::key_press);
+    let event_mask = EventMask::key_press;
     window.select_input(event_mask);;
-
-    // Wait for the window to be exposed.
-    loop_m((), |_| (
-        let event = *window.next_event;
-        if event.is_expose { break_m $ () };
-        continue_m $ ()
-    ));;
     
     let surface = XlibSurface::create_front_surface(window);
     let cairo = *Cairo::create(surface);

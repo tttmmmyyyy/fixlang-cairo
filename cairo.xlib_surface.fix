@@ -17,7 +17,7 @@ create_simple_window : (I64, I64) -> IO Window;
 create_simple_window = |(width, height)| (
     let width = width.to_I32;
     let height = height.to_I32;
-    let display : DisplayHandle = FFI_CALL[Ptr XOpenDisplay(Ptr), nullptr];
+    let display : DisplayHandle = *FFI_CALL_IO[Ptr XOpenDisplay(Ptr), nullptr];
     let window : WindowId = *FFI_CALL_IO[U64 cairo_fixlang_xlib_surface_create_x_window(Ptr, I32, I32), display, width, height];
     pure $ Window { _display : display, _window_id : window, width : width, height : height }
 );

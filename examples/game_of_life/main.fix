@@ -126,15 +126,8 @@ namespace GameState {
 main : IO ();
 main = (
     let window = *XlibSurface::create_simple_window(window_size);
-    let event_mask = EventMask::exposure.bit_or(EventMask::button_press).bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion).bit_or(EventMask::key_press);
+    let event_mask = EventMask::button_press.bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion).bit_or(EventMask::key_press);
     window.select_input(event_mask);;
-
-    // Wait for the window to be exposed.
-    loop_m((), |_| (
-        let event = *window.next_event;
-        if event.is_expose { break_m $ () };
-        continue_m $ ()
-    ));;
     
     let surface = XlibSurface::create_back_surface(window);
     let cairo = *Cairo::create(surface);
