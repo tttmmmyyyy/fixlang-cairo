@@ -716,7 +716,7 @@ get_scaled_font = |cairo| (
 show_text : String -> Cairo -> IO ();
 show_text = |text, cairo| (
     cairo._borrow_io(|cairo| (
-        text.borrow_c_str(|text| (
+        text.borrow_c_str_io(|text| (
             FFI_CALL_IO[() cairo_show_text(Ptr, Ptr), cairo, text]
         ))
     ))
