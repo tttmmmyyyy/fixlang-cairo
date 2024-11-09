@@ -144,10 +144,12 @@ get_dash_count = |cairo| cairo._borrow_io(|cairo| (
 get_dash : Cairo -> IO (Array F64, F64);
 get_dash = |cairo| (
     let dash_count = *cairo.get_dash_count;
-    let dashes : Array F64 = Array::fill(dash_count, 0.0);
-    let offset : Array F64 = Array::fill(1, 0.0);
-    eval cairo._borrow_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes._get_ptr, offset._get_ptr]);
-    pure $ (dashes, offset.@(0))
+    let dashes = Array::fill(dash_count, 0.0);
+    let offset = Boxed { value : 0.0 };
+    let (dashes, (offset, _)) = *dashes.mutate_boxed_io(|dashes| offset.mutate_boxed_io(|offset| 
+        cairo._borrow_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes, offset])
+    ));
+    pure $ (dashes, offset.@value)
 );
 
 set_fill_rule : FillRule -> Cairo -> IO ();
