@@ -485,7 +485,7 @@ glyph_path : Array Glyph -> Cairo -> IO ();
 glyph_path = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
-        glyphs.borrow_ptr(|glyphs| (
+        glyphs.borrow_ptr_io(|glyphs| (
             FFI_CALL_IO[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
@@ -494,7 +494,7 @@ glyph_path = |glyphs, cairo| (
 text_path : String -> Cairo -> IO ();
 text_path = |text, cairo| (
     cairo._borrow_io(|cairo| (
-        text.borrow_c_str(|text| (
+        text.borrow_c_str_io(|text| (
             FFI_CALL_IO[() cairo_text_path(Ptr, Ptr), cairo, text]
         ))
     ))
@@ -631,7 +631,7 @@ device_to_user_distance = |(dx, dy), cairo| cairo._borrow_io(|cairo| (
 
 select_font_face : String -> FontSlant -> FontWeight -> Cairo -> IO ();
 select_font_face = |font, slant, weight, cairo| cairo._borrow_io(|cairo| (
-        font.borrow_c_str(|font| (
+        font.borrow_c_str_io(|font| (
             FFI_CALL_IO[() cairo_select_font_face(Ptr, Ptr, I32, I32), cairo, font, slant, weight]
         ))
     )
@@ -726,7 +726,7 @@ show_glyphs : Array Glyph -> Cairo -> IO ();
 show_glyphs = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
-        glyphs.borrow_ptr(|glyphs| (
+        glyphs.borrow_ptr_io(|glyphs| (
             FFI_CALL_IO[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
@@ -736,11 +736,11 @@ show_text_glyphs : String -> Array Glyph -> Array TextCluster -> TextClusterFlag
 show_text_glyphs = |text, glyphs, clusters, flags, cairo| (
     cairo._borrow_io(|cairo| (
         let text_len = text.get_size.to_I32;
-        text.borrow_c_str(|text| (
+        text.borrow_c_str_io(|text| (
             let num_glyphs = glyphs.get_size.to_I32;
             let num_clusters = clusters.get_size.to_I32;
-            glyphs.borrow_ptr(|glyphs| (
-                clusters.borrow_ptr(|clusters| (
+            glyphs.borrow_ptr_io(|glyphs| (
+                clusters.borrow_ptr_io(|clusters| (
                     FFI_CALL_IO[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
                 ))
             ))
@@ -777,7 +777,7 @@ glyph_extents = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let extents = TextExtents::create;
         let num_glyphs = glyphs.get_size.to_I32;
-        let (extents, _) = *glyphs.borrow_ptr(|glyphs| (
+        let (extents, _) = *glyphs.borrow_ptr_io(|glyphs| (
             extents._mutate_io(|extents| (
                 FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
             ))
@@ -804,7 +804,7 @@ namespace Surface {
     write_to_png : Std::Path -> Surface -> IO ();
     write_to_png = |path, surface| (
         surface._borrow_io(|surface| (
-            path.to_string.borrow_c_str(|path| (
+            path.to_string.borrow_c_str_io(|path| (
                 FFI_CALL_IO[() cairo_surface_write_to_png(Ptr, Ptr), surface, path]
             )) 
         ))
