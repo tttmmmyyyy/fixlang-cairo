@@ -8,6 +8,5 @@ LIBPATH := ``
 # Or:
 # LIBPATH := `pkg-config cairo --libs-only-L` `pkg-config X11 --libs-only-L`
 
-libfixcairox11.a: cairo.xlib_surface.c
-	gcc $(INCLUDE) $(LIBPATH) -lcairo -lX11 -lXext -c -o cairo.xlib_surface.o cairo.xlib_surface.c
-	ar rc libfixcairox11.a cairo.xlib_surface.o
+cairo.xlib_surface.o: cairo.xlib_surface.c
+	gcc $(INCLUDE) $(LIBPATH) -c -o cairo.xlib_surface.o cairo.xlib_surface.c

@@ -1,12 +1,12 @@
 [general]
 name = "cairo-fix"
-version = "0.1.4"
+version = "0.1.5"
 
 [build]
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
+objects = ["cairo.xlib_surface.o"]
 dynamic_links = ["cairo", "X11", "Xext"]
-static_links = ["fixcairox11"]
-preliminary_commands = [["make", "libfixcairox11.a", "--quiet"]]
+preliminary_commands = [["make", "cairo.xlib_surface.o"]]
 library_paths = ["."]
 
 [[dependencies]]
