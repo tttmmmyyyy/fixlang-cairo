@@ -145,7 +145,7 @@ get_dash : Cairo -> IO (Array F64, F64);
 get_dash = |cairo| (
     let dash_count = *cairo.get_dash_count;
     let dashes = Array::fill(dash_count, 0.0);
-    let offset = Boxed { value : 0.0 };
+    let offset = Box::make(0.0);
     let (dashes, (offset, _)) = *dashes.mutate_boxed_io(|dashes| offset.mutate_boxed_io(|offset| 
         cairo._borrow_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes, offset])
     ));
@@ -418,8 +418,8 @@ has_current_point = |cairo| (
 
 get_current_point : Cairo -> IO (F64, F64);
 get_current_point = |cairo| cairo._borrow_io(|cairo|
-    let x = Boxed { value : 0.0 };
-    let y = Boxed { value : 0.0 };
+    let x = Box::make(0.0);
+    let y = Box::make(0.0);
     let (x, (y, _)) = *x.mutate_boxed_io(|x_ptr| y.mutate_boxed_io(|y_ptr|
         FFI_CALL_IO[() cairo_get_current_point(Ptr, Ptr, Ptr), cairo, x_ptr, y_ptr])
     );
@@ -525,10 +525,10 @@ rel_move_to = |(dx, dy), cairo| (
 
 path_extents : Cairo -> IO (F64, F64, F64, F64);
 path_extents = |cairo| cairo._borrow_io(|cairo|
-    let x1 = Boxed { value : 0.0 };
-    let y1 = Boxed { value : 0.0 };
-    let x2 = Boxed { value : 0.0 };
-    let y2 = Boxed { value : 0.0 };
+    let x1 = Box::make(0.0);
+    let y1 = Box::make(0.0);
+    let x2 = Box::make(0.0);
+    let y2 = Box::make(0.0);
     let (x1, (y1, (x2, (y2, _)))) = *x1.mutate_boxed_io(|x1_ptr| y1.mutate_boxed_io(|y1_ptr| x2.mutate_boxed_io(|x2_ptr| y2.mutate_boxed_io(|y2_ptr| 
         FFI_CALL_IO[() cairo_path_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1_ptr, y1_ptr, x2_ptr, y2_ptr]
     ))));
@@ -590,8 +590,8 @@ identity_matrix = |cairo| cairo._borrow_io(|cairo| (
 
 user_to_device : (F64, F64) -> Cairo -> IO (F64, F64);
 user_to_device = |(x, y), cairo| cairo._borrow_io(|cairo| (
-    let x = Boxed { value : x };
-    let y = Boxed { value : y };
+    let x = Box::make(x);
+    let y = Box::make(y);
     x.mutate_boxed_io(|x| y.mutate_boxed_io(|y| 
         FFI_CALL_IO[() cairo_user_to_device(Ptr, Ptr, Ptr), cairo, x, y]
     ));;
@@ -600,8 +600,8 @@ user_to_device = |(x, y), cairo| cairo._borrow_io(|cairo| (
 
 user_to_device_distance : (F64, F64) -> Cairo -> IO (F64, F64);
 user_to_device_distance = |(dx, dy), cairo| cairo._borrow_io(|cairo| (
-        let dx = Boxed { value : dx };
-        let dy = Boxed { value : dy };
+        let dx = Box::make(dx);
+        let dy = Box::make(dy);
         dx.mutate_boxed_io(|dx| dy.mutate_boxed_io(|dy| 
             FFI_CALL_IO[() cairo_user_to_device_distance(Ptr, Ptr, Ptr), cairo, dx, dy]
         ));;
@@ -611,8 +611,8 @@ user_to_device_distance = |(dx, dy), cairo| cairo._borrow_io(|cairo| (
 
 device_to_user : (F64, F64) -> Cairo -> IO (F64, F64);
 device_to_user = |(x, y), cairo| cairo._borrow_io(|cairo| (
-        let x = Boxed { value : x };
-        let y = Boxed { value : y };
+        let x = Box::make(x);
+        let y = Box::make(y);
         x.mutate_boxed_io(|x| y.mutate_boxed_io(|y| 
             FFI_CALL_IO[() cairo_device_to_user(Ptr, Ptr, Ptr), cairo, x, y]
         ));;
@@ -622,8 +622,8 @@ device_to_user = |(x, y), cairo| cairo._borrow_io(|cairo| (
 
 device_to_user_distance : (F64, F64) -> Cairo -> IO (F64, F64);
 device_to_user_distance = |(dx, dy), cairo| cairo._borrow_io(|cairo| (
-        let dx = Boxed { value : dx };
-        let dy = Boxed { value : dy };
+        let dx = Box::make(dx);
+        let dy = Box::make(dy);
         dx.mutate_boxed_io(|dx| dy.mutate_boxed_io(|dy| 
             FFI_CALL_IO[() cairo_device_to_user_distance(Ptr, Ptr, Ptr), cairo, dx, dy]
         ));;
@@ -904,7 +904,7 @@ namespace Pattern {
 
     get_surface : Pattern -> IO (Result Status Surface);
     get_surface = |pattern| pattern._borrow_io(|pattern| (
-        let surface = Boxed { value : nullptr };
+        let surface = Box::make(nullptr);
         let (surface, status) = *surface.mutate_boxed_io(|surface| (
             FFI_CALL_IO[I32 cairo_pattern_get_surface(Ptr, Ptr), pattern, surface]
         ));
@@ -1027,7 +1027,7 @@ namespace Pattern {
 
     mesh_get_patch_count : Pattern -> IO (Result Status I64);
     mesh_get_patch_count = |pattern| pattern._borrow_io(|pattern| (
-        let count = Boxed { value : 0_U32 };
+        let count = Box::make(0_U32);
         let (count, status) = *count.mutate_boxed_io(|count|FFI_CALL_IO[I32 cairo_mesh_pattern_get_patch_count(Ptr, Ptr), pattern, count]);
         if status == Status::success {
             pure $ Result::ok $ count.@value.to_I64
@@ -1169,20 +1169,20 @@ namespace Matrix {
 
     _borrow_io : (Ptr -> IO a) -> Matrix -> IO a;
     _borrow_io = |act, matrix| (
-        let mat = Boxed { value : matrix };
+        let mat = Box::make(matrix);
         mat.borrow_boxed_io(act)
     );
 
     _mutate : (Ptr -> IO a) -> Matrix -> (Matrix, a);
     _mutate = |act, matrix| (
-        let mat = Boxed { value : matrix };
+        let mat = Box::make(matrix);
         let (mat, res) = mat.mutate_boxed(act);
         (mat.@value, res)
     );
 
     _mutate_io : (Ptr -> IO a) -> Matrix -> IO (Matrix, a);
     _mutate_io = |act, matrix| (
-        let mat = Boxed { value : matrix };
+        let mat = Box::make(matrix);
         let (mat, res) = *mat.mutate_boxed_io(act);
         pure $ (mat.@value, res)
     );
@@ -1314,7 +1314,7 @@ namespace Region {
 
     get_extents : Region -> RectangleInt;
     get_extents = |region| region._borrow(|region| (
-        let rect = Boxed { value : RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 } };
+        let rect = Box::make $ RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
         let (rect, _) = rect.mutate_boxed(|rect| (
             FFI_CALL_IO[() cairo_region_get_extents(Ptr, Ptr), region, rect]
         ));
@@ -1328,7 +1328,7 @@ namespace Region {
 
     get_rectangle : I32 -> Region -> RectangleInt;
     get_rectangle = |index, region| region._borrow(|region| (
-        let rect = Boxed { value : RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 } };
+        let rect = Box::make $ RectangleInt { x : 0_I32, y : 0_I32, width : 0_I32, height : 0_I32 };
         let (rect, _) = rect.mutate_boxed(|rect| (
             FFI_CALL_IO[() cairo_region_get_rectangle(Ptr, I32, Ptr), region, index, rect]
         ));
@@ -1491,13 +1491,13 @@ namespace RectangleInt {
 
     _borrow : (Ptr -> a) -> RectangleInt -> a;
     _borrow = |act, rect| (
-        let rect = Boxed { value : rect };
+        let rect = Box::make $ rect;
         rect.borrow_boxed(act)
     );
 
     _mutate_io : (Ptr -> IO a) -> RectangleInt -> IO (RectangleInt, a);
     _mutate_io = |act, rect| (
-        let rect = Boxed { value : rect };
+        let rect = Box::make $ rect;
         let (rect, res) = *rect.mutate_boxed_io(act);
         pure $ (rect.@value, res)
     );
@@ -1792,14 +1792,14 @@ namespace FontExtents {
 
     _mutate : (Ptr -> IO a) -> FontExtents -> (FontExtents, a);
     _mutate = |act, extents| (
-        let extents = Boxed { value : extents };
+        let extents = Box::make $ extents;
         let (extents, res) = extents.mutate_boxed(act);
         (extents.@value, res)
     );
 
     _mutate_io : (Ptr -> IO a) -> FontExtents -> IO (FontExtents, a);
     _mutate_io = |act, extents| (
-        let extents = Boxed { value : extents };
+        let extents = Box::make $ extents;
         let (extents, res) = *extents.mutate_boxed_io(act);
         pure $ (extents.@value, res)
     );
@@ -1814,14 +1814,14 @@ namespace TextExtents {
 
     _mutate : (Ptr -> IO a) -> TextExtents -> (TextExtents, a);
     _mutate = |act, extents| (
-        let extents = Boxed { value : extents };
+        let extents = Box::make $ extents;
         let (extents, res) = extents.mutate_boxed(act);
         (extents.@value, res)
     );
 
     _mutate_io : (Ptr -> IO a) -> TextExtents -> IO (TextExtents, a);
     _mutate_io = |act, extents| (
-        let extents = Boxed { value : extents };
+        let extents = Box::make $ extents;
         let (extents, res) = *extents.mutate_boxed_io(act);
         pure $ (extents.@value, res)
     );

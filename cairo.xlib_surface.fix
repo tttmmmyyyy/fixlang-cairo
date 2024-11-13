@@ -43,7 +43,7 @@ create_back_surface = |window| (
 
 swap_buffers : XbeSwapAction -> Window -> IO ();
 swap_buffers = |swap_action, window| (
-    let swap_action = Boxed { value : (window.@_window_id, swap_action) };
+    let swap_action = Box::make $ (window.@_window_id, swap_action);
     swap_action.borrow_boxed_io(|swap_action| 
         FFI_CALL_IO[() XdbeSwapBuffers(Ptr, Ptr, I32), window.@_display, swap_action, 1_I32]
     )
