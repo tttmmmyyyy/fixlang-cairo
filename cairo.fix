@@ -129,7 +129,7 @@ set_dash : Array F64 -> F64 -> Cairo -> IO ();
 set_dash = |dashes, offset, cairo| (
     cairo._borrow_io(|cairo| ( 
         let num_dashes = dashes.get_size.to_I32;
-        dashes.borrow_ptr_io(|dashes| (
+        dashes.borrow_boxed_io(|dashes| (
             FFI_CALL_IO[() cairo_set_dash(Ptr, Ptr, I32, F64), cairo, dashes, num_dashes, offset]
         ))
     ))
@@ -487,7 +487,7 @@ glyph_path : Array Glyph -> Cairo -> IO ();
 glyph_path = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
-        glyphs.borrow_ptr_io(|glyphs| (
+        glyphs.borrow_boxed_io(|glyphs| (
             FFI_CALL_IO[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
@@ -728,7 +728,7 @@ show_glyphs : Array Glyph -> Cairo -> IO ();
 show_glyphs = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.get_size.to_I32;
-        glyphs.borrow_ptr_io(|glyphs| (
+        glyphs.borrow_boxed_io(|glyphs| (
             FFI_CALL_IO[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
         ))
     ))
@@ -741,8 +741,8 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| (
         text.borrow_c_str_io(|text| (
             let num_glyphs = glyphs.get_size.to_I32;
             let num_clusters = clusters.get_size.to_I32;
-            glyphs.borrow_ptr_io(|glyphs| (
-                clusters.borrow_ptr_io(|clusters| (
+            glyphs.borrow_boxed_io(|glyphs| (
+                clusters.borrow_boxed_io(|clusters| (
                     FFI_CALL_IO[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
                 ))
             ))
@@ -779,7 +779,7 @@ glyph_extents = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let extents = TextExtents::create;
         let num_glyphs = glyphs.get_size.to_I32;
-        let (extents, _) = *glyphs.borrow_ptr_io(|glyphs| (
+        let (extents, _) = *glyphs.borrow_boxed_io(|glyphs| (
             extents._mutate_io(|extents| (
                 FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
             ))
@@ -1303,7 +1303,7 @@ namespace Region {
     create_rectangles : Array RectangleInt -> Region;
     create_rectangles = |rects| (
         let len = rects.get_size;
-        let region = rects.borrow_ptr(|handles| FFI_CALL[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
+        let region = rects.borrow_boxed(|handles| FFI_CALL[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
         Region::_create_from_handle(region)
     );
 
@@ -1727,7 +1727,7 @@ namespace ScaledFont {
     glyph_extents = |glyphs, font| (
         let len = glyphs.get_size;
         let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
-        let (extents, _) = glyphs.borrow_ptr(|glyphs| (font._borrow(|font| extents._mutate(|extents| (
+        let (extents, _) = glyphs.borrow_boxed(|glyphs| (font._borrow(|font| extents._mutate(|extents| (
                 FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
             ))
         )));
