@@ -410,24 +410,6 @@
 
 ### `subpixel : Std::I32`
 
-## `namespace Cairo::Cairo`
-
-### `@_dtor : Cairo::Cairo -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `Cairo`.
-
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Cairo -> f Cairo::Cairo`
-
-Updates a value of `Cairo` by applying a functorial action to field `_dtor`.
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::Cairo -> Cairo::Cairo`
-
-Updates a value of `Cairo` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::Cairo -> Cairo::Cairo`
-
-Updates a value of `Cairo` by setting field `_dtor` to a specified one.
-
 ## `namespace Cairo::Content`
 
 ### `alpha : Std::I32`
@@ -468,97 +450,13 @@ Updates a value of `Cairo` by setting field `_dtor` to a specified one.
 
 ## `namespace Cairo::FontExtents`
 
-### `@ascent : Cairo::FontExtents -> Std::F64`
-
-Retrieves the field `ascent` from a value of `FontExtents`.
-
-### `@descent : Cairo::FontExtents -> Std::F64`
-
-Retrieves the field `descent` from a value of `FontExtents`.
-
-### `@height : Cairo::FontExtents -> Std::F64`
-
-Retrieves the field `height` from a value of `FontExtents`.
-
-### `@max_x_advance : Cairo::FontExtents -> Std::F64`
-
-Retrieves the field `max_x_advance` from a value of `FontExtents`.
-
-### `@max_y_advance : Cairo::FontExtents -> Std::F64`
-
-Retrieves the field `max_y_advance` from a value of `FontExtents`.
-
 ### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::FontExtents -> (Cairo::FontExtents, a)`
 
 ### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::FontExtents -> Std::IO (Cairo::FontExtents, a)`
 
-### `act_ascent : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a functorial action to field `ascent`.
-
-### `act_descent : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a functorial action to field `descent`.
-
-### `act_height : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a functorial action to field `height`.
-
-### `act_max_x_advance : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a functorial action to field `max_x_advance`.
-
-### `act_max_y_advance : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::FontExtents -> f Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a functorial action to field `max_y_advance`.
-
 ### `create : Cairo::FontExtents`
 
-### `mod_ascent : (Std::F64 -> Std::F64) -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a function to field `ascent`.
-
-### `mod_descent : (Std::F64 -> Std::F64) -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a function to field `descent`.
-
-### `mod_height : (Std::F64 -> Std::F64) -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a function to field `height`.
-
-### `mod_max_x_advance : (Std::F64 -> Std::F64) -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a function to field `max_x_advance`.
-
-### `mod_max_y_advance : (Std::F64 -> Std::F64) -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by applying a function to field `max_y_advance`.
-
-### `set_ascent : Std::F64 -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by setting field `ascent` to a specified one.
-
-### `set_descent : Std::F64 -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by setting field `descent` to a specified one.
-
-### `set_height : Std::F64 -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by setting field `height` to a specified one.
-
-### `set_max_x_advance : Std::F64 -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by setting field `max_x_advance` to a specified one.
-
-### `set_max_y_advance : Std::F64 -> Cairo::FontExtents -> Cairo::FontExtents`
-
-Updates a value of `FontExtents` by setting field `max_y_advance` to a specified one.
-
 ## `namespace Cairo::FontFace`
-
-### `@_dtor : Cairo::FontFace -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `FontFace`.
 
 ### `_borrow : (Std::Ptr -> a) -> Cairo::FontFace -> a`
 
@@ -566,27 +464,11 @@ Retrieves the field `_dtor` from a value of `FontFace`.
 
 ### `_create_from_handle : Std::Ptr -> Cairo::FontFace`
 
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::FontFace -> f Cairo::FontFace`
-
-Updates a value of `FontFace` by applying a functorial action to field `_dtor`.
-
 ### `get_type : Cairo::FontFace -> Std::I32`
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::FontFace -> Cairo::FontFace`
-
-Updates a value of `FontFace` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::FontFace -> Cairo::FontFace`
-
-Updates a value of `FontFace` by setting field `_dtor` to a specified one.
 
 ### `status : Cairo::FontFace -> Std::I32`
 
 ## `namespace Cairo::FontOptions`
-
-### `@_dtor : Cairo::FontOptions -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `FontOptions`.
 
 ### `_borrow : (Std::Ptr -> a) -> Cairo::FontOptions -> a`
 
@@ -595,10 +477,6 @@ Retrieves the field `_dtor` from a value of `FontOptions`.
 ### `_create_from_handle : Std::Ptr -> Cairo::FontOptions`
 
 ### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::FontOptions -> (Cairo::FontOptions, a)`
-
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::FontOptions -> f Cairo::FontOptions`
-
-Updates a value of `FontOptions` by applying a functorial action to field `_dtor`.
 
 ### `default : Cairo::FontOptions`
 
@@ -617,14 +495,6 @@ Updates a value of `FontOptions` by applying a functorial action to field `_dtor
 ### `hash : Cairo::FontOptions -> Std::U64`
 
 ### `merge : Cairo::FontOptions -> Cairo::FontOptions -> Cairo::FontOptions`
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::FontOptions -> Cairo::FontOptions`
-
-Updates a value of `FontOptions` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::FontOptions -> Cairo::FontOptions`
-
-Updates a value of `FontOptions` by setting field `_dtor` to a specified one.
 
 ### `set_antialias : Std::I32 -> Cairo::FontOptions -> Cairo::FontOptions`
 
@@ -678,56 +548,6 @@ Updates a value of `FontOptions` by setting field `_dtor` to a specified one.
 
 ### `rgb30 : Std::I32`
 
-## `namespace Cairo::Glyph`
-
-### `@index : Cairo::Glyph -> Std::U64`
-
-Retrieves the field `index` from a value of `Glyph`.
-
-### `@x : Cairo::Glyph -> Std::F64`
-
-Retrieves the field `x` from a value of `Glyph`.
-
-### `@y : Cairo::Glyph -> Std::F64`
-
-Retrieves the field `y` from a value of `Glyph`.
-
-### `act_index : [f : Std::Functor] (Std::U64 -> f Std::U64) -> Cairo::Glyph -> f Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a functorial action to field `index`.
-
-### `act_x : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Glyph -> f Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a functorial action to field `x`.
-
-### `act_y : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Glyph -> f Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a functorial action to field `y`.
-
-### `mod_index : (Std::U64 -> Std::U64) -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a function to field `index`.
-
-### `mod_x : (Std::F64 -> Std::F64) -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a function to field `x`.
-
-### `mod_y : (Std::F64 -> Std::F64) -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by applying a function to field `y`.
-
-### `set_index : Std::U64 -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by setting field `index` to a specified one.
-
-### `set_x : Std::F64 -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by setting field `x` to a specified one.
-
-### `set_y : Std::F64 -> Cairo::Glyph -> Cairo::Glyph`
-
-Updates a value of `Glyph` by setting field `y` to a specified one.
-
 ## `namespace Cairo::HintMetrics`
 
 ### `default : Std::I32`
@@ -766,59 +586,11 @@ Updates a value of `Glyph` by setting field `y` to a specified one.
 
 ## `namespace Cairo::Matrix`
 
-### `@x0 : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `x0` from a value of `Matrix`.
-
-### `@xx : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `xx` from a value of `Matrix`.
-
-### `@xy : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `xy` from a value of `Matrix`.
-
-### `@y0 : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `y0` from a value of `Matrix`.
-
-### `@yx : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `yx` from a value of `Matrix`.
-
-### `@yy : Cairo::Matrix -> Std::F64`
-
-Retrieves the field `yy` from a value of `Matrix`.
-
 ### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> Std::IO a`
 
 ### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> (Cairo::Matrix, a)`
 
 ### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::Matrix -> Std::IO (Cairo::Matrix, a)`
-
-### `act_x0 : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `x0`.
-
-### `act_xx : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `xx`.
-
-### `act_xy : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `xy`.
-
-### `act_y0 : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `y0`.
-
-### `act_yx : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `yx`.
-
-### `act_yy : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::Matrix -> f Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a functorial action to field `yy`.
 
 ### `identity : Cairo::Matrix`
 
@@ -830,30 +602,6 @@ Updates a value of `Matrix` by applying a functorial action to field `yy`.
 
 ### `invert : Cairo::Matrix -> Std::Option Cairo::Matrix`
 
-### `mod_x0 : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `x0`.
-
-### `mod_xx : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `xx`.
-
-### `mod_xy : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `xy`.
-
-### `mod_y0 : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `y0`.
-
-### `mod_yx : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `yx`.
-
-### `mod_yy : (Std::F64 -> Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by applying a function to field `yy`.
-
 ### `multiply : Cairo::Matrix -> Cairo::Matrix -> Cairo::Matrix`
 
 The transformation b.multiply(a) first applies the transformation a to the point and then applies the transformation b to the result.
@@ -861,30 +609,6 @@ The transformation b.multiply(a) first applies the transformation a to the point
 ### `rotate : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
 
 ### `scale : (Std::F64, Std::F64) -> Cairo::Matrix -> Cairo::Matrix`
-
-### `set_x0 : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `x0` to a specified one.
-
-### `set_xx : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `xx` to a specified one.
-
-### `set_xy : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `xy` to a specified one.
-
-### `set_y0 : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `y0` to a specified one.
-
-### `set_yx : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `yx` to a specified one.
-
-### `set_yy : Std::F64 -> Cairo::Matrix -> Cairo::Matrix`
-
-Updates a value of `Matrix` by setting field `yy` to a specified one.
 
 ### `transform_distance : (Std::F64, Std::F64) -> Cairo::Matrix -> (Std::F64, Std::F64)`
 
@@ -962,43 +686,19 @@ Updates a value of `Matrix` by setting field `yy` to a specified one.
 
 ## `namespace Cairo::Path`
 
-### `@_dtor : Cairo::Path -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `Path`.
-
 ### `_borrow : (Std::Ptr -> a) -> Cairo::Path -> a`
 
 ### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Path -> Std::IO a`
 
 ### `_create_from_handle : Std::Ptr -> Cairo::Path`
 
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Path -> f Cairo::Path`
-
-Updates a value of `Path` by applying a functorial action to field `_dtor`.
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::Path -> Cairo::Path`
-
-Updates a value of `Path` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::Path -> Cairo::Path`
-
-Updates a value of `Path` by setting field `_dtor` to a specified one.
-
 ## `namespace Cairo::Pattern`
-
-### `@_dtor : Cairo::Pattern -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `Pattern`.
 
 ### `_borrow : (Std::Ptr -> a) -> Cairo::Pattern -> a`
 
 ### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Pattern -> Std::IO a`
 
 ### `_create_from_handle : Std::Ptr -> Cairo::Pattern`
-
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Pattern -> f Cairo::Pattern`
-
-Updates a value of `Pattern` by applying a functorial action to field `_dtor`.
 
 ### `add_color_stop_rgb : Std::F64 -> (Std::F64, Std::F64, Std::F64) -> Cairo::Pattern -> Std::IO ()`
 
@@ -1064,17 +764,9 @@ Updates a value of `Pattern` by applying a functorial action to field `_dtor`.
 
 ### `mesh_set_corner_color_rgba : Std::I64 -> (Std::F64, Std::F64, Std::F64, Std::F64) -> Cairo::Pattern -> Std::IO ()`
 
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::Pattern -> Cairo::Pattern`
-
-Updates a value of `Pattern` by applying a function to field `_dtor`.
-
 ### `radial : Std::I32`
 
 ### `raster_source : Std::I32`
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::Pattern -> Cairo::Pattern`
-
-Updates a value of `Pattern` by setting field `_dtor` to a specified one.
 
 ### `set_extend : Std::I32 -> Cairo::Pattern -> Std::IO ()`
 
@@ -1090,101 +782,17 @@ Updates a value of `Pattern` by setting field `_dtor` to a specified one.
 
 ## `namespace Cairo::RectangleInt`
 
-### `@height : Cairo::RectangleInt -> Std::I32`
-
-Retrieves the field `height` from a value of `RectangleInt`.
-
-### `@width : Cairo::RectangleInt -> Std::I32`
-
-Retrieves the field `width` from a value of `RectangleInt`.
-
-### `@x : Cairo::RectangleInt -> Std::I32`
-
-Retrieves the field `x` from a value of `RectangleInt`.
-
-### `@y : Cairo::RectangleInt -> Std::I32`
-
-Retrieves the field `y` from a value of `RectangleInt`.
-
 ### `_borrow : (Std::Ptr -> a) -> Cairo::RectangleInt -> a`
 
 ### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::RectangleInt -> Std::IO (Cairo::RectangleInt, a)`
 
-### `act_height : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::RectangleInt -> f Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a functorial action to field `height`.
-
-### `act_width : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::RectangleInt -> f Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a functorial action to field `width`.
-
-### `act_x : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::RectangleInt -> f Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a functorial action to field `x`.
-
-### `act_y : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::RectangleInt -> f Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a functorial action to field `y`.
-
-### `mod_height : (Std::I32 -> Std::I32) -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a function to field `height`.
-
-### `mod_width : (Std::I32 -> Std::I32) -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a function to field `width`.
-
-### `mod_x : (Std::I32 -> Std::I32) -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a function to field `x`.
-
-### `mod_y : (Std::I32 -> Std::I32) -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by applying a function to field `y`.
-
-### `set_height : Std::I32 -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by setting field `height` to a specified one.
-
-### `set_width : Std::I32 -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by setting field `width` to a specified one.
-
-### `set_x : Std::I32 -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by setting field `x` to a specified one.
-
-### `set_y : Std::I32 -> Cairo::RectangleInt -> Cairo::RectangleInt`
-
-Updates a value of `RectangleInt` by setting field `y` to a specified one.
-
 ## `namespace Cairo::RectangleList`
-
-### `@_dtor : Cairo::RectangleList -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `RectangleList`.
 
 ### `_borrow : (Std::Ptr -> a) -> Cairo::RectangleList -> a`
 
 ### `_create_from_handle : Std::Ptr -> Cairo::RectangleList`
 
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::RectangleList -> f Cairo::RectangleList`
-
-Updates a value of `RectangleList` by applying a functorial action to field `_dtor`.
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::RectangleList -> Cairo::RectangleList`
-
-Updates a value of `RectangleList` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::RectangleList -> Cairo::RectangleList`
-
-Updates a value of `RectangleList` by setting field `_dtor` to a specified one.
-
 ## `namespace Cairo::Region`
-
-### `@_dtor : Cairo::Region -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `Region`.
 
 ### `_borrow : (Std::Ptr -> a) -> Cairo::Region -> a`
 
@@ -1193,10 +801,6 @@ Retrieves the field `_dtor` from a value of `Region`.
 ### `_create_from_handle : Std::Ptr -> Cairo::Region`
 
 ### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::Region -> (Cairo::Region, a)`
-
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Region -> f Cairo::Region`
-
-Updates a value of `Region` by applying a functorial action to field `_dtor`.
 
 ### `contains_point : (Std::I32, Std::I32) -> Cairo::Region -> Std::Bool`
 
@@ -1220,15 +824,7 @@ Updates a value of `Region` by applying a functorial action to field `_dtor`.
 
 ### `is_empty : Cairo::Region -> Std::Bool`
 
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::Region -> Cairo::Region`
-
-Updates a value of `Region` by applying a function to field `_dtor`.
-
 ### `num_rectangles : Cairo::Region -> Std::I32`
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::Region -> Cairo::Region`
-
-Updates a value of `Region` by setting field `_dtor` to a specified one.
 
 ### `status : Cairo::Region -> Std::I32`
 
@@ -1248,19 +844,11 @@ Updates a value of `Region` by setting field `_dtor` to a specified one.
 
 ## `namespace Cairo::ScaledFont`
 
-### `@_dtor : Cairo::ScaledFont -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `ScaledFont`.
-
 ### `_borrow : (Std::Ptr -> a) -> Cairo::ScaledFont -> a`
 
 ### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::ScaledFont -> Std::IO a`
 
 ### `_create_from_handle : Std::Ptr -> Cairo::ScaledFont`
-
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::ScaledFont -> f Cairo::ScaledFont`
-
-Updates a value of `ScaledFont` by applying a functorial action to field `_dtor`.
 
 ### `extents : Cairo::ScaledFont -> Cairo::FontExtents`
 
@@ -1277,14 +865,6 @@ Updates a value of `ScaledFont` by applying a functorial action to field `_dtor`
 ### `get_type : Cairo::ScaledFont -> Std::I32`
 
 ### `glyph_extents : Std::Array Cairo::Glyph -> Cairo::ScaledFont -> Cairo::TextExtents`
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::ScaledFont -> Cairo::ScaledFont`
-
-Updates a value of `ScaledFont` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::ScaledFont -> Cairo::ScaledFont`
-
-Updates a value of `ScaledFont` by setting field `_dtor` to a specified one.
 
 ### `status : Cairo::ScaledFont -> Std::I32`
 
@@ -1378,63 +958,13 @@ Updates a value of `ScaledFont` by setting field `_dtor` to a specified one.
 
 ## `namespace Cairo::Surface`
 
-### `@_dtor : Cairo::Surface -> Std::FFI::Destructor Std::Ptr`
-
-Retrieves the field `_dtor` from a value of `Surface`.
-
 ### `_borrow : (Std::Ptr -> a) -> Cairo::Surface -> a`
 
 ### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Surface -> Std::IO a`
 
 ### `_create_from_handle : Std::Ptr -> Cairo::Surface`
 
-### `act__dtor : [f : Std::Functor] (Std::FFI::Destructor Std::Ptr -> f (Std::FFI::Destructor Std::Ptr)) -> Cairo::Surface -> f Cairo::Surface`
-
-Updates a value of `Surface` by applying a functorial action to field `_dtor`.
-
-### `mod__dtor : (Std::FFI::Destructor Std::Ptr -> Std::FFI::Destructor Std::Ptr) -> Cairo::Surface -> Cairo::Surface`
-
-Updates a value of `Surface` by applying a function to field `_dtor`.
-
-### `set__dtor : Std::FFI::Destructor Std::Ptr -> Cairo::Surface -> Cairo::Surface`
-
-Updates a value of `Surface` by setting field `_dtor` to a specified one.
-
 ### `write_to_png : Std::Path -> Cairo::Surface -> Std::IO ()`
-
-## `namespace Cairo::TextCluster`
-
-### `@num_bytes : Cairo::TextCluster -> Std::I32`
-
-Retrieves the field `num_bytes` from a value of `TextCluster`.
-
-### `@num_glyphs : Cairo::TextCluster -> Std::I32`
-
-Retrieves the field `num_glyphs` from a value of `TextCluster`.
-
-### `act_num_bytes : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::TextCluster -> f Cairo::TextCluster`
-
-Updates a value of `TextCluster` by applying a functorial action to field `num_bytes`.
-
-### `act_num_glyphs : [f : Std::Functor] (Std::I32 -> f Std::I32) -> Cairo::TextCluster -> f Cairo::TextCluster`
-
-Updates a value of `TextCluster` by applying a functorial action to field `num_glyphs`.
-
-### `mod_num_bytes : (Std::I32 -> Std::I32) -> Cairo::TextCluster -> Cairo::TextCluster`
-
-Updates a value of `TextCluster` by applying a function to field `num_bytes`.
-
-### `mod_num_glyphs : (Std::I32 -> Std::I32) -> Cairo::TextCluster -> Cairo::TextCluster`
-
-Updates a value of `TextCluster` by applying a function to field `num_glyphs`.
-
-### `set_num_bytes : Std::I32 -> Cairo::TextCluster -> Cairo::TextCluster`
-
-Updates a value of `TextCluster` by setting field `num_bytes` to a specified one.
-
-### `set_num_glyphs : Std::I32 -> Cairo::TextCluster -> Cairo::TextCluster`
-
-Updates a value of `TextCluster` by setting field `num_glyphs` to a specified one.
 
 ## `namespace Cairo::TextClusterFlags`
 
@@ -1442,107 +972,11 @@ Updates a value of `TextCluster` by setting field `num_glyphs` to a specified on
 
 ## `namespace Cairo::TextExtents`
 
-### `@height : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `height` from a value of `TextExtents`.
-
-### `@width : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `width` from a value of `TextExtents`.
-
-### `@x_advance : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `x_advance` from a value of `TextExtents`.
-
-### `@x_bearing : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `x_bearing` from a value of `TextExtents`.
-
-### `@y_advance : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `y_advance` from a value of `TextExtents`.
-
-### `@y_bearing : Cairo::TextExtents -> Std::F64`
-
-Retrieves the field `y_bearing` from a value of `TextExtents`.
-
 ### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::TextExtents -> (Cairo::TextExtents, a)`
 
 ### `_mutate_io : (Std::Ptr -> Std::IO a) -> Cairo::TextExtents -> Std::IO (Cairo::TextExtents, a)`
 
-### `act_height : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `height`.
-
-### `act_width : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `width`.
-
-### `act_x_advance : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `x_advance`.
-
-### `act_x_bearing : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `x_bearing`.
-
-### `act_y_advance : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `y_advance`.
-
-### `act_y_bearing : [f : Std::Functor] (Std::F64 -> f Std::F64) -> Cairo::TextExtents -> f Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a functorial action to field `y_bearing`.
-
 ### `create : Cairo::TextExtents`
-
-### `mod_height : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `height`.
-
-### `mod_width : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `width`.
-
-### `mod_x_advance : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `x_advance`.
-
-### `mod_x_bearing : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `x_bearing`.
-
-### `mod_y_advance : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `y_advance`.
-
-### `mod_y_bearing : (Std::F64 -> Std::F64) -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by applying a function to field `y_bearing`.
-
-### `set_height : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `height` to a specified one.
-
-### `set_width : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `width` to a specified one.
-
-### `set_x_advance : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `x_advance` to a specified one.
-
-### `set_x_bearing : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `x_bearing` to a specified one.
-
-### `set_y_advance : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `y_advance` to a specified one.
-
-### `set_y_bearing : Std::F64 -> Cairo::TextExtents -> Cairo::TextExtents`
-
-Updates a value of `TextExtents` by setting field `y_bearing` to a specified one.
 
 ## `namespace Cairo::ToyFontFace`
 

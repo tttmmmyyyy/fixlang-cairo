@@ -1,10 +1,10 @@
-proj_file_hash = "9583e9f631d36531fd99b34d959d1e75"
+proj_file_hash = "087dd77d61c462fed8d06587a8761abc"
 
 [[dependencies]]
 name = "math"
-version = "0.1.2"
-path = ".fixlang/deps/math_0.1.2"
+version = "1.0.0"
+path = ".fixlang/deps/math_1.0.0"
 
 [dependencies.git]
 repo = "https://github.com/tttmmmyyyy/fixlang-math.git"
-rev = "ea7ee41420c8531786d20ccb6ca93f23b0a828c9"
+rev = "6b1c3810d49d0291c2a800f783be38138cf4381d"
