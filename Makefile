@@ -1,6 +1,6 @@
-# For Apple Silicon macOS, where cairo, X11 and Xext are installed via Homebrew for arm64.
-# INCLUDE := -I/opt/homebrew/opt/cairo/include/cairo -I/opt/homebrew/opt/libx11/include
-# LIBPATH := -L/opt/homebrew/opt/cairo/lib -L/opt/homebrew/opt/libx11/lib -L/opt/homebrew/Cellar/libxext/1.3.6/lib
+# For macOS, you need to install cairo and libx11, libext by homebrew, and install XQuartz.
+# INCLUDE := -I/opt/homebrew/opt/cairo/include/cairo -I/opt/homebrew/opt/libx11/include -I/usr/X11/include
+# LIBPATH := -L/opt/homebrew/opt/cairo/lib -L/opt/homebrew/opt/libx11/lib
 
 # For Linux:
 INCLUDE := `pkg-config cairo --cflags` `pkg-config x11 --cflags`

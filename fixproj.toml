@@ -7,7 +7,16 @@ files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
 objects = ["cairo.xlib_surface.o"]
 dynamic_links = ["cairo", "X11", "Xext"]
 preliminary_commands = [["make", "cairo.xlib_surface.o"]]
+
+# For linux,
 library_paths = ["."]
+
+# For macOS,
+# library_paths = [
+#     ".",
+#     "/opt/homebrew/opt/cairo/lib",
+#     "/opt/homebrew/opt/libx11/lib",
+# ]
 
 [[dependencies]]
 name = "math"
