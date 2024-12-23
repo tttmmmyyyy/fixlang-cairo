@@ -7,9 +7,9 @@ path = "../../"
 
 [[dependencies]]
 name = "math"
-version = "0.1.3"
-path = ".fixlang/deps/math_0.1.3"
+version = "1.0.0"
+path = ".fixlang/deps/math_1.0.0"
 
 [dependencies.git]
 repo = "https://github.com/tttmmmyyyy/fixlang-math.git"
-rev = "ba88096dc2740c9e46542c449e2aef3b19cffe34"
+rev = "6b1c3810d49d0291c2a800f783be38138cf4381d"

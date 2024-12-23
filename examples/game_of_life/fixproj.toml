@@ -1,6 +1,6 @@
 [general]
 name = "game-of-life"
-version = "0.1.1"
+version = "0.1.2"
 
 [build]
 files = ["main.fix"]
@@ -13,11 +13,11 @@ path = "../../"
 
 [[dependencies]]
 name = "time"
-version = "0.2.5"
+version = "1.0.0"
 git = { url = "https://github.com/tttmmmyyyy/fixlang-time.git" }
 
 
 [[dependencies]]
 name = "random"
-version = "0.1.1"
+version = "1.0.0"
 git = { url = "https://github.com/tttmmmyyyy/fixlang-random.git" }
