@@ -2,7 +2,7 @@ proj_file_hash = "30fd27a368d7697f52f9e97760b678af"
 
 [[dependencies]]
 name = "cairo-fix"
-version = "0.1.7"
+version = "0.1.8"
 path = "../../"
 
 [[dependencies]]
