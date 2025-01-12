@@ -6,8 +6,14 @@ version = "0.1.8"
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
 objects = ["cairo.xlib_surface.o"]
 preliminary_commands = [
-    ["make", "cairo.xlib_surface.o"],
-    ["/bin/sh", "linker_options.sh"]
+    [
+        "make",
+        "cairo.xlib_surface.o",
+    ],
+    [
+        "/bin/sh",
+        "linker_options.sh",
+    ],
 ]
 
 [[dependencies]]
