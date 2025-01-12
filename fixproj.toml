@@ -5,15 +5,10 @@ version = "0.1.8"
 [build]
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
 objects = ["cairo.xlib_surface.o"]
-dynamic_links = ["cairo", "X11", "Xext"]
-preliminary_commands = [["make", "cairo.xlib_surface.o"]]
-
-# For MacOS: 
-# library_paths = [
-#     "/opt/homebrew/opt/cairo/lib",
-#     "/opt/homebrew/opt/libx11/lib",
-#     "/opt/homebrew/Cellar/libxext/1.3.6/lib"
-# ]
+preliminary_commands = [
+    ["make", "cairo.xlib_surface.o"],
+    ["/bin/sh", "linker_options.sh"]
+]
 
 [[dependencies]]
 name = "math"
