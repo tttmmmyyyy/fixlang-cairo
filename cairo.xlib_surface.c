@@ -1,6 +1,6 @@
 #include <X11/Xlib.h>
-#include <cairo/cairo-xlib.h>
 #include <X11/extensions/Xdbe.h>
+#include <cairo-xlib.h>
 #include <cairo.h>
 #include <stdlib.h>
 
