@@ -14,7 +14,7 @@ main = (
     cairo.move_to((10.0, 50.0));;
     cairo.show_text("Hello world!");;
 
-    surface.write_to_png(Path::parse("hello.png").as_some);;
+    surface.write_to_png("hello.png");;
 
     pure()
 );
