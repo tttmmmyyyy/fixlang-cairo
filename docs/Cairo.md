@@ -8,7 +8,7 @@
 
 ### `type Cairo = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::CairoHandle`
 
 ### `type CairoHandle = Std::Ptr`
 
@@ -34,11 +34,11 @@
 
 ### `type FontFace = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::FontFace::FontFaceHandle`
 
 ### `type FontOptions = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::FontOptions::FontOptionsHandle`
 
 ### `type FontSlant = Std::I32`
 
@@ -84,11 +84,11 @@
 
 ### `type Path = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::Path::PathHandle`
 
 ### `type Pattern = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::Pattern::PatternHandle`
 
 ### `type PatternType = Std::I32`
 
@@ -104,15 +104,15 @@
 
 ### `type RectangleList = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::RectangleList::RectangleListHandle`
 
 ### `type Region = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::Region::RegionHandle`
 
 ### `type ScaledFont = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::ScaledFont::ScaledFontHandle`
 
 ### `type Status = Std::I32`
 
@@ -120,7 +120,7 @@
 
 ### `type Surface = unbox struct { ...fields... }`
 
-#### field `_dtor : Std::FFI::Destructor Std::Ptr`
+#### field `_dtor : Std::FFI::Destructor Cairo::Surface::SurfaceHandle`
 
 ### `type TextCluster = unbox struct { ...fields... }`
 
@@ -184,9 +184,9 @@
 
 ## `namespace Cairo`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::Cairo -> a`
+### `_borrow : (Cairo::CairoHandle -> a) -> Cairo::Cairo -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Cairo -> Std::IO a`
+### `_borrow_io : (Cairo::CairoHandle -> Std::IO a) -> Cairo::Cairo -> Std::IO a`
 
 ### `append_path : Cairo::Path -> Cairo::Cairo -> Std::IO ()`
 
@@ -226,7 +226,7 @@
 
 ### `font_extents : Cairo::Cairo -> Std::IO Cairo::FontExtents`
 
-### `get_antialias : Cairo::Cairo -> Std::IO Std::I32`
+### `get_antialias : Cairo::Cairo -> Std::IO Cairo::Antialias`
 
 ### `get_current_point : Cairo::Cairo -> Std::IO (Std::F64, Std::F64)`
 
@@ -234,7 +234,7 @@
 
 ### `get_dash_count : Cairo::Cairo -> Std::IO Std::I64`
 
-### `get_fill_rule : Cairo::Cairo -> Std::IO Std::I32`
+### `get_fill_rule : Cairo::Cairo -> Std::IO Cairo::FillRule`
 
 ### `get_font_face : Cairo::Cairo -> Std::IO Cairo::FontFace`
 
@@ -246,9 +246,9 @@
 
 ### `get_hairline : Cairo::Cairo -> Std::IO Std::Bool`
 
-### `get_line_cap : Cairo::Cairo -> Std::IO Std::I32`
+### `get_line_cap : Cairo::Cairo -> Std::IO Cairo::LineCap`
 
-### `get_line_join : Cairo::Cairo -> Std::IO Std::I32`
+### `get_line_join : Cairo::Cairo -> Std::IO Cairo::LineJoin`
 
 ### `get_line_width : Cairo::Cairo -> Std::IO Std::F64`
 
@@ -256,7 +256,7 @@
 
 ### `get_miter_limit : Cairo::Cairo -> Std::IO Std::F64`
 
-### `get_operator : Cairo::Cairo -> Std::IO Std::I32`
+### `get_operator : Cairo::Cairo -> Std::IO Cairo::Operator`
 
 ### `get_scaled_font : Cairo::Cairo -> Std::IO Cairo::ScaledFont`
 
@@ -304,7 +304,7 @@
 
 ### `push_group : Cairo::Cairo -> Std::IO ()`
 
-### `push_group_with_content : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `push_group_with_content : Cairo::Content -> Cairo::Cairo -> Std::IO ()`
 
 ### `rectangle : (Std::F64, Std::F64) -> (Std::F64, Std::F64) -> Cairo::Cairo -> Std::IO ()`
 
@@ -324,13 +324,13 @@
 
 ### `scale : (Std::F64, Std::F64) -> Cairo::Cairo -> Std::IO ()`
 
-### `select_font_face : Std::String -> Std::I32 -> Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `select_font_face : Std::String -> Cairo::FontSlant -> Cairo::FontWeight -> Cairo::Cairo -> Std::IO ()`
 
-### `set_antialias : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `set_antialias : Cairo::Antialias -> Cairo::Cairo -> Std::IO ()`
 
 ### `set_dash : Std::Array Std::F64 -> Std::F64 -> Cairo::Cairo -> Std::IO ()`
 
-### `set_fill_rule : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `set_fill_rule : Cairo::FillRule -> Cairo::Cairo -> Std::IO ()`
 
 ### `set_font_face : Cairo::FontFace -> Cairo::Cairo -> Std::IO ()`
 
@@ -342,9 +342,9 @@
 
 ### `set_hairline : Std::Bool -> Cairo::Cairo -> Std::IO ()`
 
-### `set_line_cap : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `set_line_cap : Cairo::LineCap -> Cairo::Cairo -> Std::IO ()`
 
-### `set_line_join : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `set_line_join : Cairo::LineJoin -> Cairo::Cairo -> Std::IO ()`
 
 ### `set_line_width : Std::F64 -> Cairo::Cairo -> Std::IO ()`
 
@@ -352,7 +352,7 @@
 
 ### `set_miter_limit : Std::F64 -> Cairo::Cairo -> Std::IO ()`
 
-### `set_operator : Std::I32 -> Cairo::Cairo -> Std::IO ()`
+### `set_operator : Cairo::Operator -> Cairo::Cairo -> Std::IO ()`
 
 ### `set_scaled_font : Cairo::ScaledFont -> Cairo::Cairo -> Std::IO ()`
 
@@ -372,9 +372,9 @@
 
 ### `show_text : Std::String -> Cairo::Cairo -> Std::IO ()`
 
-### `show_text_glyphs : Std::String -> Std::Array Cairo::Glyph -> Std::Array Cairo::TextCluster -> Std::U32 -> Cairo::Cairo -> Std::IO ()`
+### `show_text_glyphs : Std::String -> Std::Array Cairo::Glyph -> Std::Array Cairo::TextCluster -> Cairo::TextClusterFlags -> Cairo::Cairo -> Std::IO ()`
 
-### `status : Cairo::Cairo -> Std::IO Std::I32`
+### `status : Cairo::Cairo -> Std::IO Cairo::Status`
 
 ### `stroke : Cairo::Cairo -> Std::IO ()`
 
@@ -396,57 +396,57 @@
 
 ## `namespace Cairo::Antialias`
 
-### `best : Std::I32`
+### `best : Cairo::Antialias`
 
-### `default : Std::I32`
+### `default : Cairo::Antialias`
 
-### `fast : Std::I32`
+### `fast : Cairo::Antialias`
 
-### `good : Std::I32`
+### `good : Cairo::Antialias`
 
-### `gray : Std::I32`
+### `gray : Cairo::Antialias`
 
-### `none : Std::I32`
+### `none : Cairo::Antialias`
 
-### `subpixel : Std::I32`
+### `subpixel : Cairo::Antialias`
 
 ## `namespace Cairo::Content`
 
-### `alpha : Std::I32`
+### `alpha : Cairo::Content`
 
-### `color : Std::I32`
+### `color : Cairo::Content`
 
-### `color_alpha : Std::I32`
+### `color_alpha : Cairo::Content`
 
 ## `namespace Cairo::Extend`
 
-### `none : Std::I32`
+### `none : Cairo::Extend`
 
-### `pad : Std::I32`
+### `pad : Cairo::Extend`
 
-### `reflect : Std::I32`
+### `reflect : Cairo::Extend`
 
-### `repeat : Std::I32`
+### `repeat : Cairo::Extend`
 
 ## `namespace Cairo::FillRule`
 
-### `even_odd : Std::I32`
+### `even_odd : Cairo::FillRule`
 
-### `winding : Std::I32`
+### `winding : Cairo::FillRule`
 
 ## `namespace Cairo::Filter`
 
-### `best : Std::I32`
+### `best : Cairo::Filter`
 
-### `bilinear : Std::I32`
+### `bilinear : Cairo::Filter`
 
-### `fast : Std::I32`
+### `fast : Cairo::Filter`
 
-### `gaussian : Std::I32`
+### `gaussian : Cairo::Filter`
 
-### `good : Std::I32`
+### `good : Cairo::Filter`
 
-### `nearest : Std::I32`
+### `nearest : Cairo::Filter`
 
 ## `namespace Cairo::FontExtents`
 
@@ -458,37 +458,37 @@
 
 ## `namespace Cairo::FontFace`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::FontFace -> a`
+### `_borrow : (Cairo::FontFace::FontFaceHandle -> a) -> Cairo::FontFace -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::FontFace -> Std::IO a`
+### `_borrow_io : (Cairo::FontFace::FontFaceHandle -> Std::IO a) -> Cairo::FontFace -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::FontFace`
+### `_create_from_handle : Cairo::FontFace::FontFaceHandle -> Cairo::FontFace`
 
-### `get_type : Cairo::FontFace -> Std::I32`
+### `get_type : Cairo::FontFace -> Cairo::FontType`
 
-### `status : Cairo::FontFace -> Std::I32`
+### `status : Cairo::FontFace -> Cairo::Status`
 
 ## `namespace Cairo::FontOptions`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::FontOptions -> a`
+### `_borrow : (Cairo::FontOptions::FontOptionsHandle -> a) -> Cairo::FontOptions -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::FontOptions -> Std::IO a`
+### `_borrow_io : (Cairo::FontOptions::FontOptionsHandle -> Std::IO a) -> Cairo::FontOptions -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::FontOptions`
+### `_create_from_handle : Cairo::FontOptions::FontOptionsHandle -> Cairo::FontOptions`
 
-### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::FontOptions -> (Cairo::FontOptions, a)`
+### `_mutate : (Cairo::FontOptions::FontOptionsHandle -> Std::IO a) -> Cairo::FontOptions -> (Cairo::FontOptions, a)`
 
 ### `default : Cairo::FontOptions`
 
 ### `equal : Cairo::FontOptions -> Cairo::FontOptions -> Std::Bool`
 
-### `get_antialias : Cairo::FontOptions -> Std::I32`
+### `get_antialias : Cairo::FontOptions -> Cairo::Antialias`
 
-### `get_hint_metrics : Cairo::FontOptions -> Std::I32`
+### `get_hint_metrics : Cairo::FontOptions -> Cairo::HintMetrics`
 
-### `get_hint_style : Cairo::FontOptions -> Std::I32`
+### `get_hint_style : Cairo::FontOptions -> Cairo::HintStyle`
 
-### `get_subpixel_order : Cairo::FontOptions -> Std::I32`
+### `get_subpixel_order : Cairo::FontOptions -> Cairo::SubpixelOrder`
 
 ### `get_variations : Cairo::FontOptions -> Std::String`
 
@@ -496,93 +496,95 @@
 
 ### `merge : Cairo::FontOptions -> Cairo::FontOptions -> Cairo::FontOptions`
 
-### `set_antialias : Std::I32 -> Cairo::FontOptions -> Cairo::FontOptions`
+### `set_antialias : Cairo::Antialias -> Cairo::FontOptions -> Cairo::FontOptions`
 
-### `set_hint_metrics : Std::I32 -> Cairo::FontOptions -> Cairo::FontOptions`
+### `set_hint_metrics : Cairo::HintMetrics -> Cairo::FontOptions -> Cairo::FontOptions`
 
-### `set_hint_style : Std::I32 -> Cairo::FontOptions -> Cairo::FontOptions`
+### `set_hint_style : Cairo::HintStyle -> Cairo::FontOptions -> Cairo::FontOptions`
 
-### `set_subpixel_order : Std::I32 -> Cairo::FontOptions -> Cairo::FontOptions`
+### `set_subpixel_order : Cairo::SubpixelOrder -> Cairo::FontOptions -> Cairo::FontOptions`
 
 ### `set_variations : Std::String -> Cairo::FontOptions -> Cairo::FontOptions`
 
-### `status : Cairo::FontOptions -> Std::I32`
+### `status : Cairo::FontOptions -> Cairo::Status`
 
 ## `namespace Cairo::FontSlant`
 
-### `italic : Std::I32`
+### `italic : Cairo::FontSlant`
 
-### `normal : Std::I32`
+### `normal : Cairo::FontSlant`
 
-### `oblique : Std::I32`
+### `oblique : Cairo::FontSlant`
 
 ## `namespace Cairo::FontType`
 
-### `ft : Std::I32`
+### `ft : Cairo::FontType`
 
-### `quartz : Std::I32`
+### `quartz : Cairo::FontType`
 
-### `toy : Std::I32`
+### `toy : Cairo::FontType`
 
-### `user : Std::I32`
+### `user : Cairo::FontType`
 
-### `win32 : Std::I32`
+### `win32 : Cairo::FontType`
 
 ## `namespace Cairo::FontWeight`
 
-### `bold : Std::I32`
+### `bold : Cairo::FontWeight`
 
-### `normal : Std::I32`
+### `normal : Cairo::FontWeight`
 
 ## `namespace Cairo::Format`
 
-### `a1 : Std::I32`
+### `a1 : Cairo::Format`
 
-### `a8 : Std::I32`
+### `a8 : Cairo::Format`
 
-### `argb : Std::I32`
+### `argb : Cairo::Format`
 
-### `rgb16_565 : Std::I32`
+### `rgb16_565 : Cairo::Format`
 
-### `rgb24 : Std::I32`
+### `rgb24 : Cairo::Format`
 
 ### `rgb30 : Std::I32`
 
+### `stride_for_width : Cairo::Format -> Std::I32 -> Std::I32`
+
 ## `namespace Cairo::HintMetrics`
 
-### `default : Std::I32`
+### `default : Cairo::HintMetrics`
 
-### `off : Std::I32`
+### `off : Cairo::HintMetrics`
 
-### `on : Std::I32`
+### `on : Cairo::HintMetrics`
 
 ## `namespace Cairo::HintStyle`
 
-### `default : Std::I32`
+### `default : Cairo::HintStyle`
 
-### `full : Std::I32`
+### `full : Cairo::HintStyle`
 
-### `medium : Std::I32`
+### `medium : Cairo::HintStyle`
 
-### `none : Std::I32`
+### `none : Cairo::HintStyle`
 
-### `slight : Std::I32`
+### `slight : Cairo::HintStyle`
 
 ## `namespace Cairo::LineCap`
 
-### `butt : Std::I32`
+### `butt : Cairo::LineCap`
 
-### `round : Std::I32`
+### `round : Cairo::LineCap`
 
-### `square : Std::I32`
+### `square : Cairo::LineCap`
 
 ## `namespace Cairo::LineJoin`
 
-### `bevel : Std::I32`
+### `bevel : Cairo::LineJoin`
 
-### `miter : Std::I32`
+### `miter : Cairo::LineJoin`
 
-### `round : Std::I32`
+### `round : Cairo::LineJoin`
 
 ## `namespace Cairo::Matrix`
 
@@ -618,87 +620,87 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ## `namespace Cairo::Operator`
 
-### `add : Std::I32`
+### `add : Cairo::Operator`
 
-### `atop : Std::I32`
+### `atop : Cairo::Operator`
 
-### `clear : Std::I32`
+### `clear : Cairo::Operator`
 
-### `color_burn : Std::I32`
+### `color_burn : Cairo::Operator`
 
-### `color_dodge : Std::I32`
+### `color_dodge : Cairo::Operator`
 
-### `darken : Std::I32`
+### `darken : Cairo::Operator`
 
-### `dest : Std::I32`
+### `dest : Cairo::Operator`
 
-### `dest_atop : Std::I32`
+### `dest_atop : Cairo::Operator`
 
-### `dest_in : Std::I32`
+### `dest_in : Cairo::Operator`
 
-### `dest_out : Std::I32`
+### `dest_out : Cairo::Operator`
 
-### `dest_over : Std::I32`
+### `dest_over : Cairo::Operator`
 
-### `difference : Std::I32`
+### `difference : Cairo::Operator`
 
-### `exclusion : Std::I32`
+### `exclusion : Cairo::Operator`
 
-### `hard_light : Std::I32`
+### `hard_light : Cairo::Operator`
 
-### `hsl_color : Std::I32`
+### `hsl_color : Cairo::Operator`
 
-### `hsl_hue : Std::I32`
+### `hsl_hue : Cairo::Operator`
 
-### `hsl_luminosity : Std::I32`
+### `hsl_luminosity : Cairo::Operator`
 
-### `hsl_saturation : Std::I32`
+### `hsl_saturation : Cairo::Operator`
 
-### `in_ : Std::I32`
+### `in_ : Cairo::Operator`
 
-### `lighten : Std::I32`
+### `lighten : Cairo::Operator`
 
-### `multiply : Std::I32`
+### `multiply : Cairo::Operator`
 
-### `out : Std::I32`
+### `out : Cairo::Operator`
 
-### `over : Std::I32`
+### `over : Cairo::Operator`
 
-### `overlay : Std::I32`
+### `overlay : Cairo::Operator`
 
-### `saturate : Std::I32`
+### `saturate : Cairo::Operator`
 
-### `screen : Std::I32`
+### `screen : Cairo::Operator`
 
-### `soft_light : Std::I32`
+### `soft_light : Cairo::Operator`
 
-### `source : Std::I32`
+### `source : Cairo::Operator`
 
-### `xor : Std::I32`
+### `xor : Cairo::Operator`
 
 ## `namespace Cairo::Overlap`
 
-### `in_ : Std::I32`
+### `in_ : Cairo::Overlap`
 
-### `out : Std::I32`
+### `out : Cairo::Overlap`
 
-### `part : Std::I32`
+### `part : Cairo::Overlap`
 
 ## `namespace Cairo::Path`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::Path -> a`
+### `_borrow : (Cairo::Path::PathHandle -> a) -> Cairo::Path -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Path -> Std::IO a`
+### `_borrow_io : (Cairo::Path::PathHandle -> Std::IO a) -> Cairo::Path -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::Path`
+### `_create_from_handle : Cairo::Path::PathHandle -> Cairo::Path`
 
 ## `namespace Cairo::Pattern`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::Pattern -> a`
+### `_borrow : (Cairo::Pattern::PatternHandle -> a) -> Cairo::Pattern -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Pattern -> Std::IO a`
+### `_borrow_io : (Cairo::Pattern::PatternHandle -> Std::IO a) -> Cairo::Pattern -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::Pattern`
+### `_create_from_handle : Cairo::Pattern::PatternHandle -> Cairo::Pattern`
 
 ### `add_color_stop_rgb : Std::F64 -> (Std::F64, Std::F64, Std::F64) -> Cairo::Pattern -> Std::IO ()`
 
@@ -718,27 +720,27 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ### `get_color_stop_count : Cairo::Pattern -> Std::IO Std::I64`
 
-### `get_color_stop_rgba : Std::I32 -> Cairo::Pattern -> Std::IO (Std::Result Std::I32 (Std::F64, Std::F64, Std::F64, Std::F64))`
+### `get_color_stop_rgba : Std::I32 -> Cairo::Pattern -> Std::IO (Std::Result Cairo::Status (Std::F64, Std::F64, Std::F64, Std::F64))`
 
-### `get_extend : Cairo::Pattern -> Std::IO Std::I32`
+### `get_extend : Cairo::Pattern -> Std::IO Cairo::Extend`
 
-### `get_filter : Cairo::Pattern -> Std::IO Std::I32`
+### `get_filter : Cairo::Pattern -> Std::IO Cairo::Filter`
 
-### `get_linear_points : Cairo::Pattern -> Std::IO (Std::Result Std::I32 ((Std::F64, Std::F64), (Std::F64, Std::F64)))`
+### `get_linear_points : Cairo::Pattern -> Std::IO (Std::Result Cairo::Status ((Std::F64, Std::F64), (Std::F64, Std::F64)))`
 
 ### `get_matrix : Cairo::Pattern -> Std::IO Cairo::Matrix`
 
-### `get_radial_circles : Cairo::Pattern -> Std::IO (Std::Result Std::I32 ((Std::F64, Std::F64, Std::F64), (Std::F64, Std::F64, Std::F64)))`
+### `get_radial_circles : Cairo::Pattern -> Std::IO (Std::Result Cairo::Status ((Std::F64, Std::F64, Std::F64), (Std::F64, Std::F64, Std::F64)))`
 
-### `get_rgba : Cairo::Pattern -> Std::IO (Std::Result Std::I32 (Std::F64, Std::F64, Std::F64, Std::F64))`
+### `get_rgba : Cairo::Pattern -> Std::IO (Std::Result Cairo::Status (Std::F64, Std::F64, Std::F64, Std::F64))`
 
-### `get_surface : Cairo::Pattern -> Std::IO (Std::Result Std::I32 Cairo::Surface)`
+### `get_surface : Cairo::Pattern -> Std::IO (Std::Result Cairo::Status Cairo::Surface)`
 
-### `get_type : Cairo::Pattern -> Std::IO Std::I32`
+### `get_type : Cairo::Pattern -> Std::IO Cairo::PatternType`
 
-### `linear : Std::I32`
+### `linear : Cairo::PatternType`
 
-### `mesh : Std::I32`
+### `mesh : Cairo::PatternType`
 
 ### `mesh_begin_patch : Cairo::Pattern -> Std::IO ()`
 
@@ -746,11 +748,11 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ### `mesh_end_patch : Cairo::Pattern -> Std::IO ()`
 
-### `mesh_get_control_point : Std::I64 -> Cairo::Pattern -> Std::IO (Std::Result Std::I32 (Std::F64, Std::F64))`
+### `mesh_get_control_point : Std::I64 -> Cairo::Pattern -> Std::IO (Std::Result Cairo::Status (Std::F64, Std::F64))`
 
-### `mesh_get_corner_color_rgba : Std::I64 -> Cairo::Pattern -> Std::IO (Std::Result Std::I32 (Std::F64, Std::F64, Std::F64, Std::F64))`
+### `mesh_get_corner_color_rgba : Std::I64 -> Cairo::Pattern -> Std::IO (Std::Result Cairo::Status (Std::F64, Std::F64, Std::F64, Std::F64))`
 
-### `mesh_get_patch_count : Cairo::Pattern -> Std::IO (Std::Result Std::I32 Std::I64)`
+### `mesh_get_patch_count : Cairo::Pattern -> Std::IO (Std::Result Cairo::Status Std::I64)`
 
 ### `mesh_get_path : Std::I64 -> Cairo::Pattern -> Std::IO Cairo::Path`
 
@@ -764,21 +766,21 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ### `mesh_set_corner_color_rgba : Std::I64 -> (Std::F64, Std::F64, Std::F64, Std::F64) -> Cairo::Pattern -> Std::IO ()`
 
-### `radial : Std::I32`
+### `radial : Cairo::PatternType`
 
-### `raster_source : Std::I32`
+### `raster_source : Cairo::PatternType`
 
-### `set_extend : Std::I32 -> Cairo::Pattern -> Std::IO ()`
+### `set_extend : Cairo::Extend -> Cairo::Pattern -> Std::IO ()`
 
-### `set_filter : Std::I32 -> Cairo::Pattern -> Std::IO ()`
+### `set_filter : Cairo::Filter -> Cairo::Pattern -> Std::IO ()`
 
 ### `set_matrix : Cairo::Matrix -> Cairo::Pattern -> Std::IO ()`
 
-### `solid : Std::I32`
+### `solid : Cairo::PatternType`
 
-### `status : Cairo::Pattern -> Std::IO Std::I32`
+### `status : Cairo::Pattern -> Std::IO Cairo::Status`
 
-### `surface : Std::I32`
+### `surface : Cairo::PatternType`
 
 ## `namespace Cairo::RectangleInt`
 
@@ -788,23 +790,23 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ## `namespace Cairo::RectangleList`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::RectangleList -> a`
+### `_borrow : (Cairo::RectangleList::RectangleListHandle -> a) -> Cairo::RectangleList -> a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::RectangleList`
+### `_create_from_handle : Cairo::RectangleList::RectangleListHandle -> Cairo::RectangleList`
 
 ## `namespace Cairo::Region`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::Region -> a`
+### `_borrow : (Cairo::Region::RegionHandle -> a) -> Cairo::Region -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Region -> Std::IO a`
+### `_borrow_io : (Cairo::Region::RegionHandle -> Std::IO a) -> Cairo::Region -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::Region`
+### `_create_from_handle : Cairo::Region::RegionHandle -> Cairo::Region`
 
-### `_mutate : (Std::Ptr -> Std::IO a) -> Cairo::Region -> (Cairo::Region, a)`
+### `_mutate : (Cairo::Region::RegionHandle -> Std::IO a) -> Cairo::Region -> (Cairo::Region, a)`
 
 ### `contains_point : (Std::I32, Std::I32) -> Cairo::Region -> Std::Bool`
 
-### `contains_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::I32`
+### `contains_rectangle : Cairo::RectangleInt -> Cairo::Region -> Cairo::Overlap`
 
 ### `create : Cairo::Region`
 
@@ -818,37 +820,37 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ### `get_rectangle : Std::I32 -> Cairo::Region -> Cairo::RectangleInt`
 
-### `intersect : Cairo::Region -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `intersect : Cairo::Region -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
-### `intersect_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `intersect_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
 ### `is_empty : Cairo::Region -> Std::Bool`
 
 ### `num_rectangles : Cairo::Region -> Std::I32`
 
-### `status : Cairo::Region -> Std::I32`
+### `status : Cairo::Region -> Cairo::Status`
 
-### `subtract : Cairo::Region -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `subtract : Cairo::Region -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
-### `subtract_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `subtract_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
 ### `translate : (Std::I32, Std::I32) -> Cairo::Region -> Cairo::Region`
 
-### `union_ : Cairo::Region -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `union_ : Cairo::Region -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
-### `union_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `union_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
-### `xor : Cairo::Region -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `xor : Cairo::Region -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
-### `xor_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Std::I32 Cairo::Region`
+### `xor_rectangle : Cairo::RectangleInt -> Cairo::Region -> Std::Result Cairo::Status Cairo::Region`
 
 ## `namespace Cairo::ScaledFont`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::ScaledFont -> a`
+### `_borrow : (Cairo::ScaledFont::ScaledFontHandle -> a) -> Cairo::ScaledFont -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::ScaledFont -> Std::IO a`
+### `_borrow_io : (Cairo::ScaledFont::ScaledFontHandle -> Std::IO a) -> Cairo::ScaledFont -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::ScaledFont`
+### `_create_from_handle : Cairo::ScaledFont::ScaledFontHandle -> Cairo::ScaledFont`
 
 ### `extents : Cairo::ScaledFont -> Cairo::FontExtents`
 
@@ -862,113 +864,117 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ### `get_scale_matrix : Cairo::ScaledFont -> Cairo::Matrix`
 
-### `get_type : Cairo::ScaledFont -> Std::I32`
+### `get_type : Cairo::ScaledFont -> Cairo::FontType`
 
 ### `glyph_extents : Std::Array Cairo::Glyph -> Cairo::ScaledFont -> Cairo::TextExtents`
 
-### `status : Cairo::ScaledFont -> Std::I32`
+### `status : Cairo::ScaledFont -> Cairo::Status`
 
 ### `text_extents : Std::String -> Cairo::ScaledFont -> Cairo::TextExtents`
 
 ## `namespace Cairo::Status`
 
-### `clip_not_representable : Std::I32`
+### `clip_not_representable : Cairo::Status`
 
-### `device_error : Std::I32`
+### `device_error : Cairo::Status`
 
-### `device_type_mismatch : Std::I32`
+### `device_type_mismatch : Cairo::Status`
 
-### `file_not_found : Std::I32`
+### `file_not_found : Cairo::Status`
 
-### `font_type_mismatch : Std::I32`
+### `font_type_mismatch : Cairo::Status`
 
-### `invalid_clusters : Std::I32`
+### `invalid_clusters : Cairo::Status`
 
-### `invalid_content : Std::I32`
+### `invalid_content : Cairo::Status`
 
-### `invalid_dash : Std::I32`
+### `invalid_dash : Cairo::Status`
 
-### `invalid_dsc_comment : Std::I32`
+### `invalid_dsc_comment : Cairo::Status`
 
-### `invalid_format : Std::I32`
+### `invalid_format : Cairo::Status`
 
-### `invalid_index : Std::I32`
+### `invalid_index : Cairo::Status`
 
-### `invalid_matrix : Std::I32`
+### `invalid_matrix : Cairo::Status`
 
-### `invalid_path_data : Std::I32`
+### `invalid_path_data : Cairo::Status`
 
-### `invalid_pop_group : Std::I32`
+### `invalid_pop_group : Cairo::Status`
 
-### `invalid_restore : Std::I32`
+### `invalid_restore : Cairo::Status`
 
-### `invalid_size : Std::I32`
+### `invalid_size : Cairo::Status`
 
-### `invalid_slant : Std::I32`
+### `invalid_slant : Cairo::Status`
 
-### `invalid_status : Std::I32`
+### `invalid_status : Cairo::Status`
 
-### `invalid_stride : Std::I32`
+### `invalid_stride : Cairo::Status`
 
-### `invalid_string : Std::I32`
+### `invalid_string : Cairo::Status`
 
-### `invalid_visual : Std::I32`
+### `invalid_visual : Cairo::Status`
 
-### `invalid_weight : Std::I32`
+### `invalid_weight : Cairo::Status`
 
-### `negative_count : Std::I32`
+### `negative_count : Cairo::Status`
 
-### `no_current_point : Std::I32`
+### `no_current_point : Cairo::Status`
 
-### `no_memory : Std::I32`
+### `no_memory : Cairo::Status`
 
-### `null_pointer : Std::I32`
+### `null_pointer : Cairo::Status`
 
-### `pattern_type_mismatch : Std::I32`
+### `pattern_type_mismatch : Cairo::Status`
 
-### `read_error : Std::I32`
+### `read_error : Cairo::Status`
 
-### `success : Std::I32`
+### `success : Cairo::Status`
 
-### `surface_finished : Std::I32`
+### `surface_finished : Cairo::Status`
 
-### `surface_type_mismatch : Std::I32`
+### `surface_type_mismatch : Cairo::Status`
 
-### `temp_file_error : Std::I32`
+### `temp_file_error : Cairo::Status`
 
-### `user_font_error : Std::I32`
+### `user_font_error : Cairo::Status`
 
-### `user_font_immutable : Std::I32`
+### `user_font_immutable : Cairo::Status`
 
-### `user_font_not_implemented : Std::I32`
+### `user_font_not_implemented : Cairo::Status`
 
-### `write_error : Std::I32`
+### `write_error : Cairo::Status`
 
 ## `namespace Cairo::SubpixelOrder`
 
-### `bgr : Std::I32`
+### `bgr : Cairo::SubpixelOrder`
 
-### `default : Std::I32`
+### `default : Cairo::SubpixelOrder`
 
-### `rgb : Std::I32`
+### `rgb : Cairo::SubpixelOrder`
 
-### `vbgr : Std::I32`
+### `vbgr : Cairo::SubpixelOrder`
 
-### `vrgb : Std::I32`
+### `vrgb : Cairo::SubpixelOrder`
 
 ## `namespace Cairo::Surface`
 
-### `_borrow : (Std::Ptr -> a) -> Cairo::Surface -> a`
+### `_borrow : (Cairo::Surface::SurfaceHandle -> a) -> Cairo::Surface -> a`
 
-### `_borrow_io : (Std::Ptr -> Std::IO a) -> Cairo::Surface -> Std::IO a`
+### `_borrow_io : (Cairo::Surface::SurfaceHandle -> Std::IO a) -> Cairo::Surface -> Std::IO a`
 
-### `_create_from_handle : Std::Ptr -> Cairo::Surface`
+### `_create_from_handle : Cairo::Surface::SurfaceHandle -> Cairo::Surface`
+
+### `flush : Cairo::Surface -> Std::IO ()`
+
+### `mark_dirty : Cairo::Surface -> Std::IO ()`
 
 ### `write_to_png : Std::Path -> Cairo::Surface -> Std::IO ()`
 
 ## `namespace Cairo::TextClusterFlags`
 
-### `backward : Std::U32`
+### `backward : Cairo::TextClusterFlags`
 
 ## `namespace Cairo::TextExtents`
 
@@ -980,10 +986,10 @@ The transformation b.multiply(a) first applies the transformation a to the point
 
 ## `namespace Cairo::ToyFontFace`
 
-### `create : Std::String -> Std::I32 -> Std::I32 -> Cairo::FontFace`
+### `create : Std::String -> Cairo::FontSlant -> Cairo::FontWeight -> Cairo::FontFace`
 
 ### `get_family : Cairo::FontFace -> Std::String`
 
-### `get_slant : Cairo::FontFace -> Std::I32`
+### `get_slant : Cairo::FontFace -> Cairo::FontSlant`
 
-### `get_weight : Cairo::FontFace -> Std::I32`
+### `get_weight : Cairo::FontFace -> Cairo::FontWeight`

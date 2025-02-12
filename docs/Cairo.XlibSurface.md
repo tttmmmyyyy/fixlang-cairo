@@ -36,9 +36,9 @@
 
 ### `type Window = box struct { ...fields... }`
 
-#### field `_display : Std::Ptr`
+#### field `_display : Cairo.XlibSurface::DisplayHandle`
 
-#### field `_window_id : Std::U64`
+#### field `_window_id : Cairo.XlibSurface::WindowId`
 
 #### field `width : Std::I32`
 
@@ -198,19 +198,19 @@
 
 ### `destroy_window : Cairo.XlibSurface::Window -> Std::IO ()`
 
-### `events_queued : Std::I32 -> Cairo.XlibSurface::Window -> Std::IO Std::I64`
+### `events_queued : Cairo.XlibSurface::QueuedMode -> Cairo.XlibSurface::Window -> Std::IO Std::I64`
 
 ### `flush : Cairo.XlibSurface::Window -> Std::IO ()`
 
-### `keycode_to_keysym : Std::U32 -> Cairo.XlibSurface::Window -> Std::IO Std::U64`
+### `keycode_to_keysym : Cairo.XlibSurface::KeyCode -> Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::KeySym`
 
 ### `next_event : Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::Event`
 
-### `select_input : Std::U64 -> Cairo.XlibSurface::Window -> Std::IO ()`
+### `select_input : Cairo.XlibSurface::EventMask -> Cairo.XlibSurface::Window -> Std::IO ()`
 
-### `string_to_keysym : Std::String -> Std::U64`
+### `string_to_keysym : Std::String -> Cairo.XlibSurface::KeySym`
 
-### `swap_buffers : Std::U8 -> Cairo.XlibSurface::Window -> Std::IO ()`
+### `swap_buffers : Cairo.XlibSurface::XbeSwapAction -> Cairo.XlibSurface::Window -> Std::IO ()`
 
 ## `namespace Cairo.XlibSurface::Event`
 
@@ -250,34 +250,34 @@
 
 ## `namespace Cairo.XlibSurface::EventMask`
 
-### `button_press : Std::U64`
+### `button_press : Cairo.XlibSurface::EventMask`
 
-### `button_release : Std::U64`
+### `button_release : Cairo.XlibSurface::EventMask`
 
-### `exposure : Std::U64`
+### `exposure : Cairo.XlibSurface::EventMask`
 
-### `key_press : Std::U64`
+### `key_press : Cairo.XlibSurface::EventMask`
 
-### `key_release : Std::U64`
+### `key_release : Cairo.XlibSurface::EventMask`
 
-### `pointer_motion : Std::U64`
+### `pointer_motion : Cairo.XlibSurface::EventMask`
 
-### `structure_notify : Std::U64`
+### `structure_notify : Cairo.XlibSurface::EventMask`
 
 ## `namespace Cairo.XlibSurface::QueuedMode`
 
-### `after_flush : Std::I32`
+### `after_flush : Cairo.XlibSurface::QueuedMode`
 
-### `already : Std::I32`
+### `already : Cairo.XlibSurface::QueuedMode`
 
-### `reading : Std::I32`
+### `reading : Cairo.XlibSurface::QueuedMode`
 
 ## `namespace Cairo.XlibSurface::XbeSwapAction`
 
-### `background : Std::U8`
+### `background : Cairo.XlibSurface::XbeSwapAction`
 
-### `copied : Std::U8`
+### `copied : Cairo.XlibSurface::XbeSwapAction`
 
-### `undefined : Std::U8`
+### `undefined : Cairo.XlibSurface::XbeSwapAction`
 
-### `untouched : Std::U8`
+### `untouched : Cairo.XlibSurface::XbeSwapAction`

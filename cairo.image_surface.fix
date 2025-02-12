@@ -1,9 +1,70 @@
 module Cairo.ImageSurface;
 
-import Cairo::{Surface, Surface::*, Format};
+import Cairo::{Surface, Surface::*, Format, Format::stride_for_width};
 
 create : Format -> (I32, I32) -> Surface;
 create = |format, (width, height)| (
     let handle = FFI_CALL[Ptr cairo_image_surface_create(I32, I32, I32), format, width, height];
     Surface::_create_from_handle(handle)
+);
+
+get_data : Surface -> IO (Array U8);
+get_data = |surface| (
+    let bytes = (
+        let format = surface.get_format;
+        let w = surface.get_width;
+        let h = surface.get_height;
+        let stride = stride_for_width(format, w);
+        stride.to_CSizeT * h.to_CSizeT
+    );
+    surface.flush;;
+    surface._borrow_io(|handle|
+        let ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
+        let (buf, _) = *Array::empty(bytes.to_I64)._unsafe_set_size(bytes.to_I64).mutate_boxed_io(|ptr|
+            FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), ptr, ptr, bytes]
+        );
+        pure $ buf
+    )
+);
+
+write_data : Array U8 -> Surface -> IO ();
+write_data = |data, surface| (
+    let bytes = (
+        let format = surface.get_format;
+        let w = surface.get_width;
+        let h = surface.get_height;
+        let stride = stride_for_width(format, w);
+        stride.to_CSizeT * h.to_CSizeT
+    );
+    if data.get_size != bytes.to_I64 {
+        undefined("Data length does not match stride * height. Here, stride can be calculated by stride_for_width function.")
+    };
+    surface._borrow_io(|handle|
+        let ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
+        data.borrow_boxed_io(|data|
+            FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), ptr, data, bytes]
+        );;
+        surface.mark_dirty
+    )
+);
+
+get_format : Surface -> Format;
+get_format = |surface| (
+    surface._borrow(|handle|
+        FFI_CALL[CInt cairo_image_surface_get_format(Ptr), handle].to_I32
+    )
+);
+
+get_width : Surface -> I32;
+get_width = |surface| (
+    surface._borrow(|handle|
+        FFI_CALL[CInt cairo_image_surface_get_width(Ptr), handle].to_I32
+    )
+);
+
+get_height : Surface -> I32;
+get_height = |surface| (
+    surface._borrow(|handle|
+        FFI_CALL[CInt cairo_image_surface_get_height(Ptr), handle].to_I32
+    )
 );

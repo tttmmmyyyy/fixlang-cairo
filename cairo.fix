@@ -811,6 +811,20 @@ namespace Surface {
             )) 
         ))
     );
+    
+    flush : Surface -> IO ();
+    flush = |surface| (
+        surface._borrow_io(|surface| (
+            FFI_CALL_IO[() cairo_surface_flush(Ptr), surface]
+        ))
+    );
+
+    mark_dirty : Surface -> IO ();
+    mark_dirty = |surface| (
+        surface._borrow_io(|surface| (
+            FFI_CALL_IO[() cairo_surface_mark_dirty(Ptr), surface]
+        ))
+    );
 }
 
 type Pattern = unbox struct { _dtor : Destructor PatternHandle };
@@ -1977,6 +1991,11 @@ namespace Format {
 
     rgb30 : I32;
     rgb30 = 5_I32;
+
+    stride_for_width : Format -> I32 -> I32;
+    stride_for_width = |format, width| (
+        FFI_CALL[I32 cairo_format_stride_for_width(I32, I32), format, width]
+    );
 }
 
 type FontSlant = I32;

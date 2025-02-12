@@ -1,0 +1,42 @@
+module Main;
+
+import Cairo;
+import Cairo.ImageSurface;
+
+size : (I64, I64);
+size = (256, 256);
+
+main : IO ();
+main = (
+    // Create an image buffer.
+    let len = size.@0 * size.@1 * 4;
+    let image = Array::fill(len, 0_U8);
+    let image = Iterator::range(0, size.@0).fold(image, |x, image| (
+        Iterator::range(0, size.@1).fold(image, |y, image| (
+            let i = (x + size.@0 * y) * 4;
+            let image = image.set(i, x.to_U8); // A
+            let image = image.set(i + 1, y.to_U8); // R
+            let image = image.set(i + 2, 0_U8); // G
+            let image = image.set(i + 3, 255_U8); // B
+            image
+        ))
+    ));
+
+    // Create the image surface from the image buffer.
+    let size_I32 = (size.@0.to_I32, size.@1.to_I32);
+    let surface = ImageSurface::create(Format::argb, size_I32);
+    surface.write_data(image);;
+
+    // Edit the image using Cairo.
+    let cairo = *Cairo::create(surface);
+    cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);;
+    cairo.set_font_size(32.0);;
+    cairo.set_source_rgb((1.0, 0.0, 0.0));;
+    cairo.move_to((10.0, 50.0));;
+    cairo.show_text("Hello world!");;
+
+    // Save the result to a file.
+    surface.write_to_png("image.png");;
+
+    pure()
+);
