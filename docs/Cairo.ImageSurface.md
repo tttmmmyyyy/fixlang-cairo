@@ -1,23 +1,23 @@
 # `module Cairo.ImageSurface`
 
-# Types and aliases
+## Types and aliases
 
-# Traits and aliases
+## Traits and aliases
 
-# Trait implementations
+## Trait implementations
 
-# Values
+## Values
 
-## `namespace Cairo.ImageSurface`
+### `namespace Cairo.ImageSurface`
 
-### `create : Cairo::Format -> (Std::I32, Std::I32) -> Cairo::Surface`
+#### `create : Cairo::Format -> (Std::I32, Std::I32) -> Cairo::Surface`
 
-### `get_data : Cairo::Surface -> Std::IO (Std::Array Std::U8)`
+#### `get_data : Cairo::Surface -> Std::IO (Std::Array Std::U8)`
 
-### `get_format : Cairo::Surface -> Cairo::Format`
+#### `get_format : Cairo::Surface -> Cairo::Format`
 
-### `get_height : Cairo::Surface -> Std::I32`
+#### `get_height : Cairo::Surface -> Std::I32`
 
-### `get_width : Cairo::Surface -> Std::I32`
+#### `get_width : Cairo::Surface -> Std::I32`
 
-### `write_data : Std::Array Std::U8 -> Cairo::Surface -> Std::IO ()`
+#### `write_data : Std::Array Std::U8 -> Cairo::Surface -> Std::IO ()`
