@@ -1265,16 +1265,23 @@ namespace Matrix {
 
     transform_distance : (F64, F64) -> Matrix -> (F64, F64);
     transform_distance = |(dx, dy), matrix| (
-        let dx = matrix.@xx * dx + matrix.@xy * dy;
-        let dy = matrix.@yx * dx + matrix.@yy * dy;
-        (dx, dy)
+        let dx1 = matrix.@xx * dx + matrix.@xy * dy;
+        let dy1 = matrix.@yx * dx + matrix.@yy * dy;
+        (dx1, dy1)
     );
 
     transform_point : (F64, F64) -> Matrix -> (F64, F64);
     transform_point = |(x, y), matrix| (
-        let x = matrix.@xx * x + matrix.@xy * y + matrix.@x0;
-        let y = matrix.@yx * x + matrix.@yy * y + matrix.@y0;
-        (x, y)
+        let x1 = matrix.@xx * x + matrix.@xy * y + matrix.@x0;
+        let y1 = matrix.@yx * x + matrix.@yy * y + matrix.@y0;
+        (x1, y1)
+    );
+
+    transform_vector : (F64, F64) -> Matrix -> (F64, F64);
+    transform_vector = |(dx, dy), matrix| (
+        let dx1 = matrix.@xx * dx + matrix.@xy * dy;
+        let dy1 = matrix.@yx * dx + matrix.@yy * dy;
+        (dx1, dy1)
     );
 }
 
