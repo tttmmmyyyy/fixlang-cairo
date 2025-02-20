@@ -127,7 +127,7 @@ main = (
     let event_mask = EventMask::button_press.bit_or(EventMask::button_release).bit_or(EventMask::pointer_motion).bit_or(EventMask::key_press);
     window.select_input(event_mask);;
     
-    let surface = XlibSurface::create_back_surface(window);
+    let surface = *XlibSurface::create_back_surface(window);
     let cairo = *Cairo::create(surface);
 
     let time = (*Time::get_now_monotonic).to_F64;

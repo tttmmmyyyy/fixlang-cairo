@@ -5,7 +5,7 @@ import Cairo.ImageSurface;
 
 main : IO ();
 main = (
-    let surface = ImageSurface::create(Format::argb, (240_I32, 80_I32));
+    let surface = *ImageSurface::create(Format::argb, (240_I32, 80_I32));
     
     let cairo = *Cairo::create(surface);
     cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);;

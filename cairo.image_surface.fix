@@ -2,10 +2,10 @@ module Cairo.ImageSurface;
 
 import Cairo::{Surface, Surface::*, Format, Format::stride_for_width};
 
-create : Format -> (I32, I32) -> Surface;
+create : Format -> (I32, I32) -> IO Surface;
 create = |format, (width, height)| (
-    let handle = FFI_CALL[Ptr cairo_image_surface_create(I32, I32, I32), format, width, height];
-    Surface::_create_from_handle(handle)
+    let handle = *FFI_CALL_IO[Ptr cairo_image_surface_create(I32, I32, I32), format, width, height];
+    pure $ Surface::_create_from_handle(handle)
 );
 
 get_data : Surface -> IO (Array U8);

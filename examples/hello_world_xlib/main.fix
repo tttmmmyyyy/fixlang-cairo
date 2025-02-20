@@ -9,7 +9,7 @@ main = (
     let event_mask = EventMask::key_press;
     window.select_input(event_mask);;
     
-    let surface = XlibSurface::create_front_surface(window);
+    let surface = *XlibSurface::create_front_surface(window);
     let cairo = *Cairo::create(surface);
 
     cairo.select_font_face("serif", FontSlant::normal, FontWeight::bold);;

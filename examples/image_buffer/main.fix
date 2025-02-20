@@ -24,7 +24,7 @@ main = (
 
     // Create the image surface from the image buffer.
     let size_I32 = (size.@0.to_I32, size.@1.to_I32);
-    let surface = ImageSurface::create(Format::argb, size_I32);
+    let surface = *ImageSurface::create(Format::argb, size_I32);
     surface.write_data(image);;
 
     // Edit the image using Cairo.
