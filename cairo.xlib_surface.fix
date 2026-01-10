@@ -31,14 +31,14 @@ destroy_window = |window| (
 create_front_surface : Window -> IO Surface;
 create_front_surface = |window| (
     let handle = *FFI_CALL_IO[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, window.@_window_id, window.@width, window.@height];
-    pure $ Surface::_create_from_handle(handle)
+    Surface::_create_from_handle(handle)
 );
 
 create_back_surface : Window -> IO Surface;
 create_back_surface = |window| (
     let back_buffer = *FFI_CALL_IO[U64 XdbeAllocateBackBufferName(Ptr, U64, U8), window.@_display, window.@_window_id, XbeSwapAction::undefined];
     let handle = *FFI_CALL_IO[Ptr cairo_fixlang_xlib_surface_create_x_surface(Ptr, U64, I32, I32), window.@_display, back_buffer, window.@width, window.@height];
-    pure $ Surface::_create_from_handle(handle)
+    Surface::_create_from_handle(handle)
 );
 
 swap_buffers : XbeSwapAction -> Window -> IO ();
@@ -55,7 +55,7 @@ flush = |window| FFI_CALL_IO[() XFlush(Ptr), window.@_display];
 next_event : Window -> IO Event;
 next_event = |window| (
     let event_ptr = *FFI_CALL_IO[Ptr cairo_fixlang_xlib_next_event(Ptr), window.@_display];
-    let event = Destructor::make(event_ptr, |event_ptr| FFI_CALL_IO[() cairo_fixlang_xlib_free_event(Ptr), event_ptr];; pure $ nullptr);
+    let event = *Destructor::make(event_ptr, |event_ptr| FFI_CALL_IO[() cairo_fixlang_xlib_free_event(Ptr), event_ptr];; pure $ nullptr);
     event.borrow_io(|event_ptr| 
         let event_type = FFI_CALL[I32 cairo_fixlang_xlib_event_type(Ptr), event_ptr];
         if event_type == Event::_expose_id {

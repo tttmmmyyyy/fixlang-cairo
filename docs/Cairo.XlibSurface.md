@@ -1,283 +1,475 @@
-# `module Cairo.XlibSurface`
+# Cairo.XlibSurface
+
+Defined in cairo-fix@0.2.1
+
+## Values
+
+### namespace Cairo.XlibSurface
+
+#### create_back_surface
+
+Type: `Cairo.XlibSurface::Window -> Std::IO Cairo::Surface`
+
+#### create_front_surface
+
+Type: `Cairo.XlibSurface::Window -> Std::IO Cairo::Surface`
+
+#### create_simple_window
+
+Type: `(Std::I64, Std::I64) -> Std::IO Cairo.XlibSurface::Window`
+
+#### destroy_window
+
+Type: `Cairo.XlibSurface::Window -> Std::IO ()`
+
+#### events_queued
+
+Type: `Cairo.XlibSurface::QueuedMode -> Cairo.XlibSurface::Window -> Std::IO Std::I64`
+
+#### flush
+
+Type: `Cairo.XlibSurface::Window -> Std::IO ()`
+
+#### keycode_to_keysym
+
+Type: `Cairo.XlibSurface::KeyCode -> Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::KeySym`
+
+#### next_event
+
+Type: `Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::Event`
+
+#### select_input
+
+Type: `Cairo.XlibSurface::EventMask -> Cairo.XlibSurface::Window -> Std::IO ()`
+
+#### string_to_keysym
+
+Type: `Std::String -> Cairo.XlibSurface::KeySym`
+
+#### swap_buffers
+
+Type: `Cairo.XlibSurface::XbeSwapAction -> Cairo.XlibSurface::Window -> Std::IO ()`
+
+### namespace Cairo.XlibSurface::EventMask
+
+#### button_press
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### button_release
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### exposure
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### key_press
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### key_release
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### pointer_motion
+
+Type: `Cairo.XlibSurface::EventMask`
+
+#### structure_notify
+
+Type: `Cairo.XlibSurface::EventMask`
+
+### namespace Cairo.XlibSurface::QueuedMode
+
+#### after_flush
+
+Type: `Cairo.XlibSurface::QueuedMode`
+
+#### already
+
+Type: `Cairo.XlibSurface::QueuedMode`
+
+#### reading
+
+Type: `Cairo.XlibSurface::QueuedMode`
+
+### namespace Cairo.XlibSurface::XbeSwapAction
+
+#### background
+
+Type: `Cairo.XlibSurface::XbeSwapAction`
+
+#### copied
+
+Type: `Cairo.XlibSurface::XbeSwapAction`
+
+#### undefined
+
+Type: `Cairo.XlibSurface::XbeSwapAction`
+
+#### untouched
+
+Type: `Cairo.XlibSurface::XbeSwapAction`
 
 ## Types and aliases
 
-### `namespace Cairo.XlibSurface`
+### namespace Cairo.XlibSurface
 
-#### `type BackBufferId = Std::U64`
+#### BackBufferId
 
-#### `type DisplayHandle = Std::Ptr`
+Defined as: `type BackBufferId = Std::U64`
 
-#### `type Event = unbox union { ...variants... }`
+#### DisplayHandle
 
-##### variant `key_press : Cairo.XlibSurface::Event::KeyEvent`
+Defined as: `type DisplayHandle = Std::Ptr`
 
-##### variant `key_release : Cairo.XlibSurface::Event::KeyEvent`
+#### Event
 
-##### variant `button_press : Cairo.XlibSurface::Event::ButtonEvent`
+Defined as: `type Event = unbox union { ...variants... }`
 
-##### variant `button_release : Cairo.XlibSurface::Event::ButtonEvent`
+##### variant `key_press`
 
-##### variant `motion_notify : Cairo.XlibSurface::Event::MotionEvent`
+Type: `Cairo.XlibSurface::Event::KeyEvent`
 
-##### variant `expose : Cairo.XlibSurface::Event::ExposeEvent`
+##### variant `key_release`
 
-##### variant `destroy_notify : Cairo.XlibSurface::Event::DestroyNotifyEvent`
+Type: `Cairo.XlibSurface::Event::KeyEvent`
 
-##### variant `unimplemented : ()`
+##### variant `button_press`
 
-#### `type EventMask = Std::U64`
+Type: `Cairo.XlibSurface::Event::ButtonEvent`
 
-#### `type KeyCode = Std::U32`
+##### variant `button_release`
 
-#### `type KeySym = Std::U64`
+Type: `Cairo.XlibSurface::Event::ButtonEvent`
 
-#### `type QueuedMode = Std::I32`
+##### variant `motion_notify`
 
-#### `type Window = box struct { ...fields... }`
+Type: `Cairo.XlibSurface::Event::MotionEvent`
 
-##### field `_display : Cairo.XlibSurface::DisplayHandle`
+##### variant `expose`
 
-##### field `_window_id : Cairo.XlibSurface::WindowId`
+Type: `Cairo.XlibSurface::Event::ExposeEvent`
 
-##### field `width : Std::I32`
+##### variant `destroy_notify`
 
-##### field `height : Std::I32`
+Type: `Cairo.XlibSurface::Event::DestroyNotifyEvent`
 
-#### `type WindowId = Std::U64`
+##### variant `unimplemented`
 
-#### `type XbeSwapAction = Std::U8`
+Type: `()`
 
-### `namespace Cairo.XlibSurface::Event`
+#### EventMask
 
-#### `type ButtonEvent = box struct { ...fields... }`
+Defined as: `type EventMask = Std::U64`
 
-##### field `type_ : Std::I32`
+#### KeyCode
 
-##### field `serial : Std::U64`
+Defined as: `type KeyCode = Std::U32`
 
-##### field `send_event : Std::I32`
+#### KeySym
 
-##### field `_display : Std::Ptr`
+Defined as: `type KeySym = Std::U64`
 
-##### field `_window : Std::U64`
+#### QueuedMode
 
-##### field `_root : Std::U64`
+Defined as: `type QueuedMode = Std::I32`
 
-##### field `_subwindow : Std::U64`
+#### Window
 
-##### field `time : Std::U64`
+Defined as: `type Window = box struct { ...fields... }`
 
-##### field `x : Std::I32`
+##### field `_display`
 
-##### field `y : Std::I32`
+Type: `Cairo.XlibSurface::DisplayHandle`
 
-##### field `x_root : Std::I32`
+##### field `_window_id`
 
-##### field `y_root : Std::I32`
+Type: `Cairo.XlibSurface::WindowId`
 
-##### field `state : Std::U64`
+##### field `width`
 
-##### field `button : Std::U32`
+Type: `Std::I32`
 
-##### field `same_screen : Std::I32`
+##### field `height`
 
-#### `type DestroyNotifyEvent = box struct { ...fields... }`
+Type: `Std::I32`
 
-##### field `type_ : Std::I32`
+#### WindowId
 
-##### field `serial : Std::U64`
+Defined as: `type WindowId = Std::U64`
 
-##### field `send_event : Std::I32`
+#### XbeSwapAction
 
-##### field `_display : Std::Ptr`
+Defined as: `type XbeSwapAction = Std::U8`
 
-##### field `_event : Std::U64`
+### namespace Cairo.XlibSurface::Event
 
-##### field `_window : Std::U64`
+#### ButtonEvent
 
-#### `type ExposeEvent = box struct { ...fields... }`
+Defined as: `type ButtonEvent = box struct { ...fields... }`
 
-##### field `type_ : Std::I32`
+##### field `type_`
 
-##### field `serial : Std::U64`
+Type: `Std::I32`
 
-##### field `send_event : Std::I32`
+##### field `serial`
 
-##### field `_display : Std::Ptr`
+Type: `Std::U64`
 
-##### field `_window : Std::U64`
+##### field `send_event`
 
-##### field `x : Std::I32`
+Type: `Std::I32`
 
-##### field `y : Std::I32`
+##### field `_display`
 
-##### field `width : Std::I32`
+Type: `Std::Ptr`
 
-##### field `height : Std::I32`
+##### field `_window`
 
-##### field `count : Std::I32`
+Type: `Std::U64`
 
-#### `type KeyEvent = box struct { ...fields... }`
+##### field `_root`
 
-##### field `type_ : Std::I32`
+Type: `Std::U64`
 
-##### field `serial : Std::U64`
+##### field `_subwindow`
 
-##### field `send_event : Std::I32`
+Type: `Std::U64`
 
-##### field `_display : Std::Ptr`
+##### field `time`
 
-##### field `_window : Std::U64`
+Type: `Std::U64`
 
-##### field `_root : Std::U64`
+##### field `x`
 
-##### field `_subwindow : Std::U64`
+Type: `Std::I32`
 
-##### field `time : Std::U64`
+##### field `y`
 
-##### field `x : Std::I32`
+Type: `Std::I32`
 
-##### field `y : Std::I32`
+##### field `x_root`
 
-##### field `x_root : Std::I32`
+Type: `Std::I32`
 
-##### field `y_root : Std::I32`
+##### field `y_root`
 
-##### field `state : Std::U32`
+Type: `Std::I32`
 
-##### field `keycode : Std::U32`
+##### field `state`
 
-##### field `same_screen : Std::I32`
+Type: `Std::U64`
 
-#### `type MotionEvent = box struct { ...fields... }`
+##### field `button`
 
-##### field `type_ : Std::I32`
+Type: `Std::U32`
 
-##### field `serial : Std::U64`
+##### field `same_screen`
 
-##### field `send_event : Std::I32`
+Type: `Std::I32`
 
-##### field `_display : Std::Ptr`
+#### DestroyNotifyEvent
 
-##### field `_window : Std::U64`
+Defined as: `type DestroyNotifyEvent = box struct { ...fields... }`
 
-##### field `_root : Std::U64`
+##### field `type_`
 
-##### field `_subwindow : Std::U64`
+Type: `Std::I32`
 
-##### field `time : Std::U64`
+##### field `serial`
 
-##### field `x : Std::I32`
+Type: `Std::U64`
 
-##### field `y : Std::I32`
+##### field `send_event`
 
-##### field `x_root : Std::I32`
+Type: `Std::I32`
 
-##### field `y_root : Std::I32`
+##### field `_display`
 
-##### field `state : Std::U64`
+Type: `Std::Ptr`
 
-##### field `is_hint : Std::U8`
+##### field `_event`
 
-##### field `same_screen : Std::I32`
+Type: `Std::U64`
+
+##### field `_window`
+
+Type: `Std::U64`
+
+#### ExposeEvent
+
+Defined as: `type ExposeEvent = box struct { ...fields... }`
+
+##### field `type_`
+
+Type: `Std::I32`
+
+##### field `serial`
+
+Type: `Std::U64`
+
+##### field `send_event`
+
+Type: `Std::I32`
+
+##### field `_display`
+
+Type: `Std::Ptr`
+
+##### field `_window`
+
+Type: `Std::U64`
+
+##### field `x`
+
+Type: `Std::I32`
+
+##### field `y`
+
+Type: `Std::I32`
+
+##### field `width`
+
+Type: `Std::I32`
+
+##### field `height`
+
+Type: `Std::I32`
+
+##### field `count`
+
+Type: `Std::I32`
+
+#### KeyEvent
+
+Defined as: `type KeyEvent = box struct { ...fields... }`
+
+##### field `type_`
+
+Type: `Std::I32`
+
+##### field `serial`
+
+Type: `Std::U64`
+
+##### field `send_event`
+
+Type: `Std::I32`
+
+##### field `_display`
+
+Type: `Std::Ptr`
+
+##### field `_window`
+
+Type: `Std::U64`
+
+##### field `_root`
+
+Type: `Std::U64`
+
+##### field `_subwindow`
+
+Type: `Std::U64`
+
+##### field `time`
+
+Type: `Std::U64`
+
+##### field `x`
+
+Type: `Std::I32`
+
+##### field `y`
+
+Type: `Std::I32`
+
+##### field `x_root`
+
+Type: `Std::I32`
+
+##### field `y_root`
+
+Type: `Std::I32`
+
+##### field `state`
+
+Type: `Std::U32`
+
+##### field `keycode`
+
+Type: `Std::U32`
+
+##### field `same_screen`
+
+Type: `Std::I32`
+
+#### MotionEvent
+
+Defined as: `type MotionEvent = box struct { ...fields... }`
+
+##### field `type_`
+
+Type: `Std::I32`
+
+##### field `serial`
+
+Type: `Std::U64`
+
+##### field `send_event`
+
+Type: `Std::I32`
+
+##### field `_display`
+
+Type: `Std::Ptr`
+
+##### field `_window`
+
+Type: `Std::U64`
+
+##### field `_root`
+
+Type: `Std::U64`
+
+##### field `_subwindow`
+
+Type: `Std::U64`
+
+##### field `time`
+
+Type: `Std::U64`
+
+##### field `x`
+
+Type: `Std::I32`
+
+##### field `y`
+
+Type: `Std::I32`
+
+##### field `x_root`
+
+Type: `Std::I32`
+
+##### field `y_root`
+
+Type: `Std::I32`
+
+##### field `state`
+
+Type: `Std::U64`
+
+##### field `is_hint`
+
+Type: `Std::U8`
+
+##### field `same_screen`
+
+Type: `Std::I32`
 
 ## Traits and aliases
 
 ## Trait implementations
-
-## Values
-
-### `namespace Cairo.XlibSurface`
-
-#### `create_back_surface : Cairo.XlibSurface::Window -> Cairo::Surface`
-
-#### `create_front_surface : Cairo.XlibSurface::Window -> Cairo::Surface`
-
-#### `create_simple_window : (Std::I64, Std::I64) -> Std::IO Cairo.XlibSurface::Window`
-
-#### `destroy_window : Cairo.XlibSurface::Window -> Std::IO ()`
-
-#### `events_queued : Cairo.XlibSurface::QueuedMode -> Cairo.XlibSurface::Window -> Std::IO Std::I64`
-
-#### `flush : Cairo.XlibSurface::Window -> Std::IO ()`
-
-#### `keycode_to_keysym : Cairo.XlibSurface::KeyCode -> Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::KeySym`
-
-#### `next_event : Cairo.XlibSurface::Window -> Std::IO Cairo.XlibSurface::Event`
-
-#### `select_input : Cairo.XlibSurface::EventMask -> Cairo.XlibSurface::Window -> Std::IO ()`
-
-#### `string_to_keysym : Std::String -> Cairo.XlibSurface::KeySym`
-
-#### `swap_buffers : Cairo.XlibSurface::XbeSwapAction -> Cairo.XlibSurface::Window -> Std::IO ()`
-
-### `namespace Cairo.XlibSurface::Event`
-
-#### `_button_press_id : Std::I32`
-
-#### `_button_release_id : Std::I32`
-
-#### `_destroy_notify_id : Std::I32`
-
-#### `_expose_id : Std::I32`
-
-#### `_key_press_id : Std::I32`
-
-#### `_key_release_id : Std::I32`
-
-#### `_motion_notify_id : Std::I32`
-
-### `namespace Cairo.XlibSurface::Event::ButtonEvent`
-
-#### `_null : Cairo.XlibSurface::Event::ButtonEvent`
-
-### `namespace Cairo.XlibSurface::Event::DestroyNotifyEvent`
-
-#### `_null : Cairo.XlibSurface::Event::DestroyNotifyEvent`
-
-### `namespace Cairo.XlibSurface::Event::ExposeEvent`
-
-#### `_null : Cairo.XlibSurface::Event::ExposeEvent`
-
-### `namespace Cairo.XlibSurface::Event::KeyEvent`
-
-#### `_null : Cairo.XlibSurface::Event::KeyEvent`
-
-### `namespace Cairo.XlibSurface::Event::MotionEvent`
-
-#### `_null : Cairo.XlibSurface::Event::MotionEvent`
-
-### `namespace Cairo.XlibSurface::EventMask`
-
-#### `button_press : Cairo.XlibSurface::EventMask`
-
-#### `button_release : Cairo.XlibSurface::EventMask`
-
-#### `exposure : Cairo.XlibSurface::EventMask`
-
-#### `key_press : Cairo.XlibSurface::EventMask`
-
-#### `key_release : Cairo.XlibSurface::EventMask`
-
-#### `pointer_motion : Cairo.XlibSurface::EventMask`
-
-#### `structure_notify : Cairo.XlibSurface::EventMask`
-
-### `namespace Cairo.XlibSurface::QueuedMode`
-
-#### `after_flush : Cairo.XlibSurface::QueuedMode`
-
-#### `already : Cairo.XlibSurface::QueuedMode`
-
-#### `reading : Cairo.XlibSurface::QueuedMode`
-
-### `namespace Cairo.XlibSurface::XbeSwapAction`
-
-#### `background : Cairo.XlibSurface::XbeSwapAction`
-
-#### `copied : Cairo.XlibSurface::XbeSwapAction`
-
-#### `undefined : Cairo.XlibSurface::XbeSwapAction`
-
-#### `untouched : Cairo.XlibSurface::XbeSwapAction`
