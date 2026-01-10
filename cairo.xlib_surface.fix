@@ -1,6 +1,11 @@
 module Cairo.XlibSurface;
 
 import Cairo::{Surface, Surface::_create_from_handle};
+import Std::{
+    I32, I64, IO, Ptr, String, U32, U64, U8, Box::make, 
+    FFI::{borrow_boxed_io, mutate_boxed_io, Destructor::{borrow_io, make}}, Functor::map, I32::to_I64, 
+    I64::to_I32, Monad::pure, String::borrow_c_str, U64::shift_left
+};
 
 type DisplayHandle = Ptr;
 type WindowId = U64;

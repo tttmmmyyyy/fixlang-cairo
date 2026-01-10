@@ -1,6 +1,18 @@
 module Cairo;
-import Math::{sin, cos};
 
+import Math::{cos, sin};
+import Std::{
+    Array, Bool, F64, I32, I64, IO, Option, Path, Ptr, Result, String, U32, U64, 
+    Array::{fill, get_size, @, _get_ptr}, Box::{make, @value}, 
+    FFI::{
+        borrow_boxed, borrow_boxed_io, mutate_boxed, mutate_boxed_io, Destructor, 
+        Destructor::{borrow, borrow_io, make, mutate_unique}
+    }, 
+    I32::to_I64, I64::{to_I32, to_U32}, IO::unsafe_perform, Monad::pure, Option::{none, some}, 
+    Ptr::add_offset, Result::{err, ok}, 
+    String::{borrow_c_str, borrow_c_str_io, get_size, _unsafe_from_c_str_ptr}, ToString::to_string, 
+    U32::to_I64
+};
 type Cairo = unbox struct { _dtor : Destructor CairoHandle };
 
 type CairoHandle = Ptr;

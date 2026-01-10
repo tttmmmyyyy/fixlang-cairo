@@ -1,6 +1,13 @@
 module Cairo.ImageSurface;
 
-import Cairo::{Surface, Surface::*, Format, Format::stride_for_width};
+import Cairo::{
+    Format, Surface, Format::stride_for_width, 
+    Surface::{flush, mark_dirty, _borrow, _borrow_io, _create_from_handle}
+};
+import Std::{
+    undefined, Array, I32, IO, U8, Array::{empty, get_size, _unsafe_set_size}, 
+    FFI::{borrow_boxed_io, mutate_boxed_io}, I32::{to_CSizeT, to_I32}, Monad::pure, U64::to_I64
+};
 
 create : Format -> (I32, I32) -> IO Surface;
 create = |format, (width, height)| (
