@@ -2,11 +2,11 @@ module Cairo.ImageSurface;
 
 import Cairo::{
     Format, Surface, Format::stride_for_width, 
-    Surface::{flush, mark_dirty, _borrow, _borrow_io, _create_from_handle}
+    Surface::{_borrow, _borrow_io, _create_from_handle, flush, mark_dirty}
 };
 import Std::{
-    undefined, Array, I32, IO, U8, Array::{empty, get_size, _unsafe_set_size}, 
-    FFI::{borrow_boxed_io, mutate_boxed_io}, I32::{to_CSizeT, to_I32}, Monad::pure, U64::to_I64
+    undefined, Array, I32, IO, U8, Array::{@size, _unsafe_set_size, empty}, 
+    FFI::{borrow_boxed_io, mutate_boxed_io}, I32::to_I32, Monad::pure, ToCSizeT::c_size_t, ToI64::i64
 };
 
 create : Format -> (I32, I32) -> IO Surface;
@@ -22,12 +22,12 @@ get_data = |surface| (
         let w = surface.get_width;
         let h = surface.get_height;
         let stride = stride_for_width(format, w);
-        stride.to_CSizeT * h.to_CSizeT
+        stride.c_size_t * h.c_size_t
     );
     surface.flush;;
     surface._borrow_io(|handle|
         let ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
-        let (buf, _) = *Array::empty(bytes.to_I64)._unsafe_set_size(bytes.to_I64).mutate_boxed_io(|ptr|
+        let (buf, _) = *Array::empty(bytes.i64)._unsafe_set_size(bytes.i64).mutate_boxed_io(|ptr|
             FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), ptr, ptr, bytes]
         );
         pure $ buf
@@ -41,9 +41,9 @@ write_data = |data, surface| (
         let w = surface.get_width;
         let h = surface.get_height;
         let stride = stride_for_width(format, w);
-        stride.to_CSizeT * h.to_CSizeT
+        stride.c_size_t * h.c_size_t
     );
-    if data.get_size != bytes.to_I64 {
+    if data.@size != bytes.i64 {
         undefined("Data length does not match stride * height. Here, stride can be calculated by stride_for_width function.")
     };
     surface._borrow_io(|handle|
