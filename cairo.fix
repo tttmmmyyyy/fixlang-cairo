@@ -23,6 +23,9 @@ _borrow = |act, cairo| cairo.@_dtor.borrow(act);
 _borrow_io : (CairoHandle -> IO a) -> Cairo -> IO a;
 _borrow_io = |act, cairo| cairo.@_dtor.borrow_io(act);
 
+borrow_io : (CairoHandle -> IO a) -> Cairo -> IO a;
+borrow_io = _borrow_io;
+
 create : Surface -> IO Cairo;
 create = |surface| (
     surface._borrow_io(|surface| (
