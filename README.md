@@ -1,4 +1,4 @@
-# cairo-fixlang
+# cairo-fix
 
 Fix-lang binding to the Cairo graphics library.
 
