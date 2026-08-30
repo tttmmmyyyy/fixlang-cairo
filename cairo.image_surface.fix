@@ -7,7 +7,7 @@ import Cairo::{
 import Std::{
     undefined, Array, I32, IO, U8, 
     Array::{@size, _unsafe_grow_size, empty, borrow_elements_io, mutate_elements_io}, 
-    I32::to_I32, Monad::pure, ToCSizeT::c_size_t, ToI64::i64
+    Monad::pure, ToCSizeT::c_size_t, ToI32::i32, ToI64::i64
 };
 
 create : Format -> (I32, I32) -> IO Surface;
@@ -59,20 +59,20 @@ write_data = |data, surface| (
 get_format : Surface -> Format;
 get_format = |surface| (
     surface._borrow(|handle|
-        FFI_CALL[CInt cairo_image_surface_get_format(Ptr), handle].to_I32
+        FFI_CALL[CInt cairo_image_surface_get_format(Ptr), handle].i32
     )
 );
 
 get_width : Surface -> I32;
 get_width = |surface| (
     surface._borrow(|handle|
-        FFI_CALL[CInt cairo_image_surface_get_width(Ptr), handle].to_I32
+        FFI_CALL[CInt cairo_image_surface_get_width(Ptr), handle].i32
     )
 );
 
 get_height : Surface -> I32;
 get_height = |surface| (
     surface._borrow(|handle|
-        FFI_CALL[CInt cairo_image_surface_get_height(Ptr), handle].to_I32
+        FFI_CALL[CInt cairo_image_surface_get_height(Ptr), handle].i32
     )
 );
