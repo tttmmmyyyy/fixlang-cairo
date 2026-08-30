@@ -3,7 +3,8 @@ module Cairo;
 import Math::{cos, sin};
 import Std::{
     Array, Bool, F64, I32, I64, IO, Option, Path, Ptr, Result, String, U32, U64, 
-    Array::{@, @size, _get_ptr, fill}, Box::{@value, make}, 
+    Array::{@, @size, fill, borrow_elements, borrow_elements_io, mutate_elements_io}, 
+    Box::{@value, make}, 
     FFI::{
         borrow_boxed, borrow_boxed_io, mutate_boxed, mutate_boxed_io, Destructor, 
         Destructor::{borrow, borrow_io, make, mutate_unique}
@@ -144,8 +145,8 @@ set_dash : Array F64 -> F64 -> Cairo -> IO ();
 set_dash = |dashes, offset, cairo| (
     cairo._borrow_io(|cairo| ( 
         let num_dashes = dashes.@size.to_I32;
-        dashes.borrow_boxed_io(|dashes| (
-            FFI_CALL_IO[() cairo_set_dash(Ptr, Ptr, I32, F64), cairo, dashes, num_dashes, offset]
+        dashes.borrow_elements_io(|dashes_ptr| (
+            FFI_CALL_IO[() cairo_set_dash(Ptr, Ptr, I32, F64), cairo, dashes_ptr, num_dashes, offset]
         ))
     ))
 );
@@ -161,8 +162,8 @@ get_dash = |cairo| (
     let dash_count = *cairo.get_dash_count;
     let dashes = Array::fill(dash_count, 0.0);
     let offset = Box::make(0.0);
-    let (dashes, (offset, _)) = *dashes.mutate_boxed_io(|dashes| offset.mutate_boxed_io(|offset| 
-        cairo._borrow_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes, offset])
+    let (dashes, (offset, _)) = *dashes.mutate_elements_io(|dashes_ptr| offset.mutate_boxed_io(|offset_ptr| 
+        cairo._borrow_io(|cairo| FFI_CALL_IO[() cairo_get_dash(Ptr, Ptr, Ptr), cairo, dashes_ptr, offset_ptr])
     ));
     pure $ (dashes, offset.@value)
 );
@@ -266,12 +267,14 @@ clip_preserve = |cairo| cairo._borrow_io(|cairo| (
 
 clip_extents : Cairo -> IO (F64, F64, F64, F64);
 clip_extents = |cairo| cairo._borrow_io(|cairo| 
-    let x1 : Array F64 = Array::fill(1, 0.0);
-    let y1 : Array F64 = Array::fill(1, 0.0);
-    let x2 : Array F64 = Array::fill(1, 0.0);
-    let y2 : Array F64 = Array::fill(1, 0.0);
-    FFI_CALL_IO[() cairo_clip_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
-    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    let extents : Array F64 = Array::fill(4, 0.0);
+    let (extents, _) = *extents.mutate_elements_io(|p|
+        FFI_CALL_IO[
+            () cairo_clip_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, 
+            p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+        ]
+    );
+    pure $ (extents.@(0), extents.@(1), extents.@(2), extents.@(3))
 );
 
 in_clip : (F64, F64) -> Cairo -> IO Bool;
@@ -305,12 +308,14 @@ fill_preserve = |cairo| cairo._borrow_io(|cairo| (
 
 fill_extents : Cairo -> IO (F64, F64, F64, F64);
 fill_extents = |cairo| cairo._borrow_io(|cairo|
-    let x1 : Array F64 = Array::fill(1, 0.0);
-    let y1 : Array F64 = Array::fill(1, 0.0);
-    let x2 : Array F64 = Array::fill(1, 0.0);
-    let y2 : Array F64 = Array::fill(1, 0.0);
-    FFI_CALL_IO[() cairo_fill_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
-    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    let extents : Array F64 = Array::fill(4, 0.0);
+    let (extents, _) = *extents.mutate_elements_io(|p|
+        FFI_CALL_IO[
+            () cairo_fill_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, 
+            p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+        ]
+    );
+    pure $ (extents.@(0), extents.@(1), extents.@(2), extents.@(3))
 );
 
 in_fill : (F64, F64) -> Cairo -> IO Bool;
@@ -363,12 +368,14 @@ stroke_preserve = |cairo| cairo._borrow_io(|cairo| (
 
 stroke_extents : Cairo -> IO (F64, F64, F64, F64);
 stroke_extents = |cairo| cairo._borrow_io(|cairo|
-    let x1 : Array F64 = Array::fill(1, 0.0);
-    let y1 : Array F64 = Array::fill(1, 0.0);
-    let x2 : Array F64 = Array::fill(1, 0.0);
-    let y2 : Array F64 = Array::fill(1, 0.0);
-    FFI_CALL_IO[() cairo_stroke_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, x1._get_ptr, y1._get_ptr, x2._get_ptr, y2._get_ptr];;
-    pure $ (x1.@(0), y1.@(0), x2.@(0), y2.@(0))
+    let extents : Array F64 = Array::fill(4, 0.0);
+    let (extents, _) = *extents.mutate_elements_io(|p|
+        FFI_CALL_IO[
+            () cairo_stroke_extents(Ptr, Ptr, Ptr, Ptr, Ptr), cairo, 
+            p, p.add_offset(8), p.add_offset(8 * 2), p.add_offset(8 * 3)
+        ]
+    );
+    pure $ (extents.@(0), extents.@(1), extents.@(2), extents.@(3))
 );
 
 in_stroke : (F64, F64) -> Cairo -> IO Bool;
@@ -502,8 +509,8 @@ glyph_path : Array Glyph -> Cairo -> IO ();
 glyph_path = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.@size.to_I32;
-        glyphs.borrow_boxed_io(|glyphs| (
-            FFI_CALL_IO[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
+        glyphs.borrow_elements_io(|glyphs_ptr| (
+            FFI_CALL_IO[() cairo_glyph_path(Ptr, Ptr, I32), cairo, glyphs_ptr, num_glyphs]
         ))
     ))
 );
@@ -743,8 +750,8 @@ show_glyphs : Array Glyph -> Cairo -> IO ();
 show_glyphs = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let num_glyphs = glyphs.@size.to_I32;
-        glyphs.borrow_boxed_io(|glyphs| (
-            FFI_CALL_IO[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs, num_glyphs]
+        glyphs.borrow_elements_io(|glyphs_ptr| (
+            FFI_CALL_IO[() cairo_show_glyphs(Ptr, Ptr, I32), cairo, glyphs_ptr, num_glyphs]
         ))
     ))
 );
@@ -756,9 +763,9 @@ show_text_glyphs = |text, glyphs, clusters, flags, cairo| (
         text.borrow_c_str_io(|text| (
             let num_glyphs = glyphs.@size.to_I32;
             let num_clusters = clusters.@size.to_I32;
-            glyphs.borrow_boxed_io(|glyphs| (
-                clusters.borrow_boxed_io(|clusters| (
-                    FFI_CALL_IO[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs, num_glyphs, clusters, num_clusters, flags]
+            glyphs.borrow_elements_io(|glyphs_ptr| (
+                clusters.borrow_elements_io(|clusters_ptr| (
+                    FFI_CALL_IO[() cairo_show_text_glyphs(Ptr, Ptr, I32, Ptr, I32, Ptr, I32, U32), cairo, text, text_len, glyphs_ptr, num_glyphs, clusters_ptr, num_clusters, flags]
                 ))
             ))
         ))
@@ -794,9 +801,9 @@ glyph_extents = |glyphs, cairo| (
     cairo._borrow_io(|cairo| (
         let extents = TextExtents::create;
         let num_glyphs = glyphs.@size.to_I32;
-        let (extents, _) = *glyphs.borrow_boxed_io(|glyphs| (
+        let (extents, _) = *glyphs.borrow_elements_io(|glyphs_ptr| (
             extents._mutate_io(|extents| (
-                FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs, num_glyphs, extents]
+                FFI_CALL_IO[() cairo_glyph_extents(Ptr, Ptr, I32, Ptr), cairo, glyphs_ptr, num_glyphs, extents]
             ))
         ));
         pure $ extents
@@ -880,7 +887,7 @@ namespace Pattern {
     get_color_stop_rgba : I32 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
     get_color_stop_rgba = |index, pattern| pattern._borrow_io(|pattern| (
         let rgba = Array::fill(4, 0.0);
-        let (rgba, status) = *rgba.mutate_boxed_io(|p|
+        let (rgba, status) = *rgba.mutate_elements_io(|p|
             FFI_CALL_IO[
                 I32 cairo_pattern_get_color_stop_rgba(Ptr, I32, Ptr, Ptr, Ptr, Ptr), 
                 pattern, index, 
@@ -909,7 +916,7 @@ namespace Pattern {
     get_rgba : Pattern -> IO (Result Status (F64, F64, F64, F64));
     get_rgba = |pattern| pattern._borrow_io(|pattern| (
         let rgba = Array::fill(4, 0.0);
-        let (rgba, status) = *rgba.mutate_boxed_io(|p| 
+        let (rgba, status) = *rgba.mutate_elements_io(|p| 
             FFI_CALL_IO[
                 I32 cairo_pattern_get_rgba(Ptr, Ptr, Ptr, Ptr, Ptr), 
                 pattern, 
@@ -955,7 +962,7 @@ namespace Pattern {
     get_linear_points : Pattern -> IO (Result Status ((F64, F64), (F64, F64)));
     get_linear_points = |pattern| pattern._borrow_io(|pattern| (
         let coords = Array::fill(4, 0.0);
-        let (coords, status) = *coords.mutate_boxed_io(|p|
+        let (coords, status) = *coords.mutate_elements_io(|p|
             FFI_CALL_IO[
                 I32 cairo_pattern_get_linear_points(Ptr, Ptr, Ptr, Ptr, Ptr), 
                 pattern, 
@@ -978,7 +985,7 @@ namespace Pattern {
     get_radial_circles : Pattern -> IO (Result Status ((F64, F64, F64), (F64, F64, F64)));
     get_radial_circles = |pattern| pattern._borrow_io(|pattern| (
         let coords = Array::fill(6, 0.0);
-        let (coords, status) = *coords.mutate_boxed_io(|p|
+        let (coords, status) = *coords.mutate_elements_io(|p|
             FFI_CALL_IO[
                 I32 cairo_pattern_get_radial_circles(Ptr, Ptr, Ptr, Ptr, Ptr, Ptr, Ptr), 
                 pattern, 
@@ -1074,7 +1081,7 @@ namespace Pattern {
     mesh_get_control_point : I64 -> Pattern -> IO (Result Status (F64, F64));
     mesh_get_control_point = |corner, pattern| pattern._borrow_io(|pattern| (
         let xy = Array::fill(2, 0.0);
-        let (xy, status) = *xy.mutate_boxed_io(|p| 
+        let (xy, status) = *xy.mutate_elements_io(|p| 
             FFI_CALL_IO[I32 cairo_mesh_pattern_get_control_point(Ptr, U32, Ptr, Ptr), pattern, corner.to_U32, p, p.add_offset(8)]
         );
         if status == Status::success {
@@ -1087,7 +1094,7 @@ namespace Pattern {
     mesh_get_corner_color_rgba : I64 -> Pattern -> IO (Result Status (F64, F64, F64, F64));
     mesh_get_corner_color_rgba = |corner, pattern| pattern._borrow_io(|pattern| (
         let rgba = Array::fill(4, 0.0);
-        let (rgba, status) = *rgba.mutate_boxed_io(|p| 
+        let (rgba, status) = *rgba.mutate_elements_io(|p| 
             FFI_CALL_IO[
                 I32 cairo_mesh_pattern_get_corner_color_rgba(Ptr, U32, Ptr, Ptr, Ptr, Ptr, Ptr),
                 pattern, corner.to_U32,
@@ -1339,7 +1346,7 @@ namespace Region {
     create_rectangles : Array RectangleInt -> Region;
     create_rectangles = |rects| do {
         let len = rects.@size;
-        let region = *rects.borrow_boxed_io(|handles| FFI_CALL_IO[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
+        let region = *rects.borrow_elements_io(|handles| FFI_CALL_IO[Ptr cairo_region_create_rectangles(Ptr, I32), handles, len.to_I32]);
         Region::_create_from_handle(region)
     }.unsafe_perform;
 
@@ -1769,8 +1776,8 @@ namespace ScaledFont {
     glyph_extents = |glyphs, font| (
         let len = glyphs.@size;
         let extents = TextExtents { x_bearing : 0.0, y_bearing : 0.0, width : 0.0, height : 0.0, x_advance : 0.0, y_advance : 0.0 };
-        let (extents, _) = glyphs.borrow_boxed(|glyphs| (font._borrow(|font| extents._mutate(|extents| (
-                FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs, len.to_I32, extents]
+        let (extents, _) = glyphs.borrow_elements(|glyphs_ptr| (font._borrow(|font| extents._mutate(|extents| (
+                FFI_CALL_IO[() cairo_scaled_font_glyph_extents(Ptr, Ptr, I32, Ptr), font, glyphs_ptr, len.to_I32, extents]
             ))
         )));
         extents
