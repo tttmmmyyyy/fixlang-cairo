@@ -17,6 +17,9 @@ preliminary_commands = [
     ],
 ]
 
+[build.test]
+files = ["test.fix"]
+
 [[dependencies]]
 name = "math"
 version = "2.0.0"
