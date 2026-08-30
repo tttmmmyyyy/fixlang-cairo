@@ -1,6 +1,6 @@
 # Cairo.ImageSurface
 
-Defined in cairo-fix@0.2.1
+Defined in cairo-fix@0.4.0
 
 ## Values
 
