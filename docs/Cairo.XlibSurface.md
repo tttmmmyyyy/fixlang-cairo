@@ -1,6 +1,6 @@
 # Cairo.XlibSurface
 
-Defined in cairo-fix@0.2.1
+Defined in cairo-fix@0.4.0
 
 ## Values
 
@@ -180,14 +180,6 @@ Defined as: `type QueuedMode = Std::I32`
 
 Defined as: `type Window = box struct { ...fields... }`
 
-##### field `_display`
-
-Type: `Cairo.XlibSurface::DisplayHandle`
-
-##### field `_window_id`
-
-Type: `Cairo.XlibSurface::WindowId`
-
 ##### field `width`
 
 Type: `Std::I32`
@@ -221,22 +213,6 @@ Type: `Std::U64`
 ##### field `send_event`
 
 Type: `Std::I32`
-
-##### field `_display`
-
-Type: `Std::Ptr`
-
-##### field `_window`
-
-Type: `Std::U64`
-
-##### field `_root`
-
-Type: `Std::U64`
-
-##### field `_subwindow`
-
-Type: `Std::U64`
 
 ##### field `time`
 
@@ -286,18 +262,6 @@ Type: `Std::U64`
 
 Type: `Std::I32`
 
-##### field `_display`
-
-Type: `Std::Ptr`
-
-##### field `_event`
-
-Type: `Std::U64`
-
-##### field `_window`
-
-Type: `Std::U64`
-
 #### ExposeEvent
 
 Defined as: `type ExposeEvent = box struct { ...fields... }`
@@ -313,14 +277,6 @@ Type: `Std::U64`
 ##### field `send_event`
 
 Type: `Std::I32`
-
-##### field `_display`
-
-Type: `Std::Ptr`
-
-##### field `_window`
-
-Type: `Std::U64`
 
 ##### field `x`
 
@@ -357,22 +313,6 @@ Type: `Std::U64`
 ##### field `send_event`
 
 Type: `Std::I32`
-
-##### field `_display`
-
-Type: `Std::Ptr`
-
-##### field `_window`
-
-Type: `Std::U64`
-
-##### field `_root`
-
-Type: `Std::U64`
-
-##### field `_subwindow`
-
-Type: `Std::U64`
 
 ##### field `time`
 
@@ -421,22 +361,6 @@ Type: `Std::U64`
 ##### field `send_event`
 
 Type: `Std::I32`
-
-##### field `_display`
-
-Type: `Std::Ptr`
-
-##### field `_window`
-
-Type: `Std::U64`
-
-##### field `_root`
-
-Type: `Std::U64`
-
-##### field `_subwindow`
-
-Type: `Std::U64`
 
 ##### field `time`
 

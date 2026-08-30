@@ -1,6 +1,6 @@
 # Cairo
 
-Defined in cairo-fix@0.2.1
+Defined in cairo-fix@0.4.0
 
 ## Values
 
@@ -17,6 +17,10 @@ Type: `(Std::F64, Std::F64) -> Std::F64 -> Std::F64 -> Std::F64 -> Cairo::Cairo 
 #### arc_negative
 
 Type: `(Std::F64, Std::F64) -> Std::F64 -> Std::F64 -> Std::F64 -> Cairo::Cairo -> Std::IO ()`
+
+#### borrow_io
+
+Type: `(Cairo::CairoHandle -> Std::IO a) -> Cairo::Cairo -> Std::IO a`
 
 #### clip
 
@@ -1428,10 +1432,6 @@ Defined as: `type Antialias = Std::I32`
 
 Defined as: `type Cairo = unbox struct { ...fields... }`
 
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::CairoHandle`
-
 #### CairoHandle
 
 Defined as: `type CairoHandle = Std::Ptr`
@@ -1480,17 +1480,9 @@ Type: `Std::F64`
 
 Defined as: `type FontFace = unbox struct { ...fields... }`
 
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::FontFace::FontFaceHandle`
-
 #### FontOptions
 
 Defined as: `type FontOptions = unbox struct { ...fields... }`
-
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::FontOptions::FontOptionsHandle`
 
 #### FontSlant
 
@@ -1580,17 +1572,9 @@ Defined as: `type Overlap = Std::I32`
 
 Defined as: `type Path = unbox struct { ...fields... }`
 
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::Path::PathHandle`
-
 #### Pattern
 
 Defined as: `type Pattern = unbox struct { ...fields... }`
-
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::Pattern::PatternHandle`
 
 #### PatternType
 
@@ -1620,25 +1604,13 @@ Type: `Std::I32`
 
 Defined as: `type RectangleList = unbox struct { ...fields... }`
 
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::RectangleList::RectangleListHandle`
-
 #### Region
 
 Defined as: `type Region = unbox struct { ...fields... }`
 
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::Region::RegionHandle`
-
 #### ScaledFont
 
 Defined as: `type ScaledFont = unbox struct { ...fields... }`
-
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::ScaledFont::ScaledFontHandle`
 
 #### Status
 
@@ -1651,10 +1623,6 @@ Defined as: `type SubpixelOrder = Std::I32`
 #### Surface
 
 Defined as: `type Surface = unbox struct { ...fields... }`
-
-##### field `_dtor`
-
-Type: `Std::FFI::Destructor Cairo::Surface::SurfaceHandle`
 
 #### TextCluster
 

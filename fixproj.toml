@@ -1,6 +1,7 @@
 [general]
 name = "cairo-fix"
-version = "0.3.0"
+version = "0.4.0"
+fix_version = "1.5.0"
 
 [build]
 files = ["cairo.fix", "cairo.image_surface.fix", "cairo.xlib_surface.fix"]
@@ -16,7 +17,10 @@ preliminary_commands = [
     ],
 ]
 
+[build.test]
+files = ["test.fix"]
+
 [[dependencies]]
 name = "math"
-version = "1.0.0"
+version = "2.0.0"
 git = { url = "https://github.com/tttmmmyyyy/fixlang-math.git" }

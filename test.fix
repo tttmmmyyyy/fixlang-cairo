@@ -1,0 +1,21 @@
+module Test;
+
+import Cairo::{Format, Format::{argb, stride_for_width}};
+import Cairo.ImageSurface::{create, get_data, write_data};
+import Std::{
+    Array, IO, U8, Array::{from_map, @size}, Debug::assert_eq, ToI32::i32, ToI64::i64, ToU8::u8
+};
+
+// An image surface hands back through `get_data` the bytes `write_data` put into it.
+test : IO ();
+test = (
+    let width = 4;
+    let height = 4;
+    let stride = stride_for_width(argb, width.i32).i64;
+    let written : Array U8 = Array::from_map(stride * height, |i| (i % 251).u8);
+    let surface = *create(argb, (width.i32, height.i32));
+    surface.write_data(written);;
+    let read = *surface.get_data;
+    assert_eq(|_| "the length of the data read back", read.@size, written.@size);;
+    assert_eq(|_| "the data read back", read, written)
+);
