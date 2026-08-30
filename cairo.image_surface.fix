@@ -6,7 +6,7 @@ import Cairo::{
 };
 import Std::{
     undefined, Array, I32, IO, U8, 
-    Array::{@size, _unsafe_grow_size, empty, borrow_elements_io, mutate_elements_io}, 
+    Array::{@size, fill, borrow_elements_io, mutate_elements_io}, 
     Monad::pure, ToCSizeT::c_size_t, ToI32::i32, ToI64::i64
 };
 
@@ -28,7 +28,7 @@ get_data = |surface| (
     surface.flush;;
     surface._borrow_io(|handle|
         let surface_ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
-        let (buf, _) = *Array::empty(bytes.i64)._unsafe_grow_size(bytes.i64).mutate_elements_io(|buf_ptr|
+        let (buf, _) = *Array::fill(bytes.i64, 0_U8).mutate_elements_io(|buf_ptr|
             FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), buf_ptr, surface_ptr, bytes]
         );
         pure $ buf
