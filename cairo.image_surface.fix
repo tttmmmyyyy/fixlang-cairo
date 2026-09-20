@@ -29,7 +29,7 @@ get_data = |surface| (
     surface._borrow_io(|handle|
         let surface_ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
         let (buf, _) = *Array::fill(bytes.i64, 0_U8).mutate_elements_io(|buf_ptr|
-            FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), buf_ptr, surface_ptr, bytes]
+            FFI_CALL_IO[() memcpy(Ptr, Ptr, I64), buf_ptr, surface_ptr, bytes.i64]
         );
         pure $ buf
     )
@@ -50,7 +50,7 @@ write_data = |data, surface| (
     surface._borrow_io(|handle|
         let surface_ptr = *FFI_CALL_IO[Ptr cairo_image_surface_get_data(Ptr), handle];
         data.borrow_elements_io(|data_ptr|
-            FFI_CALL_IO[() memcpy(Ptr, Ptr, CSizeT), surface_ptr, data_ptr, bytes]
+            FFI_CALL_IO[() memcpy(Ptr, Ptr, I64), surface_ptr, data_ptr, bytes.i64]
         );;
         surface.mark_dirty
     )
