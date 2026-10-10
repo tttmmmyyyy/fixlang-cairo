@@ -9,7 +9,7 @@
 // # import Cairo;
 // let surface = *ImageSurface::create(argb, (3_I32, 2_I32));
 // let stride = stride_for_width(argb, 3_I32).i64;
-// surface.write_data(Array::fill(stride * 2, 255_U8));; // Fill the surface with opaque white.
+// surface.write_data(fill(stride * 2, 255_U8));; // Fill the surface with opaque white.
 // let data = *surface.get_data;
 // assert_eq(|_|"", data.@size, stride * 2);;
 // assert_eq(|_|"", data.@(0), 255_U8)

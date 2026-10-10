@@ -1296,7 +1296,7 @@ namespace Matrix {
     //
     // # Examples
     // ```fix
-    // let m = Matrix::init_scale((2.0, 2.0)).multiply(Matrix::init_translate((1.0, 0.0)));
+    // let m = init_scale((2.0, 2.0)).multiply(init_translate((1.0, 0.0)));
     // assert_eq(|_|"", m.transform_point((0.0, 0.0)), (2.0, 0.0))
     // ```
     multiply : Matrix -> Matrix -> Matrix;
