@@ -1,6 +1,6 @@
 # Cairo
 
-Defined in cairo-fix@0.4.2
+Defined in cairo-fix@0.4.3
 
 Binding to the cairo 2D graphics library.
 

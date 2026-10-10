@@ -1,6 +1,6 @@
 # Cairo.ImageSurface
 
-Defined in cairo-fix@0.4.2
+Defined in cairo-fix@0.4.3
 
 Image surfaces, which draw into a pixel buffer in memory.
 
