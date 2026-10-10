@@ -1,6 +1,6 @@
 # Cairo.XlibSurface
 
-Defined in cairo-fix@0.4.0
+Defined in cairo-fix@0.4.2
 
 ## Values
 
