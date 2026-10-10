@@ -1,3 +1,22 @@
+// Binding to the cairo 2D graphics library.
+//
+// Create a `Cairo` context on a surface (for example, one made by `Cairo.ImageSurface::create`), build a path on it
+// (`move_to`, `line_to`, `rectangle`, `arc`, ...), choose a color by `set_source_rgb`, and draw the path by `fill` or `stroke`.
+// `Surface::write_to_png` saves a surface to a PNG file.
+//
+// # Examples
+// ```fix
+// # import Cairo.ImageSurface;
+// let surface = *ImageSurface::create(argb, (4_I32, 4_I32));
+// let cairo = *Cairo::create(surface);
+// cairo.set_source_rgb((1.0, 1.0, 1.0));;
+// cairo.rectangle((0.0, 0.0), (2.0, 4.0));; // The corner (x, y) and the size (width, height).
+// cairo.fill;;
+// // The left half of the surface is now opaque white, and the right half stays transparent black.
+// let data = *surface.get_data;
+// assert_eq(|_|"", data.@(0), 255_U8);;
+// assert_eq(|_|"", data.@(3 * 4), 0_U8)
+// ```
 module Cairo;
 
 import Math::{cos, sin};
@@ -1274,6 +1293,12 @@ namespace Matrix {
     );
 
     // The transformation b.multiply(a) first applies the transformation a to the point and then applies the transformation b to the result.
+    //
+    // # Examples
+    // ```fix
+    // let m = Matrix::init_scale((2.0, 2.0)).multiply(Matrix::init_translate((1.0, 0.0)));
+    // assert_eq(|_|"", m.transform_point((0.0, 0.0)), (2.0, 0.0))
+    // ```
     multiply : Matrix -> Matrix -> Matrix;
     multiply = |a, b| (
         let xx = a.@xx * b.@xx + a.@yx * b.@xy;
